@@ -1,11 +1,15 @@
-# B-sure Autofiscaliteit-tool
+# B-sure × PXL · Autofiscaliteit-tool
 
 Beslissingstool voor de voertuigkeuze bij B-sure NV, ontwikkeld als deliverable van de
 graduaatsproef **"Autofiscaliteit: impact van autokosten op verworpen uitgaven bij B-sure NV"**
 (Sami Elhamdaoui, Graduaat Accounting Administration, Hogeschool PXL, 2025-2026).
 
-De tool implementeert het prototype uit Bijlage 4 van het rapport als webapplicatie, met de drie
-onderdelen uit het schema:
+De applicatie is een werkinstrument dat verder gaat dan het rapport: ze bevat een **catalogus met de
+25 bekendste bedrijfswagens in België**, een verzorgde **gecombineerde huisstijl B-sure × PXL**, en
+een pagina **/over** met het auteurschap en het verhaal achter de graduaatsproef.
+
+De tool implementeert het prototype uit Bijlage 4 van het rapport, met de drie onderdelen uit het
+schema:
 
 1. **Parameters** — aftrekkalender (Tabel 1), VAA-parameters (Tabel 2), RSZ-parameters (Tabel 3),
    VenB-tarieven en KMO-grenzen, jaarlijks bij te werken.
@@ -60,15 +64,32 @@ npm run build                # productie-build
 
 ## Database
 
-Het Supabase-project bevat vijf tabellen, aangemaakt via migraties en geseed met alle data uit het
-rapport:
+Het Supabase-project bevat zes tabellen, aangemaakt via migraties en geseed met alle data uit het
+rapport plus de wagencatalogus:
 
 - `tax_parameters` — fiscale parameters per jaar (2025-2031)
 - `bestelperiodes` — bestelperiodes met RSZ-multiplicator
 - `deduction_rules` — aftrekkalender (Tabel 1 + Bijlage 3)
-- `vehicles` — wagens, incl. de twee geanonimiseerde dossierwagens uit Bijlage 1 en een
-  PHEV-kandidaat
+- `car_catalog` — 25 populaire Belgische bedrijfswagens (richtwaarden cataloguswaarde/CO₂)
+- `vehicles` — eigen wagens (vloot of kandidaat), incl. de dossierwagens uit Bijlage 1; met
+  optionele koppeling (`catalog_id`, `merk`, `model`) naar de catalogus
 - `evaluations` — beslissingshistoriek van bewaarde vergelijkingen
+
+### Wagencatalogus
+
+De 25 modellen zijn een realistische dwarsdoorsnede van de Belgische bedrijfswagenmarkt 2025
+(19 BEV, 3 PHEV, 1 HEV, 2 fossiel), zodat de fiscale kloof tussen elektrisch en verbranding
+zichtbaar wordt. Cataloguswaarden en CO₂ zijn **indicatieve richtwaarden** die per uitvoering en
+optie variëren; de jaarlijkse autokosten worden geraamd op basis van de cataloguswaarde en zijn per
+offerte aan te passen.
+
+## Huisstijl & auteurschap
+
+De interface combineert de huisstijl van **B-sure** (diep marineblauw, sober en verzorgd, slogan
+"financieel geluk") met die van **Hogeschool PXL** (zwart en goud, `#AE9A64`). De pagina **/over**
+en de footer vermelden expliciet dat dit een graduaatsproef van **Sami Elhamdaoui** is. De tool
+gebruikt een **eigen wordmark** en geen gekopieerde officiële logo's; merknamen blijven eigendom van
+hun respectieve eigenaars en worden enkel ter situering vermeld.
 
 **Beveiliging**: de toepassing gebruikt de *publishable key* met permissieve RLS-policies, zoals
 past bij een interne demo-omgeving zonder accounts. Voor productiegebruik binnen B-sure wordt

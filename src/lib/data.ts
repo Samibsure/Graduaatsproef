@@ -2,6 +2,7 @@ import { supabase } from "./supabase";
 import { DEFAULT_CONTEXT, DEFAULT_PARAMETERS, DEFAULT_PERIODES, DEFAULT_REGELS } from "./fiscaal/defaults";
 import type {
   Bestelperiode,
+  CatalogCar,
   DeductionRule,
   FiscaleContext,
   TaxParameters,
@@ -45,6 +46,16 @@ export async function laadWagens(): Promise<Vehicle[]> {
   const { data, error } = await supabase.from("vehicles").select("*").order("created_at");
   if (error) throw new Error(`Wagens laden mislukt: ${error.message}`);
   return data as Vehicle[];
+}
+
+/** Laadt de catalogus met de bekendste bedrijfswagens, gesorteerd op populariteit. */
+export async function laadCatalogus(): Promise<CatalogCar[]> {
+  const { data, error } = await supabase
+    .from("car_catalog")
+    .select("*")
+    .order("populariteit_rang", { ascending: true, nullsFirst: false });
+  if (error) throw new Error(`Catalogus laden mislukt: ${error.message}`);
+  return data as CatalogCar[];
 }
 
 export async function bewaarWagen(wagen: Omit<Vehicle, "id"> & { id?: string }): Promise<void> {

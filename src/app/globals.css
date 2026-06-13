@@ -1,7 +1,41 @@
 @import "tailwindcss";
 
+/*
+ * Gecombineerde huisstijl B-sure × PXL
+ * - B-sure: diep marineblauw/antraciet ("ink") + wit, sober en verzorgd
+ * - PXL (huisstijl 2025): rich black + goud-accent (#AE9A64)
+ */
+:root {
+  --ink: #0b1f33;
+  --ink-700: #14304a;
+  --ink-600: #1d3e5c;
+  --gold: #ae9a64;
+  --gold-soft: #d8c79a;
+  --paper: #f6f7f9;
+  --line: #e6e9ee;
+}
+
+@theme inline {
+  --color-ink: var(--ink);
+  --color-ink-700: var(--ink-700);
+  --color-ink-600: var(--ink-600);
+  --color-gold: var(--gold);
+  --color-gold-soft: var(--gold-soft);
+  --color-paper: var(--paper);
+  --color-line: var(--line);
+}
+
 body {
-  background: #f8fafc;
-  color: #0f172a;
+  background: var(--paper);
+  color: var(--ink);
   font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+/* Subtiele goud-gradiënt voor accentvlakken */
+.bg-ink-gradient {
+  background: radial-gradient(120% 140% at 100% 0%, var(--ink-600) 0%, var(--ink) 55%);
+}
+
+.text-balance {
+  text-wrap: balance;
 }

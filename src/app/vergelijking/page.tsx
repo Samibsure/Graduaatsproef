@@ -105,9 +105,9 @@ export default function VergelijkingPagina() {
         </p>
       </div>
 
-      {fout && <p className="rounded-md bg-rose-50 px-4 py-3 text-sm text-rose-700">{fout}</p>}
+      {fout && <p className="rounded-lg bg-rose-50 px-4 py-3 text-sm text-rose-700">{fout}</p>}
 
-      <section className="rounded-xl border border-slate-200 bg-white p-5">
+      <section className="rounded-xl border border-line bg-white p-5">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <h2 className="text-sm font-semibold">Kandidaten ({kandidaten.length}/{MAX_KANDIDATEN})</h2>
@@ -120,8 +120,8 @@ export default function VergelijkingPagina() {
                     onClick={() => wissel(w.id)}
                     className={`rounded-full border px-3 py-1 text-sm font-medium transition-colors ${
                       actief
-                        ? "border-blue-900 bg-blue-900 text-white"
-                        : "border-slate-300 text-slate-600 hover:bg-slate-50"
+                        ? "border-ink bg-ink text-white"
+                        : "border-line text-slate-600 hover:bg-paper"
                     }`}
                   >
                     {w.omschrijving}
@@ -137,7 +137,7 @@ export default function VergelijkingPagina() {
             <label className="flex items-center gap-2">
               <span className="text-xs font-medium text-slate-500">Eerste gebruiksjaar</span>
               <select
-                className="rounded-md border border-slate-300 px-2 py-1.5"
+                className="rounded-lg border border-line px-2 py-1.5"
                 value={startjaar}
                 onChange={(e) => setStartjaar(Number(e.target.value))}
               >
@@ -162,12 +162,12 @@ export default function VergelijkingPagina() {
 
       {projecties.length > 0 && (
         <>
-          <section className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
+          <section className="overflow-x-auto rounded-xl border border-line bg-white">
             <h2 className="px-5 pt-4 font-semibold">
               Fiscale vergelijking · gebruiksjaar {startjaar} (cf. Tabel 4 van het rapport)
             </h2>
             <table className="mt-3 w-full text-sm">
-              <thead className="border-y border-slate-200 bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
+              <thead className="border-y border-line bg-paper text-left text-xs uppercase tracking-wide text-slate-500">
                 <tr>
                   <th className="px-5 py-2.5">Parameter</th>
                   {projecties.map((p) => (
@@ -211,12 +211,12 @@ export default function VergelijkingPagina() {
             </p>
           </section>
 
-          <section className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
+          <section className="overflow-x-auto rounded-xl border border-line bg-white">
             <h2 className="px-5 pt-4 font-semibold">
               Detail per gebruiksjaar ({startjaar}–{startjaar + 3})
             </h2>
             <table className="mt-3 w-full text-sm">
-              <thead className="border-y border-slate-200 bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
+              <thead className="border-y border-line bg-paper text-left text-xs uppercase tracking-wide text-slate-500">
                 <tr>
                   <th className="px-5 py-2.5">Wagen</th>
                   {projecties[0].jaren.map((j) => (
@@ -247,13 +247,13 @@ export default function VergelijkingPagina() {
             </p>
           </section>
 
-          <section className="rounded-xl border border-slate-200 bg-white">
+          <section className="rounded-xl border border-line bg-white">
             <h2 className="px-5 pt-4 font-semibold">
               Scoringsmatrix (cf. Tabel 5 van het rapport)
             </h2>
             <div className="overflow-x-auto">
               <table className="mt-3 w-full text-sm">
-                <thead className="border-y border-slate-200 bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
+                <thead className="border-y border-line bg-paper text-left text-xs uppercase tracking-wide text-slate-500">
                   <tr>
                     <th className="px-5 py-2.5">Criterium</th>
                     <th className="px-5 py-2.5 text-right">Weging</th>
@@ -276,7 +276,7 @@ export default function VergelijkingPagina() {
                       ))}
                     </tr>
                   ))}
-                  <tr className="bg-blue-50 font-semibold">
+                  <tr className="bg-gold/10 font-semibold">
                     <td className="px-5 py-2.5">Gewogen eindscore (op 10)</td>
                     <td className="px-5 py-2.5 text-right">100%</td>
                     {scores.map((s) => (
@@ -314,20 +314,20 @@ export default function VergelijkingPagina() {
             </div>
           </section>
 
-          <section className="rounded-xl border border-slate-200 bg-white p-5">
+          <section className="rounded-xl border border-line bg-white p-5">
             <h2 className="font-semibold">Beslissing bewaren</h2>
             <p className="mt-1 text-sm text-slate-500">
               Bewaar deze vergelijking als onderbouwing voor de directievergadering.
             </p>
             <div className="mt-3 grid gap-3 sm:grid-cols-2">
               <input
-                className="rounded-md border border-slate-300 px-3 py-1.5 text-sm"
+                className="rounded-lg border border-line px-3 py-1.5 text-sm"
                 placeholder="Titel (bv. Vervanging wagen X – juni 2026)"
                 value={titel}
                 onChange={(e) => setTitel(e.target.value)}
               />
               <input
-                className="rounded-md border border-slate-300 px-3 py-1.5 text-sm"
+                className="rounded-lg border border-line px-3 py-1.5 text-sm"
                 placeholder="Notitie / motivering (optioneel)"
                 value={notitie}
                 onChange={(e) => setNotitie(e.target.value)}
@@ -336,7 +336,7 @@ export default function VergelijkingPagina() {
             <button
               onClick={bewaarBeslissing}
               disabled={bezig}
-              className="mt-3 rounded-md bg-blue-900 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-800 disabled:opacity-50"
+              className="mt-3 rounded-lg bg-ink px-4 py-2 text-sm font-semibold text-white hover:bg-ink-700 disabled:opacity-50"
             >
               {bezig ? "Bezig…" : "Bewaar beslissing"}
             </button>
@@ -348,7 +348,7 @@ export default function VergelijkingPagina() {
       )}
 
       {evaluaties.length > 0 && (
-        <section className="rounded-xl border border-slate-200 bg-white">
+        <section className="rounded-xl border border-line bg-white">
           <h2 className="px-5 pt-4 font-semibold">Beslissingshistoriek</h2>
           <ul className="mt-2 divide-y divide-slate-100">
             {evaluaties.map((e) => (

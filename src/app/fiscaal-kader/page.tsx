@@ -75,7 +75,7 @@ export default function FiscaalKaderPagina() {
 
       <Kader titel="Tabel 1 · Aftrekbaarheidskalender per voertuigtype en aankoopjaar (2025-2031)">
         <table className="w-full text-sm">
-          <thead className="border-y border-slate-200 bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
+          <thead className="border-y border-line bg-paper text-left text-xs uppercase tracking-wide text-slate-500">
             <tr>
               {["Voertuigtype", "Bestelmoment", "2025", "2026", "2027", "2028", "2029", "2030+"].map(
                 (h) => (
@@ -126,7 +126,7 @@ export default function FiscaalKaderPagina() {
             jaarlijkse autokosten bedragen € 10.000, de aftrekbaarheid in 2026 is 50%
             (uitdoofkalender) en er is een tankkaart.
           </p>
-          <p className="rounded-md bg-slate-50 px-3 py-2 font-mono text-xs">
+          <p className="rounded-lg bg-paper px-3 py-2 font-mono text-xs">
             VU = (1 − 0,50) × 10.000 + 0,40 × VAA → het niet-aftrekbare deel (€ 5.000) plus 40% van
             het voordeel van alle aard wordt bij de belastbare grondslag gevoegd.
           </p>
@@ -141,7 +141,7 @@ export default function FiscaalKaderPagina() {
         <ul className="space-y-3 px-4 pb-4">
           {overgangsregels.map((o) => (
             <li key={o.periode} className="text-sm">
-              <p className="font-semibold text-blue-900">{o.periode}</p>
+              <p className="font-semibold text-ink">{o.periode}</p>
               <p className="mt-0.5 text-slate-600">{o.regels}</p>
             </li>
           ))}
@@ -165,7 +165,7 @@ export default function FiscaalKaderPagina() {
 
 function Kader({ titel, children }: { titel: string; children: React.ReactNode }) {
   return (
-    <section className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+    <section className="overflow-hidden rounded-xl border border-line bg-white">
       <h2 className="px-4 pb-3 pt-4 font-semibold">{titel}</h2>
       {children}
     </section>
@@ -174,7 +174,7 @@ function Kader({ titel, children }: { titel: string; children: React.ReactNode }
 
 function Formule({ tekst }: { tekst: string }) {
   return (
-    <p className="mx-4 mb-3 rounded-md bg-blue-50 px-3 py-2 text-sm font-medium text-blue-900">
+    <p className="mx-4 mb-3 rounded-lg bg-gold/10 px-3 py-2 text-sm font-medium text-ink">
       {tekst}
     </p>
   );
@@ -187,7 +187,7 @@ function Bron({ tekst }: { tekst: string }) {
 function DrieKolommen({ rijen, koppen }: { rijen: string[][]; koppen: string[] }) {
   return (
     <table className="w-full text-sm">
-      <thead className="border-y border-slate-200 bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
+      <thead className="border-y border-line bg-paper text-left text-xs uppercase tracking-wide text-slate-500">
         <tr>
           {koppen.map((h) => (
             <th key={h} className="px-4 py-2.5">

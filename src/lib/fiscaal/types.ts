@@ -38,12 +38,18 @@ export interface DeductionRule {
   aftrek_pct: number;
 }
 
+export type Categorie = "vloot" | "kandidaat";
+
 /** Invoer per wagen (tabel vehicles, cf. Bijlage 4 tabblad 2 van het rapport). */
 export interface Vehicle {
   id: string;
   omschrijving: string;
   werknemer: string | null;
   kenteken: string | null;
+  categorie: Categorie;
+  merk: string | null;
+  model: string | null;
+  catalog_id: number | null;
   voertuigtype: Voertuigtype;
   brandstof: Brandstof;
   besteldatum: string;
@@ -58,6 +64,20 @@ export interface Vehicle {
   km_per_jaar: number | null;
   flex_score: number;
   restwaarde_score: number;
+}
+
+/** Referentiemodel uit de wagencatalogus (tabel car_catalog). */
+export interface CatalogCar {
+  id: number;
+  merk: string;
+  model: string;
+  voertuigtype: Voertuigtype;
+  brandstof: Brandstof;
+  co2: number;
+  cataloguswaarde: number;
+  segment: string | null;
+  populariteit_rang: number | null;
+  opmerking: string | null;
 }
 
 /** Alle referentiedata die de rekenkern nodig heeft. */

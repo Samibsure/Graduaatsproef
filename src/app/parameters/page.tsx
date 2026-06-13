@@ -126,14 +126,14 @@ export default function ParametersPagina() {
           <button
             onClick={bewaarAlles}
             disabled={bezig}
-            className="rounded-md bg-blue-900 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-800 disabled:opacity-50"
+            className="rounded-lg bg-ink px-4 py-2 text-sm font-semibold text-white hover:bg-ink-700 disabled:opacity-50"
           >
             {bezig ? "Bezig…" : "Bewaar wijzigingen"}
           </button>
           <button
             onClick={herstel}
             disabled={bezig}
-            className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium hover:bg-slate-50 disabled:opacity-50"
+            className="rounded-lg border border-line px-4 py-2 text-sm font-medium hover:bg-paper disabled:opacity-50"
           >
             Herstel standaardwaarden
           </button>
@@ -141,15 +141,15 @@ export default function ParametersPagina() {
       </div>
 
       {melding && (
-        <p className="rounded-md bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{melding}</p>
+        <p className="rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{melding}</p>
       )}
-      {fout && <p className="rounded-md bg-rose-50 px-4 py-3 text-sm text-rose-700">{fout}</p>}
+      {fout && <p className="rounded-lg bg-rose-50 px-4 py-3 text-sm text-rose-700">{fout}</p>}
 
-      <section className="rounded-xl border border-slate-200 bg-white p-5">
+      <section className="rounded-xl border border-line bg-white p-5">
         <div className="flex items-center justify-between">
           <h2 className="font-semibold">Parameters per jaar</h2>
           <select
-            className="rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+            className="rounded-lg border border-line px-2 py-1.5 text-sm"
             value={jaar}
             onChange={(e) => setJaar(Number(e.target.value))}
           >
@@ -168,7 +168,7 @@ export default function ParametersPagina() {
                 <input
                   type="number"
                   step="any"
-                  className="w-full rounded-md border border-slate-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none"
+                  className="w-full rounded-lg border border-line px-3 py-1.5 text-sm focus:border-gold focus:outline-none"
                   value={params[veld] as number}
                   onChange={(e) => zetParam(veld, Number(e.target.value))}
                 />
@@ -178,7 +178,7 @@ export default function ParametersPagina() {
         )}
       </section>
 
-      <section className="rounded-xl border border-slate-200 bg-white p-5">
+      <section className="rounded-xl border border-line bg-white p-5">
         <h2 className="font-semibold">RSZ-multiplicator per bestelperiode (Tabel 3)</h2>
         <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {ctx?.periodes.map((p) => (
@@ -187,7 +187,7 @@ export default function ParametersPagina() {
               <input
                 type="number"
                 step="any"
-                className="w-full rounded-md border border-slate-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none"
+                className="w-full rounded-lg border border-line px-3 py-1.5 text-sm focus:border-gold focus:outline-none"
                 value={p.rsz_multiplicator}
                 onChange={(e) => zetMultiplicator(p.code, Number(e.target.value))}
               />
@@ -196,7 +196,7 @@ export default function ParametersPagina() {
         </div>
       </section>
 
-      <section className="rounded-xl border border-slate-200 bg-white p-5">
+      <section className="rounded-xl border border-line bg-white p-5">
         <h2 className="font-semibold">Aftrekkalender (Tabel 1)</h2>
         <p className="mt-1 text-sm text-slate-500">
           Aftrekbaarheid in VenB per voertuigtype en bestelperiode. “Hele gebruiksduur” geldt voor
@@ -207,10 +207,10 @@ export default function ParametersPagina() {
           if (regels.length === 0) return null;
           return (
             <div key={type} className="mt-4">
-              <h3 className="text-sm font-semibold text-blue-900">{type}</h3>
+              <h3 className="text-sm font-semibold text-ink">{type}</h3>
               <div className="mt-2 overflow-x-auto">
                 <table className="w-full text-sm">
-                  <thead className="border-y border-slate-200 bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
+                  <thead className="border-y border-line bg-paper text-left text-xs uppercase tracking-wide text-slate-500">
                     <tr>
                       <th className="px-3 py-2">Bestelperiode</th>
                       <th className="px-3 py-2">Gebruiksjaar</th>
@@ -231,7 +231,7 @@ export default function ParametersPagina() {
                             step="any"
                             min={0}
                             max={120}
-                            className="w-24 rounded-md border border-slate-300 px-2 py-1 text-right text-sm focus:border-blue-500 focus:outline-none"
+                            className="w-24 rounded-lg border border-line px-2 py-1 text-right text-sm focus:border-gold focus:outline-none"
                             value={r.aftrek_pct}
                             onChange={(e) => zetRegel(r, Number(e.target.value))}
                           />
