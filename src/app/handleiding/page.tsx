@@ -31,7 +31,7 @@ const stappen = [
     n: "4",
     titel: "Lees het advies en bewaar de beslissing",
     tekst:
-      "Onderaan krijgt elke kandidaat een eindscore op 10 en een advies: aanvaarden (≥ 7), overwegen (4–7) of afwijzen (< 4). Geef de vergelijking een titel en een korte motivering en klik ‘Bewaar beslissing’. Ze komt in de beslissingshistoriek terecht — handig als onderbouwing voor de directievergadering.",
+      "Onderaan krijgt elke kandidaat een eindscore op 10 en een advies: aanvaarden (≥ 7), overwegen (4–7) of afwijzen (< 4). Geef de vergelijking een titel en een korte motivering en klik ‘Bewaar beslissing’. Ze komt in de beslissingshistoriek terecht, handig als onderbouwing voor de directievergadering.",
     link: { href: "/vergelijking", label: "Naar het scoredashboard" },
   },
   {
@@ -51,7 +51,7 @@ export default function HandleidingPagina() {
         <h1 className="mt-4 text-3xl font-bold tracking-tight">Zo gebruik je de tool</h1>
         <p className="mt-3 max-w-2xl text-white/80">
           Een praktische gids in vijf stappen. Bedoeld voor de directie van B-sure en voor wie de
-          tool voor het eerst opent — geen voorkennis van fiscaliteit nodig.
+          tool voor het eerst opent: geen voorkennis van fiscaliteit nodig.
         </p>
       </section>
 

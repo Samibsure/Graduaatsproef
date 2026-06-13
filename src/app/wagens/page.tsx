@@ -113,7 +113,7 @@ export default function WagensPagina() {
   return (
     <div className="space-y-6">
       <SectionTitle
-        sub="Identificatie, technische gegevens, financieel en beleid per wagen — cf. Bijlage 4 van het rapport. Berekende cijfers gelden voor gebruiksjaar 2026."
+        sub="Identificatie, technische gegevens, financieel en beleid per wagen, cf. Bijlage 4 van het rapport. Berekende cijfers gelden voor gebruiksjaar 2026."
         action={
           <button
             onClick={() => setFormulier({ ...leegFormulier })}
@@ -140,7 +140,7 @@ export default function WagensPagina() {
             <div className="mt-4 rounded-xl bg-paper p-4">
               <label className="block text-sm">
                 <span className="mb-1 block text-xs font-medium text-slate-500">
-                  Snel starten — kies een model uit de catalogus (vult de technische velden voor)
+                  Snel starten: kies een model uit de catalogus (vult de technische velden voor)
                 </span>
                 <select
                   className={invoer}
@@ -152,7 +152,7 @@ export default function WagensPagina() {
                   </option>
                   {catalogus.map((c) => (
                     <option key={c.id} value={c.id}>
-                      {c.merk} {c.model} — {c.voertuigtype} · {euro(c.cataloguswaarde)}
+                      {c.merk} {c.model} · {c.voertuigtype} · {euro(c.cataloguswaarde)}
                     </option>
                   ))}
                 </select>

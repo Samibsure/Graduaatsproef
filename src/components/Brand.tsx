@@ -1,7 +1,7 @@
 /**
  * Eigen wordmark-lockup in de gecombineerde B-sure × PXL huisstijl.
  * Bewust een eigen tekstlockup (geen kopie van de officiële, handelsmerk-
- * beschermde logo's) — ink + PXL-goud. Werkt volledig offline (inline SVG).
+ * beschermde logo's), in ink + PXL-goud. Werkt volledig offline (inline SVG).
  */
 export function BrandLockup({ variant = "light" }: { variant?: "light" | "dark" }) {
   const ink = variant === "dark" ? "#ffffff" : "var(--ink)";
