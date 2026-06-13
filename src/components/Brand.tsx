@@ -12,7 +12,7 @@ export function BrandLockup({ variant = "light" }: { variant?: "light" | "dark" 
       <span className="flex flex-col">
         <span className="flex items-baseline gap-1.5">
           <span className="text-[15px] font-semibold tracking-tight" style={{ color: ink }}>
-            b&#8209;sure
+            B&#8209;sure
           </span>
           <span className="text-[11px] font-medium" style={{ color: "var(--gold)" }}>
             ×
