@@ -75,7 +75,7 @@ export default function Dashboard() {
           <div className="bs-rise">
             <Eyebrow dash>Autofiscaliteit, helder gemaakt</Eyebrow>
             <h1 className="m-0 mb-5 text-[clamp(38px,5.2vw,62px)] font-bold leading-[1.04] tracking-[-0.022em] text-ink">
-              Financieel geluk,
+              De juiste bedrijfswagen,
               <br />
               <span className="text-gold">fiscaal onderbouwd</span>
             </h1>
