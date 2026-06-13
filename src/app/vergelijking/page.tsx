@@ -14,10 +14,10 @@ import {
 import AdviesBadge from "@/components/AdviesBadge";
 import CarImage from "@/components/CarImage";
 import { Badge, Card, SectionTitle } from "@/components/ui";
-import { bewaarEvaluatie, laadEvaluaties, laadFiscaleContext, laadWagens, type Evaluatie } from "@/lib/data";
+import { bewaarEvaluatie, laadCatalogus, laadEvaluaties, laadFiscaleContext, laadWagens, type Evaluatie } from "@/lib/data";
 import { berekenProjectie } from "@/lib/fiscaal/engine";
 import { CRITERIA, scoreVergelijking } from "@/lib/fiscaal/scoring";
-import type { FiscaleContext, Projectie, Vehicle } from "@/lib/fiscaal/types";
+import type { CatalogCar, FiscaleContext, Projectie, Vehicle } from "@/lib/fiscaal/types";
 import { euro, getal, pct } from "@/lib/format";
 
 const MAX_KANDIDATEN = 3;
@@ -32,6 +32,7 @@ const adviesKleur: Record<string, string> = {
 export default function VergelijkingPagina() {
   const [ctx, setCtx] = useState<FiscaleContext | null>(null);
   const [wagens, setWagens] = useState<Vehicle[]>([]);
+  const [catalogus, setCatalogus] = useState<CatalogCar[]>([]);
   const [geselecteerd, setGeselecteerd] = useState<string[]>([]);
   const [startjaar, setStartjaar] = useState(2026);
   const [kmoTarief, setKmoTarief] = useState(false);
@@ -43,11 +44,12 @@ export default function VergelijkingPagina() {
   const [bewaard, setBewaard] = useState(false);
 
   useEffect(() => {
-    Promise.all([laadFiscaleContext(), laadWagens(), laadEvaluaties()])
-      .then(([c, w, e]) => {
+    Promise.all([laadFiscaleContext(), laadWagens(), laadEvaluaties(), laadCatalogus()])
+      .then(([c, w, e, k]) => {
         setCtx(c);
         setWagens(w);
         setEvaluaties(e);
+        setCatalogus(k);
         setGeselecteerd(w.slice(0, MAX_KANDIDATEN).map((v) => v.id));
       })
       .catch((e) => setFout(e instanceof Error ? e.message : String(e)));
@@ -100,6 +102,9 @@ export default function VergelijkingPagina() {
   const winnaar =
     scores.length > 0 ? [...scores].sort((a, b) => b.eindscore - a.eindscore)[0] : null;
   const winnaarWagen = winnaar ? kandidaten.find((w) => w.id === winnaar.vehicleId) ?? null : null;
+  const winnaarCatalog = winnaarWagen
+    ? catalogus.find((c) => c.id === winnaarWagen.catalog_id) ?? null
+    : null;
 
   return (
     <div className="space-y-6">
@@ -125,9 +130,10 @@ export default function VergelijkingPagina() {
         <Card className="flex flex-col items-center gap-5 overflow-hidden border-gold/40 sm:flex-row">
           <CarImage
             type={winnaarWagen.voertuigtype}
-            segment={null}
+            segment={winnaarCatalog?.segment ?? null}
+            imageUrl={winnaarCatalog?.image_url}
             alt={winnaar.omschrijving}
-            className="h-32 w-full shrink-0 sm:w-56"
+            className="h-32 w-full shrink-0 object-cover sm:w-56"
           />
           <div className="flex-1 px-5 pb-5 pt-0 sm:py-5 sm:pl-0">
             <Badge tint="gold">Aanbevolen keuze</Badge>

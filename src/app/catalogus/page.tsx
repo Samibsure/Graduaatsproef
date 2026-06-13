@@ -152,7 +152,8 @@ export default function CatalogusPagina() {
       <p className="text-xs text-slate-400">
         Cataloguswaarden en CO₂ zijn indicatieve richtwaarden (juni 2026) die per uitvoering en optie
         variëren. Pas ze per concrete offerte aan bij “Mijn wagens”. De jaarlijkse autokosten worden
-        hier geraamd op basis van de cataloguswaarde.
+        hier geraamd op basis van de cataloguswaarde. Modelfoto’s ter illustratie via Wikimedia
+        Commons (vrije/CC-licenties); afgebeelde uitvoeringen kunnen afwijken.
       </p>
     </div>
   );
