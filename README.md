@@ -85,8 +85,8 @@ offerte aan te passen.
 
 ## Huisstijl & auteurschap
 
-De interface combineert de huisstijl van **B-sure** (diep marineblauw, sober en verzorgd, slogan
-"financieel geluk") met die van **Hogeschool PXL** (zwart en goud, `#AE9A64`). De pagina **/over**
+De interface combineert de huisstijl van **B-sure** (diep marineblauw, sober en verzorgd) met die
+van **Hogeschool PXL** (zwart en goud, `#AE9A64`). De pagina **/over**
 en de footer vermelden expliciet dat dit een graduaatsproef van **Sami Elhamdaoui** is. De tool
 gebruikt een **eigen wordmark** en geen gekopieerde officiële logo's; merknamen blijven eigendom van
 hun respectieve eigenaars en worden enkel ter situering vermeld.

@@ -112,7 +112,7 @@ export default function OverPagina() {
       </div>
 
       <p className="text-center text-xs text-slate-400">
-        Huisstijl geïnspireerd op B-sure (“financieel geluk”) en Hogeschool PXL (zwart · goud).
+        Huisstijl geïnspireerd op B-sure en Hogeschool PXL (zwart · goud).
         Logo’s en merknamen blijven eigendom van hun respectieve eigenaars; deze tool gebruikt een
         eigen wordmark en vermeldt beide organisaties enkel ter situering van de graduaatsproef.
       </p>
