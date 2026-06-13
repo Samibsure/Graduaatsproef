@@ -77,8 +77,8 @@ export default function OverPagina() {
           </p>
           <h3 className="mt-5 text-sm font-semibold text-ink">Uitgewerkt in dit instrument</h3>
           <ul className="mt-2 space-y-1.5 text-sm text-slate-600">
-            <li>• Deelvraag 1 — het fiscale kader voor autokosten (2025-2031)</li>
-            <li>• Deelvraag 4 — een transparante, herhaalbare beslissingsmatrix</li>
+            <li>• Deelvraag 1: het fiscale kader voor autokosten (2025-2031)</li>
+            <li>• Deelvraag 4: een transparante, herhaalbare beslissingsmatrix</li>
           </ul>
         </Card>
 
@@ -86,19 +86,19 @@ export default function OverPagina() {
           <h2 className="text-lg font-semibold text-ink">Wat de tool doet</h2>
           <ul className="mt-3 space-y-2 text-sm text-slate-600">
             <li>
-              <span className="font-medium text-ink">Wagencatalogus</span> — 25 populaire
+              <span className="font-medium text-ink">Wagencatalogus</span>: 25 populaire
               bedrijfswagens met directe fiscale preview.
             </li>
             <li>
-              <span className="font-medium text-ink">Mijn wagens</span> — eigen vloot en kandidaten,
+              <span className="font-medium text-ink">Mijn wagens</span>: eigen vloot en kandidaten,
               met volledige berekening van aftrek, VAA, verworpen uitgaven en RSZ.
             </li>
             <li>
-              <span className="font-medium text-ink">Vergelijking</span> — scoringsmatrix met zes
+              <span className="font-medium text-ink">Vergelijking</span>: scoringsmatrix met zes
               gewogen criteria en een advies per kandidaat.
             </li>
             <li>
-              <span className="font-medium text-ink">Parameters</span> — jaarlijks bij te werken na
+              <span className="font-medium text-ink">Parameters</span>: jaarlijks bij te werken na
               het begrotingsakkoord.
             </li>
           </ul>

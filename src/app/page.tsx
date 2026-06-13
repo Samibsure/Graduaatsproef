@@ -128,7 +128,7 @@ export default function Dashboard() {
       {/* Vloot + kandidaten */}
       <section className="grid gap-6 lg:grid-cols-2">
         <VlootKaart titel="Huidige vloot" leeg="Nog geen vlootwagens." rijen={vloot} />
-        <VlootKaart titel="Kandidaten" leeg="Nog geen kandidaten — voeg er toe vanuit de catalogus." rijen={kandidaten} />
+        <VlootKaart titel="Kandidaten" leeg="Nog geen kandidaten. Voeg er toe vanuit de catalogus." rijen={kandidaten} />
       </section>
 
       {/* Catalogus-teaser */}
