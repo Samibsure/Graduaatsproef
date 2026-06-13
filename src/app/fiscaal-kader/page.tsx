@@ -19,11 +19,10 @@ const tabel2 = [
 ];
 
 const tabel3 = [
-  ["Indexatiecoëfficiënt", "1,6291", "+2,8% t.o.v. 2025"],
-  ["Multiplicator wagens besteld 1/7/2023 – 31/12/2026", "4", "Ongewijzigd"],
-  ["Multiplicator wagens besteld vanaf 1/1/2027", "5,5", "+ 37,5%"],
-  ["Multiplicator wagens besteld vanaf 1/1/2028", "6", "+ 50% t.o.v. 2026"],
-  ["Minimumbijdrage BEV en lage-uitstoot PHEV", "€ 42,34 / maand", "€ 508,08 / jaar"],
+  ["Indexatiecoëfficiënt", "1,6291", "+2,2% t.o.v. 2025"],
+  ["Multiplicator niet-BEV besteld vanaf 1/7/2023", "×4 in 2026", "×2,75 (2025) → ×4 (2026) → ×5,5 (2027)"],
+  ["Minimumbijdrage niet-BEV besteld vanaf 1/7/2023", "€ 42,34 / maand", "€ 508,08 / jaar"],
+  ["Basisminimum: BEV en bestellingen vóór 1/7/2023", "€ 33,93 / maand", "€ 407,16 / jaar"],
 ];
 
 const overgangsregels = [
@@ -35,17 +34,17 @@ const overgangsregels = [
   {
     periode: "1 juli 2023 – 31 december 2025",
     regels:
-      "De gramformule blijft maar plafonneert op 100% in 2025; daarna treedt de uitdoofkalender in werking (75% → 50% → 25% → 0% voor fossiel en PHEV). RSZ-multiplicator: 4.",
+      "De gramformule blijft maar plafonneert op 100% in 2025; daarna treedt de uitdoofkalender in werking (75% → 50% → 25% → 0% voor fossiel en PHEV). RSZ-multiplicator (niet-BEV) loopt per bijdragejaar op: ×2,75 (2025), ×4 (2026), ×5,5 (2027).",
   },
   {
     periode: "1 januari 2026 – 31 december 2026",
     regels:
-      "Fossiele wagens en PHEV: 0% aftrek vanaf het eerste gebruiksjaar. BEV behoudt 100% voor de hele gebruiksduur. RSZ-multiplicator: 4.",
+      "Fossiele wagens en PHEV: 0% aftrek vanaf het eerste gebruiksjaar. BEV behoudt 100% voor de hele gebruiksduur. RSZ-multiplicator niet-BEV: ×4 (bijdragejaar 2026); BEV blijft op het basisminimum.",
   },
   {
     periode: "Vanaf 1 januari 2027",
     regels:
-      "BEV start in het afbouwpad: 95% (2027), 90% (2028), 82,5% (2029), 75% (2030), 67,5% (2031). RSZ-multiplicator stijgt naar 5,5 in 2027 en 6 vanaf 2028.",
+      "BEV start in het afbouwpad: 95% (2027), 90% (2028), 82,5% (2029), 75% (2030), 67,5% (2031). RSZ-multiplicator voor niet-BEV ×5,5 vanaf bijdragejaar 2027.",
   },
 ];
 
@@ -113,7 +112,7 @@ export default function FiscaalKaderPagina() {
       </Kader>
 
       <Kader titel="Tabel 3 · CO₂-solidariteitsbijdrage 2026">
-        <Formule tekst="Maandelijkse bijdrage = ((CO₂ × 9 − 600) / 12) × indexcoëfficiënt × multiplicator, met vloerbedrag voor lage-uitstootwagens" />
+        <Formule tekst="Maandbijdrage = ((CO₂ × 9 − constante) / 12) × indexcoëfficiënt × multiplicator. Constante: 600 (diesel), 768 (benzine/CNG), 990 (LPG). Emissievrije wagens en bestellingen vóór 1/7/2023 vallen op het basisminimum, zonder multiplicator." />
         <DrieKolommen rijen={tabel3} koppen={["Parameter", "Waarde 2026", "Wijziging"]} />
         <Bron tekst="Securex (2025), RSZ (2025), Wet 25 november 2021." />
       </Kader>
