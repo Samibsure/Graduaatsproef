@@ -11,11 +11,11 @@ een pagina **/over** met het auteurschap en het verhaal achter de graduaatsproef
 De tool implementeert het prototype uit Bijlage 4 van het rapport, met de drie onderdelen uit het
 schema:
 
-1. **Parameters** — aftrekkalender (Tabel 1), VAA-parameters (Tabel 2), RSZ-parameters (Tabel 3),
+1. **Parameters**: aftrekkalender (Tabel 1), VAA-parameters (Tabel 2), RSZ-parameters (Tabel 3),
    VenB-tarieven en KMO-grenzen, jaarlijks bij te werken.
-2. **Invoer per wagen** — identificatie, technische gegevens, financieel en beleid per
+2. **Invoer per wagen**: identificatie, technische gegevens, financieel en beleid per
    kandidaat-wagen.
-3. **Scoredashboard** — automatische berekening van aftrekbaarheid, VAA, verworpen uitgaven, extra
+3. **Scoredashboard**: automatische berekening van aftrekbaarheid, VAA, verworpen uitgaven, extra
    VenB en RSZ-bijdrage; scoringsmatrix met zes gewogen criteria; vergelijkende grafiek tussen
    maximaal drie kandidaten; aanbeveling *aanvaarden / overwegen / afwijzen*; beslissingshistoriek.
 
@@ -25,8 +25,8 @@ schema:
 | --- | --- |
 | Frontend | Next.js 15 (App Router), TypeScript, Tailwind CSS, Recharts |
 | Rekenkern | Pure TypeScript-functies in `src/lib/fiscaal/` (geen UI-afhankelijkheid) |
-| Data | Supabase (PostgreSQL) — project "Graduaatsproef" |
-| Tests | Vitest — `src/lib/fiscaal/*.test.ts` |
+| Data | Supabase (PostgreSQL), project "Graduaatsproef" |
+| Tests | Vitest, `src/lib/fiscaal/*.test.ts` |
 | Hosting | Vercel |
 
 ### Rekenkern
@@ -67,13 +67,13 @@ npm run build                # productie-build
 Het Supabase-project bevat zes tabellen, aangemaakt via migraties en geseed met alle data uit het
 rapport plus de wagencatalogus:
 
-- `tax_parameters` — fiscale parameters per jaar (2025-2031)
-- `bestelperiodes` — bestelperiodes met RSZ-multiplicator
-- `deduction_rules` — aftrekkalender (Tabel 1 + Bijlage 3)
-- `car_catalog` — 25 populaire Belgische bedrijfswagens (richtwaarden cataloguswaarde/CO₂)
-- `vehicles` — eigen wagens (vloot of kandidaat), incl. de dossierwagens uit Bijlage 1; met
+- `tax_parameters`: fiscale parameters per jaar (2025-2031)
+- `bestelperiodes`: bestelperiodes met RSZ-multiplicator
+- `deduction_rules`: aftrekkalender (Tabel 1 + Bijlage 3)
+- `car_catalog`: 25 populaire Belgische bedrijfswagens (richtwaarden cataloguswaarde/CO₂)
+- `vehicles`: eigen wagens (vloot of kandidaat), incl. de dossierwagens uit Bijlage 1; met
   optionele koppeling (`catalog_id`, `merk`, `model`) naar de catalogus
-- `evaluations` — beslissingshistoriek van bewaarde vergelijkingen
+- `evaluations`: beslissingshistoriek van bewaarde vergelijkingen
 
 ### Wagencatalogus
 
