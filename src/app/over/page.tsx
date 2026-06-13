@@ -8,7 +8,7 @@ export const metadata = {
 
 export default function OverPagina() {
   return (
-    <div className="space-y-8">
+    <div className="mx-auto max-w-[1100px] space-y-8 px-6 py-12">
       <section className="bg-ink-gradient relative overflow-hidden rounded-3xl px-6 py-10 text-white sm:px-10">
         <div className="absolute -right-8 -top-8 opacity-20">
           <BSureMark size={150} />

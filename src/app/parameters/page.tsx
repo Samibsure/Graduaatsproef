@@ -115,27 +115,32 @@ export default function ParametersPagina() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+    <div className="mx-auto max-w-[1100px] space-y-6 px-6 py-[52px]">
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold">Fiscale parameters</h1>
-          <p className="mt-1 text-sm text-slate-500">
-            Jaarlijks bij te werken na het federale begrotingsakkoord (aanbeveling 5 van het
-            rapport). Wijzigingen werken meteen door in alle berekeningen.
+          <div className="mb-3 text-[12px] font-bold uppercase tracking-[0.16em] text-gold">
+            Parameters
+          </div>
+          <h1 className="m-0 text-[clamp(28px,4vw,44px)] font-bold tracking-[-0.02em] text-ink">
+            Fiscale parameters
+          </h1>
+          <p className="mt-2.5 max-w-[44em] text-[16.5px] text-ink-700">
+            Jaarlijks bij te werken na het federale begrotingsakkoord. Wijzigingen werken meteen
+            door in alle berekeningen.
           </p>
         </div>
         <div className="flex gap-3">
           <button
             onClick={bewaarAlles}
             disabled={bezig}
-            className="rounded-lg bg-ink px-4 py-2 text-sm font-semibold text-white hover:bg-ink-700 disabled:opacity-50"
+            className="inline-flex h-[46px] items-center rounded-[11px] bg-gold px-5 text-[14.5px] font-bold text-ink transition-colors hover:bg-gold-hover disabled:opacity-50"
           >
             {bezig ? "Bezig…" : "Bewaar wijzigingen"}
           </button>
           <button
             onClick={herstel}
             disabled={bezig}
-            className="rounded-lg border border-line px-4 py-2 text-sm font-medium hover:bg-paper disabled:opacity-50"
+            className="inline-flex h-[46px] items-center rounded-[11px] border-[1.5px] border-line px-5 text-[14.5px] font-bold text-ink transition-colors hover:bg-paper disabled:opacity-50"
           >
             Herstel standaardwaarden
           </button>

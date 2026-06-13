@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import CarImage from "@/components/CarImage";
-import { Badge, Card, SectionTitle, TypeDot } from "@/components/ui";
+import Icon from "@/components/Icon";
+import { Container, Eyebrow } from "@/components/ui";
 import { bewaarWagen, laadCatalogus, laadFiscaleContext } from "@/lib/data";
 import { catalogNaarWagen, catalogPreview } from "@/lib/fiscaal/catalog";
 import { berekenJaar } from "@/lib/fiscaal/engine";
@@ -16,13 +17,14 @@ const FILTERS: Array<{ code: Voertuigtype | "alle"; label: string }> = [
   { code: "BEV", label: "Elektrisch" },
   { code: "PHEV", label: "Plug-in hybride" },
   { code: "HEV", label: "Hybride" },
-  { code: "fossiel", label: "Diesel/benzine" },
+  { code: "fossiel", label: "Diesel / benzine" },
 ];
 
 export default function CatalogusPagina() {
   const [ctx, setCtx] = useState<FiscaleContext | null>(null);
   const [catalogus, setCatalogus] = useState<CatalogCar[]>([]);
   const [filter, setFilter] = useState<Voertuigtype | "alle">("alle");
+  const [query, setQuery] = useState("");
   const [bezigId, setBezigId] = useState<number | null>(null);
   const [toegevoegd, setToegevoegd] = useState<number[]>([]);
   const [fout, setFout] = useState<string | null>(null);
@@ -36,12 +38,17 @@ export default function CatalogusPagina() {
       .catch((e) => setFout(e instanceof Error ? e.message : String(e)));
   }, []);
 
-  const gefilterd = useMemo(
-    () => (filter === "alle" ? catalogus : catalogus.filter((c) => c.voertuigtype === filter)),
-    [catalogus, filter],
-  );
+  const gefilterd = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return catalogus.filter((c) => {
+      const typeOk = filter === "alle" || c.voertuigtype === filter;
+      const qOk = !q || `${c.merk} ${c.model}`.toLowerCase().includes(q);
+      return typeOk && qOk;
+    });
+  }, [catalogus, filter, query]);
 
   async function voegToe(car: CatalogCar) {
+    if (toegevoegd.includes(car.id)) return;
     setBezigId(car.id);
     setFout(null);
     try {
@@ -54,116 +61,166 @@ export default function CatalogusPagina() {
     }
   }
 
-  return (
-    <div className="space-y-6">
-      <SectionTitle
-        sub="De 25 bekendste bedrijfswagens in België met indicatieve cataloguswaarde en WLTP-uitstoot. Elk model toont meteen de fiscale impact voor 2026. Voeg een model toe als kandidaat om het in een vergelijking mee te nemen."
-        action={
-          <Link href="/vergelijking" className="text-sm font-medium text-ink hover:text-gold">
-            Naar vergelijking →
-          </Link>
-        }
-      >
-        Wagencatalogus
-      </SectionTitle>
+  const toegevoegdeNamen = catalogus
+    .filter((c) => toegevoegd.includes(c.id))
+    .map((c) => `${c.merk} ${c.model}`);
 
-      <div className="flex flex-wrap gap-2">
-        {FILTERS.map((f) => (
-          <button
-            key={f.code}
-            onClick={() => setFilter(f.code)}
-            className={`rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors ${
-              filter === f.code ? "bg-ink text-white" : "border border-line bg-white text-slate-600 hover:bg-slate-50"
-            }`}
-          >
-            {f.label}
-          </button>
-        ))}
+  return (
+    <Container className="pb-[140px] pt-[52px]">
+      {/* Kop + zoek */}
+      <div className="mb-[30px] flex flex-wrap items-end justify-between gap-6">
+        <div>
+          <Eyebrow>Catalogus</Eyebrow>
+          <h1 className="m-0 mb-2.5 text-[clamp(30px,4vw,46px)] font-bold tracking-[-0.02em]">
+            Het wagenpark, fiscaal gewogen
+          </h1>
+          <p className="m-0 max-w-[40em] text-[16.5px] text-ink-700">
+            De 25 bekendste bedrijfswagens in België. Elke wagen toont meteen zijn fiscale
+            kerncijfers voor 2026. Voeg modellen toe om ze te vergelijken.
+          </p>
+        </div>
+        <div className="relative min-w-[260px]">
+          <span className="absolute left-3.5 top-1/2 inline-flex -translate-y-1/2 text-ink-500">
+            <Icon name="search" size={18} />
+          </span>
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Zoek op merk of model"
+            aria-label="Zoeken"
+            className="bs-inp h-[46px] w-full rounded-[11px] pl-[42px] pr-4 text-[15px]"
+          />
+        </div>
       </div>
 
-      {fout && <p className="rounded-xl bg-rose-50 px-4 py-3 text-sm text-rose-700">{fout}</p>}
+      {/* Filters */}
+      <div className="mb-[30px] flex flex-wrap items-center justify-between gap-[18px] border-b border-line pb-[22px]">
+        <div className="flex flex-wrap gap-2.5">
+          {FILTERS.map((f) => {
+            const count =
+              f.code === "alle"
+                ? catalogus.length
+                : catalogus.filter((c) => c.voertuigtype === f.code).length;
+            return (
+              <button
+                key={f.code}
+                onClick={() => setFilter(f.code)}
+                data-active={filter === f.code}
+                className="bs-chip inline-flex cursor-pointer items-center gap-[7px] rounded-full px-4 py-[9px] text-[14px] font-bold transition-all"
+              >
+                {f.label} <span className="font-bold opacity-55">{count}</span>
+              </button>
+            );
+          })}
+        </div>
+        <div className="flex items-center gap-2.5 text-[14px] text-ink-500">
+          <Icon name="arrow-down-up" size={16} />
+          <span>Gesorteerd op populariteit</span>
+        </div>
+      </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {fout && <p className="mb-6 rounded-xl bg-rose-50 px-4 py-3 text-sm text-rose-700">{fout}</p>}
+
+      {/* Kaarten */}
+      <div className="grid gap-[22px] sm:grid-cols-2 lg:grid-cols-3">
         {gefilterd.map((car) => {
           const j = ctx ? berekenJaar(ctx, catalogPreview(car, EVALUATIEJAAR), EVALUATIEJAAR) : null;
-          const isToegevoegd = toegevoegd.includes(car.id);
+          const isAdded = toegevoegd.includes(car.id);
           return (
-            <Card key={car.id} className="flex flex-col overflow-hidden">
-              <div className="relative">
+            <div
+              key={car.id}
+              data-selected={isAdded}
+              className="bs-cat-card overflow-hidden rounded-[14px] bg-white transition-all"
+            >
+              <div className="relative aspect-[16/10]">
                 <CarImage
                   type={car.voertuigtype}
                   segment={car.segment}
                   imageUrl={car.image_url}
                   alt={`${car.merk} ${car.model}`}
-                  className="aspect-[260/150] w-full"
+                  className="h-full w-full object-cover"
                 />
-                <span className="absolute right-3 top-3">
-                  <Badge tint="gold">#{car.populariteit_rang}</Badge>
+                <span className="absolute left-3 top-3 rounded-full bg-white/[0.94] px-[11px] py-[5px] text-[11px] font-bold text-ink">
+                  {car.voertuigtype}
+                </span>
+                <span className="absolute right-3 top-3 inline-flex items-center gap-[5px] rounded-full bg-ink px-2.5 py-[5px] text-[12px] font-bold text-white">
+                  <span className="text-gold">#{car.populariteit_rang}</span>
+                  <span className="text-[10px] font-normal opacity-55">POPULAIR</span>
                 </span>
               </div>
-
-              <div className="flex flex-1 flex-col p-5">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="font-semibold text-ink">
-                    {car.merk} {car.model}
-                  </p>
-                  <p className="text-xs text-slate-500">{car.segment}</p>
+              <div className="p-5">
+                <div className="text-[18px] font-bold text-ink">
+                  {car.merk} {car.model}
                 </div>
-              </div>
+                <div className="mb-[18px] text-[13.5px] text-ink-500">
+                  {car.segment} · catalogusprijs {euro(car.cataloguswaarde)}
+                </div>
 
-              <div className="mt-2 flex items-center gap-1.5 text-xs font-medium text-slate-500">
-                <TypeDot type={car.voertuigtype} />
-                {car.voertuigtype} · {car.brandstof}
-              </div>
+                <div className="mb-[18px] grid grid-cols-2 gap-px overflow-hidden rounded-[10px] border border-line bg-line">
+                  <Cell label="Fiscale aftrek" value={j ? pct(j.aftrekPct) : "…"} />
+                  <Cell label="CO₂" value={`${car.co2} g/km`} />
+                  <Cell label="VAA / jaar" value={j ? euro(j.vaa) : "…"} />
+                  <Cell label="Verworpen uitg." value={j ? euro(j.verworpenUitgaven) : "…"} />
+                </div>
 
-              <dl className="mt-4 grid grid-cols-2 gap-y-2 text-sm">
-                <Rij label="Cataloguswaarde" waarde={euro(car.cataloguswaarde)} />
-                <Rij label="CO₂" waarde={`${car.co2} g/km`} />
-                <Rij label="Aftrek 2026" waarde={j ? pct(j.aftrekPct) : "…"} accent={j?.aftrekPct === 100} />
-                <Rij label="VAA / jaar" waarde={j ? euro(j.vaa) : "…"} />
-                <Rij label="Verworpen uitg." waarde={j ? euro(j.verworpenUitgaven) : "…"} />
-                <Rij label="RSZ / jaar" waarde={j ? euro(j.rszJaar) : "…"} />
-              </dl>
-
-              {car.opmerking && (
-                <p className="mt-3 text-xs leading-relaxed text-slate-400">{car.opmerking}</p>
-              )}
-
-              <div className="mt-auto pt-4">
                 <button
                   onClick={() => voegToe(car)}
-                  disabled={bezigId === car.id || isToegevoegd}
-                  className={`w-full rounded-xl px-4 py-2 text-sm font-semibold transition-colors ${
-                    isToegevoegd
-                      ? "bg-emerald-100 text-emerald-700"
-                      : "bg-ink text-white hover:bg-ink-700 disabled:opacity-50"
-                  }`}
+                  data-selected={isAdded}
+                  disabled={bezigId === car.id || isAdded}
+                  className="bs-cat-add inline-flex h-[46px] w-full items-center justify-center gap-2 rounded-[10px] text-[14.5px] font-bold transition-all"
                 >
-                  {isToegevoegd ? "Toegevoegd ✓" : bezigId === car.id ? "Bezig…" : "Voeg toe als kandidaat"}
+                  <Icon name={isAdded ? "check" : "plus"} size={17} />
+                  {isAdded ? "Toegevoegd" : bezigId === car.id ? "Bezig…" : "Voeg toe aan vergelijking"}
                 </button>
               </div>
-              </div>
-            </Card>
+            </div>
           );
         })}
       </div>
 
-      <p className="text-xs text-slate-400">
-        Cataloguswaarden en CO₂ zijn indicatieve richtwaarden (juni 2026) die per uitvoering en optie
-        variëren. Pas ze per concrete offerte aan bij “Mijn wagens”. De jaarlijkse autokosten worden
-        hier geraamd op basis van de cataloguswaarde. Modelfoto’s ter illustratie via Wikimedia
-        Commons (vrije/CC-licenties); afgebeelde uitvoeringen kunnen afwijken.
-      </p>
-    </div>
+      {/* Selectiebalk */}
+      {toegevoegd.length > 0 && (
+        <div
+          className="bs-no-print fixed inset-x-0 bottom-0 z-40 border-t border-line"
+          style={{
+            background: "rgba(255,255,255,0.9)",
+            backdropFilter: "blur(14px)",
+            WebkitBackdropFilter: "blur(14px)",
+            boxShadow: "0 -8px 28px rgba(11,31,51,0.07)",
+          }}
+        >
+          <Container className="flex flex-wrap items-center justify-between gap-[18px] py-4">
+            <div className="flex items-center gap-3.5">
+              <span className="inline-flex h-10 w-10 items-center justify-center rounded-[10px] bg-gold-soft text-[17px] font-bold text-ink">
+                {toegevoegd.length}
+              </span>
+              <div>
+                <div className="text-[15px] font-bold text-ink">
+                  {toegevoegd.length === 1
+                    ? "1 wagen toegevoegd"
+                    : `${toegevoegd.length} wagens toegevoegd`}
+                </div>
+                <div className="text-[13px] text-ink-500">{toegevoegdeNamen.join(" · ")}</div>
+              </div>
+            </div>
+            <Link
+              href="/vergelijking"
+              className="inline-flex h-12 items-center gap-2.5 rounded-[11px] bg-gold px-[26px] text-[15.5px] font-bold text-ink transition-colors hover:bg-gold-hover"
+            >
+              Naar de vergelijking <Icon name="arrow-right" size={18} />
+            </Link>
+          </Container>
+        </div>
+      )}
+    </Container>
   );
 }
 
-function Rij({ label, waarde, accent }: { label: string; waarde: string; accent?: boolean }) {
+function Cell({ label, value }: { label: string; value: string }) {
   return (
-    <>
-      <dt className="text-slate-500">{label}</dt>
-      <dd className={`text-right font-medium ${accent ? "text-emerald-600" : "text-ink"}`}>{waarde}</dd>
-    </>
+    <div className="bg-white px-[13px] py-[11px]">
+      <div className="text-[11.5px] text-ink-500">{label}</div>
+      <div className="text-[16px] font-bold text-ink">{value}</div>
+    </div>
   );
 }

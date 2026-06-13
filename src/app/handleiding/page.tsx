@@ -45,7 +45,7 @@ const stappen = [
 
 export default function HandleidingPagina() {
   return (
-    <div className="space-y-8">
+    <div className="mx-auto max-w-[1100px] space-y-8 px-6 py-12">
       <section className="bg-ink-gradient rounded-3xl px-6 py-10 text-white sm:px-10">
         <Badge tint="gold">Handleiding</Badge>
         <h1 className="mt-4 text-3xl font-bold tracking-tight">Zo gebruik je de tool</h1>
