@@ -78,6 +78,7 @@ export interface CatalogCar {
   segment: string | null;
   populariteit_rang: number | null;
   opmerking: string | null;
+  image_url: string | null;
 }
 
 /** Alle referentiedata die de rekenkern nodig heeft. */

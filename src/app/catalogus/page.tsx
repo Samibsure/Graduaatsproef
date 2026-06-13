@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import CarImage from "@/components/CarImage";
 import { Badge, Card, SectionTitle, TypeDot } from "@/components/ui";
 import { bewaarWagen, laadCatalogus, laadFiscaleContext } from "@/lib/data";
 import { catalogNaarWagen, catalogPreview } from "@/lib/fiscaal/catalog";
@@ -87,7 +88,21 @@ export default function CatalogusPagina() {
           const j = ctx ? berekenJaar(ctx, catalogPreview(car, EVALUATIEJAAR), EVALUATIEJAAR) : null;
           const isToegevoegd = toegevoegd.includes(car.id);
           return (
-            <Card key={car.id} className="flex flex-col p-5">
+            <Card key={car.id} className="flex flex-col overflow-hidden">
+              <div className="relative">
+                <CarImage
+                  type={car.voertuigtype}
+                  segment={car.segment}
+                  imageUrl={car.image_url}
+                  alt={`${car.merk} ${car.model}`}
+                  className="aspect-[260/150] w-full"
+                />
+                <span className="absolute right-3 top-3">
+                  <Badge tint="gold">#{car.populariteit_rang}</Badge>
+                </span>
+              </div>
+
+              <div className="flex flex-1 flex-col p-5">
               <div className="flex items-start justify-between">
                 <div>
                   <p className="font-semibold text-ink">
@@ -95,7 +110,6 @@ export default function CatalogusPagina() {
                   </p>
                   <p className="text-xs text-slate-500">{car.segment}</p>
                 </div>
-                <Badge tint="gold">#{car.populariteit_rang}</Badge>
               </div>
 
               <div className="mt-2 flex items-center gap-1.5 text-xs font-medium text-slate-500">
@@ -116,17 +130,20 @@ export default function CatalogusPagina() {
                 <p className="mt-3 text-xs leading-relaxed text-slate-400">{car.opmerking}</p>
               )}
 
-              <button
-                onClick={() => voegToe(car)}
-                disabled={bezigId === car.id || isToegevoegd}
-                className={`mt-4 rounded-xl px-4 py-2 text-sm font-semibold transition-colors ${
-                  isToegevoegd
-                    ? "bg-emerald-100 text-emerald-700"
-                    : "bg-ink text-white hover:bg-ink-700 disabled:opacity-50"
-                }`}
-              >
-                {isToegevoegd ? "Toegevoegd ✓" : bezigId === car.id ? "Bezig…" : "Voeg toe als kandidaat"}
-              </button>
+              <div className="mt-auto pt-4">
+                <button
+                  onClick={() => voegToe(car)}
+                  disabled={bezigId === car.id || isToegevoegd}
+                  className={`w-full rounded-xl px-4 py-2 text-sm font-semibold transition-colors ${
+                    isToegevoegd
+                      ? "bg-emerald-100 text-emerald-700"
+                      : "bg-ink text-white hover:bg-ink-700 disabled:opacity-50"
+                  }`}
+                >
+                  {isToegevoegd ? "Toegevoegd ✓" : bezigId === car.id ? "Bezig…" : "Voeg toe als kandidaat"}
+                </button>
+              </div>
+              </div>
             </Card>
           );
         })}

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { BSureMark } from "@/components/Brand";
+import CarImage from "@/components/CarImage";
 import { Badge, Card, SectionTitle, StatCard, TypeDot } from "@/components/ui";
 import { laadCatalogus, laadFiscaleContext, laadWagens } from "@/lib/data";
 import { berekenJaar } from "@/lib/fiscaal/engine";
@@ -81,6 +82,49 @@ export default function Dashboard() {
         <StatCard label="Aandeel elektrisch" value={`${aandeelBev}%`} detail="van de ingevoerde wagens" />
       </section>
 
+      {/* Zo werkt het */}
+      <section>
+        <SectionTitle sub="In drie stappen van een offerte naar een onderbouwde, herhaalbare beslissing.">
+          Zo werkt het
+        </SectionTitle>
+        <div className="grid gap-4 sm:grid-cols-3">
+          {[
+            {
+              n: "1",
+              t: "Kies wagens",
+              d: "Selecteer modellen uit de catalogus van 25 populaire bedrijfswagens, of voeg je eigen offerte toe bij ‘Mijn wagens’.",
+              href: "/catalogus",
+              cta: "Naar catalogus",
+            },
+            {
+              n: "2",
+              t: "Vergelijk fiscaal",
+              d: "De tool berekent aftrek, VAA, verworpen uitgaven en RSZ-bijdrage, en weegt zes criteria tot één eindscore.",
+              href: "/vergelijking",
+              cta: "Naar vergelijking",
+            },
+            {
+              n: "3",
+              t: "Beslis en bewaar",
+              d: "Krijg een helder advies (aanvaarden / overwegen / afwijzen) en bewaar de beslissing voor de directievergadering.",
+              href: "/handleiding",
+              cta: "Lees de handleiding",
+            },
+          ].map((s) => (
+            <Card key={s.n} className="flex flex-col p-5">
+              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-gold/15 text-sm font-bold text-[#7a6a3f]">
+                {s.n}
+              </span>
+              <h3 className="mt-3 font-semibold text-ink">{s.t}</h3>
+              <p className="mt-1 flex-1 text-sm leading-relaxed text-slate-600">{s.d}</p>
+              <Link href={s.href} className="mt-3 text-sm font-medium text-ink hover:text-gold">
+                {s.cta} →
+              </Link>
+            </Card>
+          ))}
+        </div>
+      </section>
+
       {/* Vloot + kandidaten */}
       <section className="grid gap-6 lg:grid-cols-2">
         <VlootKaart titel="Huidige vloot" leeg="Nog geen vlootwagens." rijen={vloot} />
@@ -102,20 +146,28 @@ export default function Dashboard() {
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {catalogus.slice(0, 6).map((c) => (
             <Link key={c.id} href="/catalogus">
-              <Card className="p-4 transition-shadow hover:shadow-md">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-medium text-slate-400">#{c.populariteit_rang}</span>
-                  <span className="flex items-center gap-1.5 text-xs font-medium text-slate-500">
-                    <TypeDot type={c.voertuigtype} />
-                    {c.voertuigtype}
-                  </span>
+              <Card className="overflow-hidden transition-shadow hover:shadow-md">
+                <CarImage
+                  type={c.voertuigtype}
+                  segment={c.segment}
+                  imageUrl={c.image_url}
+                  alt={`${c.merk} ${c.model}`}
+                  className="aspect-[260/150] w-full"
+                />
+                <div className="p-4">
+                  <div className="flex items-center justify-between">
+                    <p className="font-semibold text-ink">
+                      {c.merk} {c.model}
+                    </p>
+                    <span className="flex items-center gap-1.5 text-xs font-medium text-slate-500">
+                      <TypeDot type={c.voertuigtype} />
+                      {c.voertuigtype}
+                    </span>
+                  </div>
+                  <p className="mt-0.5 text-sm text-slate-500">
+                    {euro(c.cataloguswaarde)} · {c.co2} g/km
+                  </p>
                 </div>
-                <p className="mt-1 font-semibold text-ink">
-                  {c.merk} {c.model}
-                </p>
-                <p className="mt-0.5 text-sm text-slate-500">
-                  {euro(c.cataloguswaarde)} · {c.co2} g/km
-                </p>
               </Card>
             </Link>
           ))}

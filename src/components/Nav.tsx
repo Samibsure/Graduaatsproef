@@ -12,6 +12,7 @@ const links = [
   { href: "/vergelijking", label: "Vergelijking" },
   { href: "/parameters", label: "Parameters" },
   { href: "/fiscaal-kader", label: "Fiscaal kader" },
+  { href: "/handleiding", label: "Handleiding" },
   { href: "/over", label: "Over" },
 ];
 

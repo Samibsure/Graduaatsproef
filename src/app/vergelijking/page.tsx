@@ -12,6 +12,8 @@ import {
   YAxis,
 } from "recharts";
 import AdviesBadge from "@/components/AdviesBadge";
+import CarImage from "@/components/CarImage";
+import { Badge, Card, SectionTitle } from "@/components/ui";
 import { bewaarEvaluatie, laadEvaluaties, laadFiscaleContext, laadWagens, type Evaluatie } from "@/lib/data";
 import { berekenProjectie } from "@/lib/fiscaal/engine";
 import { CRITERIA, scoreVergelijking } from "@/lib/fiscaal/scoring";
@@ -95,17 +97,51 @@ export default function VergelijkingPagina() {
     }
   }
 
+  const winnaar =
+    scores.length > 0 ? [...scores].sort((a, b) => b.eindscore - a.eindscore)[0] : null;
+  const winnaarWagen = winnaar ? kandidaten.find((w) => w.id === winnaar.vehicleId) ?? null : null;
+
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-xl font-bold">Scoredashboard</h1>
-        <p className="mt-1 text-sm text-slate-500">
-          Selecteer maximaal drie kandidaat-wagens. De tool berekent het volledige fiscale plaatje
-          over vier gebruiksjaren en past de scoringsmatrix uit het rapport toe.
-        </p>
-      </div>
+      <SectionTitle
+        sub="Selecteer maximaal drie kandidaten. De tool berekent het volledige fiscale plaatje over vier gebruiksjaren en past de scoringsmatrix uit het rapport toe."
+        action={
+          scores.length > 0 ? (
+            <button
+              onClick={() => window.print()}
+              className="rounded-xl border border-line px-4 py-2 text-sm font-medium text-ink hover:bg-paper"
+            >
+              Print / export PDF
+            </button>
+          ) : null
+        }
+      >
+        Scoredashboard
+      </SectionTitle>
 
       {fout && <p className="rounded-lg bg-rose-50 px-4 py-3 text-sm text-rose-700">{fout}</p>}
+
+      {winnaar && winnaarWagen && (
+        <Card className="flex flex-col items-center gap-5 overflow-hidden border-gold/40 sm:flex-row">
+          <CarImage
+            type={winnaarWagen.voertuigtype}
+            segment={null}
+            alt={winnaar.omschrijving}
+            className="h-32 w-full shrink-0 sm:w-56"
+          />
+          <div className="flex-1 px-5 pb-5 pt-0 sm:py-5 sm:pl-0">
+            <Badge tint="gold">Aanbevolen keuze</Badge>
+            <h2 className="mt-2 text-xl font-bold text-ink">{winnaar.omschrijving}</h2>
+            <p className="mt-1 text-sm text-slate-600">
+              Hoogste eindscore met advies <span className="font-semibold">{winnaar.advies}</span>.
+            </p>
+          </div>
+          <div className="px-5 pb-5 text-center sm:py-5 sm:pr-8">
+            <p className="text-4xl font-bold text-ink">{getal(winnaar.eindscore)}</p>
+            <p className="text-xs uppercase tracking-wide text-slate-500">eindscore / 10</p>
+          </div>
+        </Card>
+      )}
 
       <section className="rounded-xl border border-line bg-white p-5">
         <div className="flex flex-wrap items-start justify-between gap-4">
