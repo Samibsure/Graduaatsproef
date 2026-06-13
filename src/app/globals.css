@@ -39,3 +39,20 @@ body {
 .text-balance {
   text-wrap: balance;
 }
+
+@media print {
+  header,
+  footer {
+    display: none !important;
+  }
+  body {
+    background: #ffffff;
+  }
+  main {
+    max-width: none !important;
+    padding: 0 !important;
+  }
+  .shadow-sm {
+    box-shadow: none !important;
+  }
+}
