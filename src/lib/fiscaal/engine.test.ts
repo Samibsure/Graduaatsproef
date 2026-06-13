@@ -115,9 +115,10 @@ describe("voordeel van alle aard (Tabel 2)", () => {
 });
 
 describe("RSZ CO₂-solidariteitsbijdrage (Tabel 3)", () => {
-  it("BEV betaalt de minimumbijdrage: € 42,34/maand = € 508,08/jaar", () => {
-    expect(rszBijdrageMaand(ctx, bev, 2026)).toBeCloseTo(42.34, 2);
-    expect(berekenJaar(ctx, bev, 2026).rszJaar).toBeCloseTo(508.08, 2);
+  it("BEV betaalt het basisminimum: € 33,93/maand = € 407,16/jaar", () => {
+    // Emissievrije wagens zijn vrijgesteld van het verhoogde minimum (€ 42,34).
+    expect(rszBijdrageMaand(ctx, bev, 2026)).toBeCloseTo(33.93, 2);
+    expect(berekenJaar(ctx, bev, 2026).rszJaar).toBeCloseTo(407.16, 2);
   });
 
   // Bijlage 1 vermeldt ≈ € 130/maand, maar laat daarbij de multiplicator (4)
@@ -128,13 +129,13 @@ describe("RSZ CO₂-solidariteitsbijdrage (Tabel 3)", () => {
 });
 
 describe("verworpen uitgaven en extra VenB (Bijlage 1)", () => {
-  it("Wagen A (BEV): VU € 676, extra VenB € 169, totale fiscale meerkost ≈ € 677", () => {
+  it("Wagen A (BEV): VU € 676, extra VenB € 169, totale fiscale meerkost ≈ € 576", () => {
     const r = berekenJaar(ctx, bev, 2026);
     expect(r.nietAftrekbaar).toBe(0);
     expect(r.vuUitVaa).toBeCloseTo(676, 2); // 40% × 1.690 (laadkaart aanwezig)
     expect(r.verworpenUitgaven).toBeCloseTo(676, 2);
     expect(r.extraVenB).toBeCloseTo(169, 2);
-    expect(r.fiscaleMeerkost).toBeCloseTo(169 + 508.08, 2);
+    expect(r.fiscaleMeerkost).toBeCloseTo(169 + 407.16, 2);
   });
 
   it("Wagen B (diesel): niet-aftrekbaar deel € 4.600 + 40% van het VAA", () => {

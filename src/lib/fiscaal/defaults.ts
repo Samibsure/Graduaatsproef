@@ -18,6 +18,8 @@ export const DEFAULT_PARAMETERS: TaxParameters[] = [2025, 2026, 2027, 2028, 2029
     co2_pct_per_gram: 0.1,
     rsz_index: year === 2025 ? 1.5948 : 1.6291,
     rsz_min_maand: year === 2025 ? 37.33 : 42.34,
+    rsz_min_basis: year === 2025 ? 33.22 : 33.93,
+    rsz_multiplicator: year === 2025 ? 2.75 : year === 2026 ? 4 : 5.5,
     venb_tarief: 25,
     kmo_tarief: 20,
     kmo_min_bezoldiging: year === 2025 ? 45000 : 50000,

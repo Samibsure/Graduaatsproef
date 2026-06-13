@@ -13,6 +13,10 @@ export interface TaxParameters {
   co2_pct_per_gram: number;
   rsz_index: number;
   rsz_min_maand: number;
+  /** Basisminimum RSZ-bijdrage (wagens besteld vóór 1/7/2023 en alle BEV). */
+  rsz_min_basis: number;
+  /** RSZ-multiplicator voor niet-BEV besteld vanaf 1/7/2023, per bijdragejaar. */
+  rsz_multiplicator: number;
   venb_tarief: number;
   kmo_tarief: number;
   kmo_min_bezoldiging: number;
