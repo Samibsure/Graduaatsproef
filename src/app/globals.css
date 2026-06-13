@@ -1,58 +1,238 @@
 @import "tailwindcss";
 
 /*
- * Gecombineerde huisstijl B-sure × PXL
- * - B-sure: diep marineblauw/antraciet ("ink") + wit, sober en verzorgd
- * - PXL (huisstijl 2025): rich black + goud-accent (#AE9A64)
+ * Huisstijl B-sure × PXL — navy (ink) + goud, Trebuchet MS.
+ * Tokens afgestemd op het B-sure design system (handoff).
  */
 :root {
   --ink: #0b1f33;
-  --ink-700: #14304a;
-  --ink-600: #1d3e5c;
+  --ink-700: #2b3f52;
+  --ink-600: #16314c;
+  --ink-500: #5c6b7a;
   --gold: #ae9a64;
-  --gold-soft: #d8c79a;
-  --paper: #f6f7f9;
-  --line: #e6e9ee;
+  --gold-hover: #97844f;
+  --gold-soft: #f4efe2;
+  --gold-line: rgba(174, 154, 100, 0.45);
+  --paper: #f7f8fa;
+  --line: #e6e9ed;
+  --danger: #a23b34;
+  --success: #2e7d5b;
+  --grey-200: #e4e4e4;
+  --focus-ring: rgba(11, 31, 51, 0.3);
+  --accent-hover: #16314c;
 }
 
 @theme inline {
   --color-ink: var(--ink);
   --color-ink-700: var(--ink-700);
   --color-ink-600: var(--ink-600);
+  --color-ink-500: var(--ink-500);
   --color-gold: var(--gold);
+  --color-gold-hover: var(--gold-hover);
   --color-gold-soft: var(--gold-soft);
   --color-paper: var(--paper);
   --color-line: var(--line);
+  --color-danger: var(--danger);
+}
+
+html,
+body {
+  margin: 0;
 }
 
 body {
-  background: var(--paper);
-  color: var(--ink);
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  background: #ffffff;
+  color: #1a1a1a;
+  font-family: "Trebuchet MS", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* Subtiele goud-gradiënt voor accentvlakken */
-.bg-ink-gradient {
-  background: radial-gradient(120% 140% at 100% 0%, var(--ink-600) 0%, var(--ink) 55%);
+/* ---- Animaties ---- */
+@keyframes bsRise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes bsFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.bs-rise {
+  animation: bsRise 0.55s cubic-bezier(0, 0, 0.2, 1) both;
+}
+.bs-fade {
+  animation: bsFade 0.4s ease both;
+}
+
+/* ---- Navigatie ---- */
+.bs-nav-link {
+  color: var(--ink-500);
+  border-bottom: 2px solid transparent;
+}
+.bs-nav-link:hover {
+  color: var(--ink);
+}
+.bs-nav-link[data-active="true"] {
+  color: var(--ink);
+  border-bottom-color: var(--gold);
+}
+.bs-mob-link {
+  color: var(--ink-500);
+}
+.bs-mob-link[data-active="true"] {
+  color: var(--ink);
+  background: var(--gold-soft);
+}
+
+/* ---- Filterchips ---- */
+.bs-chip {
+  background: #fff;
+  border: 1px solid var(--line);
+  color: var(--ink-500);
+}
+.bs-chip:hover {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+.bs-chip[data-active="true"] {
+  background: var(--gold-soft);
+  border-color: var(--gold);
+  color: var(--ink);
+}
+
+/* ---- Catalogus-kaart ---- */
+.bs-cat-card {
+  border: 1px solid var(--line);
+}
+.bs-cat-card[data-selected="true"] {
+  border: 1.5px solid var(--gold);
+  box-shadow: 0 12px 30px rgba(174, 154, 100, 0.18);
+}
+.bs-cat-add {
+  background: #fff;
+  color: var(--ink);
+  border: 1.5px solid var(--ink);
+}
+.bs-cat-add:hover {
+  background: var(--paper);
+}
+.bs-cat-add[data-selected="true"] {
+  background: var(--ink);
+  color: #fff;
+  border: 1px solid var(--ink);
+}
+.bs-cat-add[data-selected="true"]:hover {
+  background: var(--accent-hover);
+}
+
+/* ---- Vergelijkingstabel ---- */
+.bs-cmp-table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+.bs-cmp-table th,
+.bs-cmp-table td {
+  transition: background 0.15s ease;
+}
+.bs-cmp-table th[data-win="true"],
+.bs-cmp-table td[data-win="true"] {
+  background: rgba(174, 154, 100, 0.09);
+}
+.bs-cmp-bar {
+  transition: opacity 0.15s;
+}
+.bs-cmp-bar:hover {
+  opacity: 0.82;
+}
+@media (max-width: 760px) {
+  .bs-cmp-scroll {
+    overflow-x: auto;
+  }
+  .bs-cmp-table .bs-sticky-col {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    background: #fff;
+    box-shadow: 1px 0 0 var(--line);
+  }
+}
+
+/* ---- Metric-switch ---- */
+.bs-mswitch {
+  background: #fff;
+  border: none;
+  border-right: 1px solid var(--line);
+  color: var(--ink-500);
+}
+.bs-mswitch:hover {
+  color: var(--ink);
+}
+.bs-mswitch[data-active="true"] {
+  background: var(--ink);
+  color: #fff;
+}
+.bs-mswitch:last-child {
+  border-right: none;
+}
+
+/* ---- Formuliervelden ---- */
+.bs-inp {
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.bs-inp::placeholder {
+  color: var(--ink-500);
+  opacity: 0.7;
+}
+.bs-inp:hover {
+  border-color: var(--ink-500);
+}
+.bs-inp:focus {
+  outline: none;
+  border-color: var(--ink);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+.bs-inp[data-error="true"] {
+  border-color: var(--danger);
+}
+.bs-inp[data-error="true"]:focus {
+  box-shadow: 0 0 0 3px rgba(162, 59, 52, 0.2);
+}
+
+/* ---- TOC-link (fiscaal kader) ---- */
+.bs-toc-link {
+  border-left: 2px solid transparent;
+  color: var(--ink-700);
+}
+.bs-toc-link:hover {
+  color: var(--ink);
+  border-left-color: var(--gold);
 }
 
 .text-balance {
   text-wrap: balance;
 }
 
+/* Subtiele accent-gradiënt voor donkere vlakken (hero's). */
+.bg-ink-gradient {
+  background: radial-gradient(120% 140% at 100% 0%, var(--ink-600) 0%, var(--ink) 55%);
+}
+
 @media print {
-  header,
-  footer {
+  .bs-no-print {
     display: none !important;
   }
   body {
-    background: #ffffff;
-  }
-  main {
-    max-width: none !important;
-    padding: 0 !important;
-  }
-  .shadow-sm {
-    box-shadow: none !important;
+    background: #fff;
   }
 }

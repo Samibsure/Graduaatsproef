@@ -1,209 +1,157 @@
-const tabel1 = [
-  ["BEV", "vóór 1/1/2027", "100%", "100%", "100%", "100%", "100%", "100%"],
-  ["BEV", "2027", "–", "–", "95%", "95%", "95%", "95% → 67,5%"],
-  ["BEV", "2028", "–", "–", "–", "90%", "90%", "90% → 67,5%"],
-  ["PHEV", "2023-2025", "75%", "50%", "25%", "0%", "0%", "0%"],
-  ["PHEV", "vanaf 1/1/2026", "–", "0%", "0%", "0%", "0%", "0%"],
-  ["Diesel/benzine", "2023-2025", "75% (gram)", "50%", "25%", "0%", "0%", "0%"],
-  ["Diesel/benzine", "vanaf 1/1/2026", "–", "0%", "0%", "0%", "0%", "0%"],
+import Icon from "@/components/Icon";
+import { Eyebrow } from "@/components/ui";
+
+export const metadata = {
+  title: "Fiscaal kader · B-sure × PXL Autofiscaliteit",
+};
+
+const toc = [
+  { id: "fk-aftrek", label: "Fiscale aftrekbaarheid" },
+  { id: "fk-vaa", label: "Voordeel alle aard" },
+  { id: "fk-co2", label: "CO₂-bijdrage werkgever" },
+  { id: "fk-tco", label: "Totale eigendomskost" },
 ];
 
-const tabel2 = [
-  ["Referentie-CO₂ benzine, LPG, CNG", "70 g/km", "Hoger dan 70 = hoger %"],
-  ["Referentie-CO₂ diesel", "58 g/km", "Strenger dan benzine"],
-  ["Minimum CO₂-percentage", "4%", "Geldt voor BEV"],
-  ["Maximum CO₂-percentage", "18%", "Hoge uitstoot"],
-  ["Minimum VAA per jaar", "€ 1.690", "Was € 1.650 in 2025"],
-  ["Vrijstelling woon-werk", "€ 500", "Per jaar"],
-  ["Leeftijdscorrectie", "100% tot 94%", "− 6% per jaar, min 70%"],
-];
-
-const tabel3 = [
-  ["Indexatiecoëfficiënt", "1,6291", "+2,2% t.o.v. 2025"],
-  ["Multiplicator niet-BEV besteld vanaf 1/7/2023", "×4 in 2026", "×2,75 (2025) → ×4 (2026) → ×5,5 (2027)"],
-  ["Minimumbijdrage niet-BEV besteld vanaf 1/7/2023", "€ 42,34 / maand", "€ 508,08 / jaar"],
-  ["Basisminimum: BEV en bestellingen vóór 1/7/2023", "€ 33,93 / maand", "€ 407,16 / jaar"],
-];
-
-const overgangsregels = [
-  {
-    periode: "Vóór 1 juli 2023",
-    regels:
-      "Aftrek op basis van de gramformule: 120% − (0,5% × coëfficiënt × CO₂), met een resultaat tussen 50% en 100%. Coëfficiënt: 1 voor diesel, 0,95 voor benzine, LPG en elektrisch, 0,9 voor CNG. RSZ-multiplicator: 1.",
-  },
-  {
-    periode: "1 juli 2023 – 31 december 2025",
-    regels:
-      "De gramformule blijft maar plafonneert op 100% in 2025; daarna treedt de uitdoofkalender in werking (75% → 50% → 25% → 0% voor fossiel en PHEV). RSZ-multiplicator (niet-BEV) loopt per bijdragejaar op: ×2,75 (2025), ×4 (2026), ×5,5 (2027).",
-  },
-  {
-    periode: "1 januari 2026 – 31 december 2026",
-    regels:
-      "Fossiele wagens en PHEV: 0% aftrek vanaf het eerste gebruiksjaar. BEV behoudt 100% voor de hele gebruiksduur. RSZ-multiplicator niet-BEV: ×4 (bijdragejaar 2026); BEV blijft op het basisminimum.",
-  },
-  {
-    periode: "Vanaf 1 januari 2027",
-    regels:
-      "BEV start in het afbouwpad: 95% (2027), 90% (2028), 82,5% (2029), 75% (2030), 67,5% (2031). RSZ-multiplicator voor niet-BEV ×5,5 vanaf bijdragejaar 2027.",
-  },
-];
-
-const checklist = [
-  "Welke wagen wordt vervangen? Bestelmoment, type, kilometerstand, jaarlijkse autokosten van de huidige wagen.",
-  "Wat is het gewenste vervangmoment? 2026, 2027 of later? Wat zijn de operationele beperkingen?",
-  "Welke kandidaten worden vergeleken? Minstens één BEV, eventueel één PHEV, eventueel één fossiel. Cataloguswaarde, CO₂, geschatte jaarlijkse autokosten.",
-  "Wat is het verwachte kilometerprofiel? Stadsritten, autosnelweg, buitenland?",
-  "Is er thuislaadinfrastructuur bij de werknemer? Indien neen, is installatie mogelijk?",
-  "Welke laadkaarten of tankkaarten worden voorzien?",
-  "Is de score in de matrix berekend? Welke kandidaat wint? Met welke marge?",
-  "Is er een operationele reden om af te wijken van de hoogste score? Welke?",
-  "Wat is de besluitvorming? Wie tekent? Tegen welke datum wordt besteld?",
+const vaaItems = [
+  ["Cataloguswaarde", "De nieuwwaarde inclusief opties en btw, vóór kortingen."],
+  ["CO₂-coëfficiënt", "Stijgt met de uitstoot, vertrekkend van een referentie-uitstoot die jaarlijks wordt aangepast (2026: 70 g benzine, 58 g diesel)."],
+  ["Leeftijdscorrectie", "De cataloguswaarde vermindert met 6% per begonnen jaar, tot een ondergrens van 70%."],
 ];
 
 export default function FiscaalKaderPagina() {
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-xl font-bold">Het fiscale kader voor autokosten</h1>
-        <p className="mt-1 max-w-3xl text-sm text-slate-500">
-          Samenvatting van de vier bouwstenen uit het rapport: de aftrekbaarheid in
-          vennootschapsbelasting (art. 198bis WIB ’92), het voordeel van alle aard (art. 36 WIB
-          ’92), de RSZ-solidariteitsbijdrage en de verworpen uitgaven (art. 198 WIB ’92).
-        </p>
-      </div>
-
-      <Kader titel="Tabel 1 · Aftrekbaarheidskalender per voertuigtype en aankoopjaar (2025-2031)">
-        <table className="w-full text-sm">
-          <thead className="border-y border-line bg-paper text-left text-xs uppercase tracking-wide text-slate-500">
-            <tr>
-              {["Voertuigtype", "Bestelmoment", "2025", "2026", "2027", "2028", "2029", "2030+"].map(
-                (h) => (
-                  <th key={h} className="px-4 py-2.5">
-                    {h}
-                  </th>
-                ),
-              )}
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100">
-            {tabel1.map((rij) => (
-              <tr key={`${rij[0]}-${rij[1]}`}>
-                {rij.map((cel, i) => (
-                  <td key={i} className={`px-4 py-2 ${i < 2 ? "font-medium" : ""}`}>
-                    {cel}
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        <Bron tekst="FOD Financiën (2025), Wet 25 november 2021, eigen verwerking." />
-      </Kader>
-
-      <Kader titel="Tabel 2 · Berekening van het voordeel van alle aard (VAA), parameters 2026">
-        <Formule tekst="VAA = cataloguswaarde × 6/7 × leeftijdscorrectie × CO₂-percentage" />
-        <p className="px-4 pb-2 text-sm text-slate-600">
-          Het CO₂-percentage start op 5,5% bij de referentie-CO₂ en stijgt met 0,1% per gram extra.
-          Voor een BEV geldt het minimum van 4%; voor een diesel met 135 g/km loopt het op tot
-          13,2%.
-        </p>
-        <DrieKolommen rijen={tabel2} koppen={["Parameter", "Waarde 2026", "Toelichting"]} />
-        <Bron tekst="Moore (2026), FOD Financiën (2025)." />
-      </Kader>
-
-      <Kader titel="Tabel 3 · CO₂-solidariteitsbijdrage 2026">
-        <Formule tekst="Maandbijdrage = ((CO₂ × 9 − constante) / 12) × indexcoëfficiënt × multiplicator. Constante: 600 (diesel), 768 (benzine/CNG), 990 (LPG). Emissievrije wagens en bestellingen vóór 1/7/2023 vallen op het basisminimum, zonder multiplicator." />
-        <DrieKolommen rijen={tabel3} koppen={["Parameter", "Waarde 2026", "Wijziging"]} />
-        <Bron tekst="Securex (2025), RSZ (2025), Wet 25 november 2021." />
-      </Kader>
-
-      <Kader titel="Verworpen uitgaven · rekenvoorbeeld uit het rapport">
-        <Formule tekst="Verworpen uitgaven = (1 − aftrek%) × autokosten + (17% zonder / 40% met tank- of laadkaart) × VAA" />
-        <div className="space-y-2 px-4 pb-4 text-sm text-slate-600">
-          <p>
-            Stel: een werknemer rijdt een diesel met cataloguswaarde € 38.000 en 135 g/km CO₂. De
-            jaarlijkse autokosten bedragen € 10.000, de aftrekbaarheid in 2026 is 50%
-            (uitdoofkalender) en er is een tankkaart.
-          </p>
-          <p className="rounded-lg bg-paper px-3 py-2 font-mono text-xs">
-            VU = (1 − 0,50) × 10.000 + 0,40 × VAA → het niet-aftrekbare deel (€ 5.000) plus 40% van
-            het voordeel van alle aard wordt bij de belastbare grondslag gevoegd.
-          </p>
-          <p>
-            Bij een vennootschapsbelastingtarief van 25% betekent elke euro verworpen uitgave € 0,25
-            extra belasting: winst die niet verlaagd wordt en dus volledig belast blijft.
-          </p>
+    <div className="mx-auto grid max-w-[1100px] items-start gap-14 px-6 pb-[90px] pt-[52px] lg:grid-cols-[220px_1fr]">
+      <aside className="sticky top-[92px] hidden lg:block">
+        <div className="mb-4 text-[11.5px] font-bold uppercase tracking-[0.14em] text-ink-500">
+          Op deze pagina
         </div>
-      </Kader>
-
-      <Kader titel="Overgangsregels per bestelperiode (Bijlage 3)">
-        <ul className="space-y-3 px-4 pb-4">
-          {overgangsregels.map((o) => (
-            <li key={o.periode} className="text-sm">
-              <p className="font-semibold text-ink">{o.periode}</p>
-              <p className="mt-0.5 text-slate-600">{o.regels}</p>
-            </li>
+        <nav className="flex flex-col gap-0.5 border-l border-line">
+          {toc.map((t) => (
+            <a
+              key={t.id}
+              href={`#${t.id}`}
+              className="bs-toc-link -ml-px py-2 pl-4 text-[14px] transition-colors"
+            >
+              {t.label}
+            </a>
           ))}
-        </ul>
-        <p className="px-4 pb-4 text-sm font-medium text-amber-700">
-          Belangrijk: voor de aftrekbaarheid telt de besteldatum, niet de leverdatum. Een BEV
-          besteld in december 2026 en geleverd in 2027 behoudt levenslang 100% aftrek (BDO, 2026).
+        </nav>
+      </aside>
+
+      <article className="max-w-[720px]">
+        <Eyebrow>Fiscaal kader</Eyebrow>
+        <h1 className="m-0 mb-[18px] text-[clamp(30px,4vw,46px)] font-bold tracking-[-0.02em]">
+          De fiscaliteit van de bedrijfswagen
+        </h1>
+        <p className="m-0 mb-4 text-[18px] leading-relaxed text-ink-700">
+          Vier elementen bepalen samen de fiscale impact van een bedrijfswagen: de aftrekbaarheid
+          voor de werkgever, het voordeel alle aard voor de werknemer, de CO₂-solidariteitsbijdrage
+          en de totale eigendomskost. Hieronder vindt u het kader dat onze berekening hanteert.
         </p>
-      </Kader>
+        <div className="inline-flex items-center gap-2 text-[13px] text-ink-500">
+          <Icon name="calendar" size={15} /> Laatst bijgewerkt voor aanslagjaar 2026
+        </div>
 
-      <Kader titel="Checklist directiegesprek bij vlootbeslissing (Bijlage 2)">
-        <ol className="list-decimal space-y-2 px-9 pb-4 text-sm text-slate-600">
-          {checklist.map((vraag) => (
-            <li key={vraag}>{vraag}</li>
-          ))}
-        </ol>
-      </Kader>
+        <section id="fk-aftrek" className="mt-12 scroll-mt-[92px]">
+          <h2 className="m-0 mb-3.5 text-[26px] font-bold tracking-[-0.01em]">Fiscale aftrekbaarheid</h2>
+          <p className="m-0 mb-[18px] text-[16px] leading-[1.7] text-ink-700">
+            De mate waarin de kosten van de wagen aftrekbaar zijn, hangt af van de aandrijving en de
+            CO₂-uitstoot. Volledig elektrische wagens blijven het gunstigst, terwijl de aftrek voor
+            wagens met een verbrandingsmotor stelselmatig wordt afgebouwd (vanaf bestelling 2026:
+            0%).
+          </p>
+          <div className="mb-3.5 overflow-hidden rounded-[12px] border border-line">
+            <table className="w-full border-collapse text-[15px]">
+              <thead>
+                <tr className="bg-paper">
+                  {["Aandrijving", "Aftrekbaarheid", "Tendens"].map((h) => (
+                    <th
+                      key={h}
+                      className="border-b border-line px-[18px] py-[13px] text-left text-[12px] font-bold uppercase tracking-[0.08em] text-ink-500"
+                    >
+                      {h}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  ["Elektrisch", "100%", "Stabiel, afbouw vanaf besteljaar 2027"],
+                  ["Plug-in hybride", "75% → 50% → 25% → 0%", "Dalend (uitdoofkalender)"],
+                  ["Diesel / benzine", "CO₂-formule, in uitdoof", "Sterk dalend"],
+                ].map((r) => (
+                  <tr key={r[0]} className="border-b border-line last:border-0">
+                    <td className="px-[18px] py-3.5 font-bold text-ink">{r[0]}</td>
+                    <td className="px-[18px] py-3.5 text-ink-700">{r[1]}</td>
+                    <td className="px-[18px] py-3.5 text-ink-700">{r[2]}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="m-0 text-[13.5px] leading-[1.6] text-ink-500">
+            De percentages zijn indicatief. De exacte aftrek volgt uit de gramformule en het
+            besteljaar; onze rekenkern is hierin leidend.
+          </p>
+        </section>
+
+        <section id="fk-vaa" className="mt-11 scroll-mt-[92px]">
+          <h2 className="m-0 mb-3.5 text-[26px] font-bold tracking-[-0.01em]">Voordeel alle aard</h2>
+          <p className="m-0 mb-[18px] text-[16px] leading-[1.7] text-ink-700">
+            De werknemer die de wagen ook privé gebruikt, wordt belast op een voordeel alle aard
+            (VAA). Dit wordt berekend op de cataloguswaarde, een CO₂-coëfficiënt en een
+            leeftijdscorrectie, met een wettelijk minimum van € 1.690 (2026).
+          </p>
+          <div className="grid gap-px overflow-hidden rounded-[12px] border border-line bg-line">
+            {vaaItems.map(([t, d]) => (
+              <div key={t} className="flex items-start gap-3.5 bg-white px-[18px] py-4">
+                <span className="mt-px flex-none text-gold">
+                  <Icon name="circle-dot" size={17} />
+                </span>
+                <div>
+                  <div className="mb-0.5 font-bold text-ink">{t}</div>
+                  <div className="text-[14.5px] leading-[1.55] text-ink-700">{d}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section id="fk-co2" className="mt-11 scroll-mt-[92px]">
+          <h2 className="m-0 mb-3.5 text-[26px] font-bold tracking-[-0.01em]">CO₂-bijdrage werkgever</h2>
+          <p className="m-0 text-[16px] leading-[1.7] text-ink-700">
+            Naast de aftrekbeperking betaalt de werkgever een maandelijkse solidariteitsbijdrage aan
+            de RSZ. Die stijgt met de CO₂-uitstoot (brandstofconstante diesel 600, benzine 768, LPG
+            990) en wordt voor niet-elektrische wagens besteld vanaf 1/7/2023 met een
+            multiplicator verhoogd die per bijdragejaar oploopt (×4 in 2026, ×5,5 vanaf 2027). Voor
+            volledig elektrische wagens geldt het lagere basisminimum (€ 33,93/maand in 2026).
+          </p>
+        </section>
+
+        <section id="fk-tco" className="mt-11 scroll-mt-[92px]">
+          <h2 className="m-0 mb-3.5 text-[26px] font-bold tracking-[-0.01em]">Totale eigendomskost</h2>
+          <p className="m-0 mb-[18px] text-[16px] leading-[1.7] text-ink-700">
+            De totale eigendomskost (TCO) brengt alle elementen samen: de jaarlijkse autokosten, de
+            niet-aftrekbare component (extra vennootschapsbelasting) en de CO₂-bijdrage. Het is dit
+            bedrag dat een eerlijke vergelijking tussen wagens mogelijk maakt.
+          </p>
+          <div className="flex items-start gap-4 rounded-[14px] bg-ink px-[26px] py-6">
+            <span className="mt-0.5 flex-none text-gold">
+              <Icon name="lightbulb" size={22} />
+            </span>
+            <div>
+              <div className="mb-1.5 text-[16px] font-bold text-white">
+                Waarom de TCO doorslaggevend is
+              </div>
+              <p className="m-0 text-[14.5px] leading-[1.6] text-white/[0.74]">
+                Een lagere catalogusprijs betekent niet automatisch een lagere kost. Een elektrische
+                wagen met een hogere aanschafprijs kan dankzij de volledige aftrek, het lage voordeel
+                alle aard en de lage RSZ-bijdrage alsnog voordeliger uitkomen.
+              </p>
+            </div>
+          </div>
+        </section>
+      </article>
     </div>
-  );
-}
-
-function Kader({ titel, children }: { titel: string; children: React.ReactNode }) {
-  return (
-    <section className="overflow-hidden rounded-xl border border-line bg-white">
-      <h2 className="px-4 pb-3 pt-4 font-semibold">{titel}</h2>
-      {children}
-    </section>
-  );
-}
-
-function Formule({ tekst }: { tekst: string }) {
-  return (
-    <p className="mx-4 mb-3 rounded-lg bg-gold/10 px-3 py-2 text-sm font-medium text-ink">
-      {tekst}
-    </p>
-  );
-}
-
-function Bron({ tekst }: { tekst: string }) {
-  return <p className="px-4 py-3 text-xs text-slate-400">Bron: {tekst}</p>;
-}
-
-function DrieKolommen({ rijen, koppen }: { rijen: string[][]; koppen: string[] }) {
-  return (
-    <table className="w-full text-sm">
-      <thead className="border-y border-line bg-paper text-left text-xs uppercase tracking-wide text-slate-500">
-        <tr>
-          {koppen.map((h) => (
-            <th key={h} className="px-4 py-2.5">
-              {h}
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody className="divide-y divide-slate-100">
-        {rijen.map((rij) => (
-          <tr key={rij[0]}>
-            <td className="px-4 py-2 font-medium">{rij[0]}</td>
-            <td className="px-4 py-2">{rij[1]}</td>
-            <td className="px-4 py-2 text-slate-500">{rij[2]}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
   );
 }
