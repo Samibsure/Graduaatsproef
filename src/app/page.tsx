@@ -198,6 +198,14 @@ export default function Dashboard() {
               </div>
             ))}
           </div>
+          <div className="mt-10 text-center">
+            <Link
+              href="/handleiding"
+              className="inline-flex h-[48px] items-center gap-2 rounded-[11px] border-[1.5px] border-ink bg-white px-6 text-[15px] font-bold text-ink transition-colors hover:bg-ink hover:text-white"
+            >
+              <Icon name="info" size={17} /> Lees de volledige handleiding
+            </Link>
+          </div>
         </Container>
       </section>
 
