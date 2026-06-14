@@ -11,6 +11,7 @@ const links = [
   { href: "/vergelijking", label: "Vergelijking" },
   { href: "/wagens", label: "Wagens" },
   { href: "/fiscaal-kader", label: "Fiscaal kader" },
+  { href: "/handleiding", label: "Handleiding" },
 ];
 
 export default function Nav() {
