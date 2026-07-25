@@ -1,41 +1,23 @@
 "use client";
 
-import Link from "next/link";
+import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import CarImage from "@/components/CarImage";
 import Icon from "@/components/Icon";
 import { Container, Eyebrow, StatCard } from "@/components/ui";
+import { Link } from "@/i18n/navigation";
 import { laadCatalogus, laadFiscaleContext } from "@/lib/data";
 import { catalogPreview } from "@/lib/fiscaal/catalog";
 import { berekenJaar } from "@/lib/fiscaal/engine";
 import type { CatalogCar, FiscaleContext } from "@/lib/fiscaal/types";
-import { euro, pct } from "@/lib/format";
+import { formatters } from "@/lib/format";
 
 const EVALUATIEJAAR = 2026;
 const BEV_DEADLINE = new Date("2026-12-31T23:59:59");
 
-const steps = [
-  {
-    num: "01",
-    icon: "car",
-    title: "Voeg uw wagens toe",
-    text: "U registreert de wagens die u overweegt, of kiest ze rechtstreeks uit onze catalogus van 25 modellen.",
-  },
-  {
-    num: "02",
-    icon: "calculator",
-    title: "Wij berekenen de impact",
-    text: "De fiscale aftrek, het voordeel alle aard, de verworpen uitgaven en de RSZ-bijdrage worden nauwkeurig doorgerekend.",
-  },
-  {
-    num: "03",
-    icon: "scale",
-    title: "Vergelijk en kies",
-    text: "U ziet de winnaar in één oogopslag, met een heldere onderbouwing per gewogen criterium.",
-  },
-];
-
 export default function Dashboard() {
+  const t = useTranslations("dashboard");
+  const { euro, pct } = formatters(useLocale());
   const [ctx, setCtx] = useState<FiscaleContext | null>(null);
   const [catalogus, setCatalogus] = useState<CatalogCar[]>([]);
   const [fout, setFout] = useState<string | null>(null);
@@ -61,6 +43,12 @@ export default function Dashboard() {
   const topJ = topCar ? preview(topCar) : null;
   const featured = catalogus.slice(0, 3);
 
+  const steps = [
+    { num: "01", icon: "car", title: t("stap1Titel"), text: t("stap1Tekst") },
+    { num: "02", icon: "calculator", title: t("stap2Titel"), text: t("stap2Tekst") },
+    { num: "03", icon: "scale", title: t("stap3Titel"), text: t("stap3Tekst") },
+  ];
+
   return (
     <div>
       {fout && (
@@ -73,29 +61,27 @@ export default function Dashboard() {
       <section className="overflow-hidden border-b border-line bg-paper">
         <Container className="grid items-center gap-14 py-[72px] lg:grid-cols-[1.15fr_0.85fr]">
           <div className="bs-rise">
-            <Eyebrow dash>Autofiscaliteit, helder gemaakt</Eyebrow>
+            <Eyebrow dash>{t("eyebrow")}</Eyebrow>
             <h1 className="m-0 mb-5 text-[clamp(38px,5.2vw,62px)] font-bold leading-[1.04] tracking-[-0.022em] text-ink">
-              De juiste bedrijfswagen,
+              {t("kop1")}
               <br />
-              <span className="text-gold">fiscaal onderbouwd</span>
+              <span className="text-gold">{t("kop2")}</span>
             </h1>
             <p className="m-0 mb-8 max-w-[30em] text-[19px] leading-relaxed text-ink-700">
-              Wij brengen de fiscale impact van uw bedrijfswagens helder in kaart. U vergelijkt
-              rustig, op basis van cijfers, en kiest met vertrouwen. Gratis voor elk Belgisch
-              bedrijf, zonder limiet op het aantal wagens.
+              {t("intro")}
             </p>
             <div className="flex flex-wrap gap-3.5">
               <Link
                 href="/registreren"
                 className="inline-flex h-[52px] items-center gap-2.5 rounded-[11px] bg-gold px-7 text-[16px] font-bold text-white transition-colors hover:bg-gold-hover"
               >
-                Gratis starten <Icon name="arrow-right" size={18} />
+                {t("ctaStarten")} <Icon name="arrow-right" size={18} />
               </Link>
               <Link
                 href="/catalogus"
                 className="inline-flex h-[52px] items-center rounded-[11px] border-[1.5px] border-ink bg-transparent px-6 text-[16px] font-bold text-ink transition-colors hover:bg-ink hover:text-white"
               >
-                Verken de catalogus
+                {t("ctaCatalogus")}
               </Link>
             </div>
           </div>
@@ -104,10 +90,10 @@ export default function Dashboard() {
             <div className="overflow-hidden rounded-[16px] border border-line bg-white shadow-[0_18px_48px_rgba(11,31,51,0.10)]">
               <div className="flex items-center justify-between bg-ink px-[22px] py-[18px]">
                 <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-white/[0.62]">
-                  Fiscaal voorbeeld
+                  {t("voorbeeld")}
                 </span>
                 <span className="inline-flex items-center gap-1.5 text-[12.5px] font-bold text-gold">
-                  <Icon name="award" size={15} /> Meest aftrekbaar
+                  <Icon name="award" size={15} /> {t("meestAftrekbaar")}
                 </span>
               </div>
               <div className="p-[22px]">
@@ -135,15 +121,15 @@ export default function Dashboard() {
                     <div className="text-[30px] font-bold leading-none text-ink">
                       {topJ ? pct(topJ.aftrekPct) : "…"}
                     </div>
-                    <div className="text-[11px] tracking-[0.04em] text-ink-500">AFTREK 2026</div>
+                    <div className="text-[11px] tracking-[0.04em] text-ink-500">{t("aftrekJaar")}</div>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-px overflow-hidden rounded-[10px] border border-line bg-line">
                   {[
-                    ["Cataloguswaarde", topCar ? euro(topCar.cataloguswaarde) : "…"],
-                    ["VAA / jaar", topJ ? euro(topJ.vaa) : "…"],
-                    ["Verworpen uitg. / jr", topJ ? euro(topJ.verworpenUitgaven) : "…"],
-                    ["RSZ / jaar", topJ ? euro(topJ.rszJaar) : "…"],
+                    [t("cataloguswaarde"), topCar ? euro(topCar.cataloguswaarde) : "…"],
+                    [t("vaaPerJaar"), topJ ? euro(topJ.vaa) : "…"],
+                    [t("vuPerJaar"), topJ ? euro(topJ.verworpenUitgaven) : "…"],
+                    [t("rszPerJaar"), topJ ? euro(topJ.rszJaar) : "…"],
                   ].map(([l, v]) => (
                     <div key={l} className="bg-white px-[15px] py-[13px]">
                       <div className="text-[12px] text-ink-500">{l}</div>
@@ -161,10 +147,10 @@ export default function Dashboard() {
       <section>
         <Container className="py-14">
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            <StatCard icon="layout-grid" label="Wagens in catalogus" value={catalogus.length || "…"} detail="Elektrisch, hybride en fossiel" />
-            <StatCard icon="percent" label="Aftrek elektrisch 2026" value="100%" detail="Volledig aftrekbaar in 2026" />
-            <StatCard icon="calendar" label="BEV-venster 100% aftrek" value={dagen > 0 ? `${dagen} d` : "verstreken"} detail="bestellen vóór 1 januari 2027" />
-            <StatCard icon="leaf" label="Aandeel elektrisch" value={`${bevAandeel}%`} detail="van de catalogus" />
+            <StatCard icon="layout-grid" label={t("kpiCatalogus")} value={catalogus.length || "…"} detail={t("kpiCatalogusDetail")} />
+            <StatCard icon="percent" label={t("kpiAftrek")} value={pct(100)} detail={t("kpiAftrekDetail")} />
+            <StatCard icon="calendar" label={t("kpiVenster")} value={dagen > 0 ? t("kpiDagen", { dagen }) : t("kpiVerstreken")} detail={t("kpiVensterDetail")} />
+            <StatCard icon="leaf" label={t("kpiAandeel")} value={pct(bevAandeel)} detail={t("kpiAandeelDetail")} />
           </div>
         </Container>
       </section>
@@ -174,14 +160,13 @@ export default function Dashboard() {
         <Container className="py-[68px]">
           <div className="mx-auto mb-12 max-w-[640px] text-center">
             <div className="mb-3.5 text-[12px] font-bold uppercase tracking-[0.16em] text-gold">
-              Zo werkt het
+              {t("zoWerktHet")}
             </div>
             <h2 className="m-0 mb-4 text-[clamp(28px,3.4vw,40px)] font-bold tracking-[-0.02em]">
-              In drie rustige stappen naar een onderbouwde keuze
+              {t("zoWerktKop")}
             </h2>
             <p className="m-0 text-[17px] text-ink-700">
-              U levert de wagens aan. Wij rekenen de fiscale gevolgen door. Samen kiest u met
-              vertrouwen.
+              {t("zoWerktIntro")}
             </p>
           </div>
           <div className="grid gap-6 md:grid-cols-3">
@@ -203,7 +188,7 @@ export default function Dashboard() {
               href="/handleiding"
               className="inline-flex h-[48px] items-center gap-2 rounded-[11px] border-[1.5px] border-ink bg-white px-6 text-[15px] font-bold text-ink transition-colors hover:bg-ink hover:text-white"
             >
-              <Icon name="info" size={17} /> Lees de volledige handleiding
+              <Icon name="info" size={17} /> {t("leesHandleiding")}
             </Link>
           </div>
         </Container>
@@ -214,16 +199,16 @@ export default function Dashboard() {
         <Container className="py-[68px]">
           <div className="mb-8 flex flex-wrap items-end justify-between gap-6">
             <div>
-              <Eyebrow>Uit de catalogus</Eyebrow>
+              <Eyebrow>{t("uitCatalogus")}</Eyebrow>
               <h2 className="m-0 text-[clamp(28px,3.4vw,40px)] font-bold tracking-[-0.02em]">
-                Fiscaal voordelige wagens, uitgelicht
+                {t("uitgelichtKop")}
               </h2>
             </div>
             <Link
               href="/catalogus"
               className="inline-flex h-[46px] items-center gap-2 whitespace-nowrap rounded-[11px] border-[1.5px] border-line bg-transparent px-[22px] text-[15px] font-bold text-ink transition-colors hover:border-ink hover:bg-paper"
             >
-              Bekijk de volledige catalogus <Icon name="arrow-right" size={17} />
+              {t("bekijkCatalogus")} <Icon name="arrow-right" size={17} />
             </Link>
           </div>
           <div className="grid gap-6 md:grid-cols-3">
@@ -259,13 +244,13 @@ export default function Dashboard() {
                         <div className="text-[22px] font-bold leading-none text-ink">
                           #{car.populariteit_rang}
                         </div>
-                        <div className="text-[10px] tracking-[0.06em] text-ink-500">POPULAIR</div>
+                        <div className="text-[10px] tracking-[0.06em] text-ink-500">{t("populair")}</div>
                       </div>
                     </div>
                     <div className="flex gap-[18px] border-t border-line pt-3.5">
-                      <Metric label="Aftrek" value={j ? pct(j.aftrekPct) : "…"} />
-                      <Metric label="VAA/jr" value={j ? euro(j.vaa) : "…"} />
-                      <Metric label="Verw. uitg." value={j ? euro(j.verworpenUitgaven) : "…"} />
+                      <Metric label={t("metricAftrek")} value={j ? pct(j.aftrekPct) : "…"} />
+                      <Metric label={t("metricVaa")} value={j ? euro(j.vaa) : "…"} />
+                      <Metric label={t("metricVu")} value={j ? euro(j.verworpenUitgaven) : "…"} />
                     </div>
                   </div>
                 </Link>
