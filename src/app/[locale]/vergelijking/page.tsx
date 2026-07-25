@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useMemo, useState } from "react";
 import CarImage from "@/components/CarImage";
 import Icon from "@/components/Icon";
@@ -16,7 +17,7 @@ import {
 import { berekenProjectie } from "@/lib/fiscaal/engine";
 import { CRITERIA, scoreVergelijking } from "@/lib/fiscaal/scoring";
 import type { CatalogCar, FiscaleContext, Vehicle } from "@/lib/fiscaal/types";
-import { euro, getal, pct } from "@/lib/format";
+import { formatters } from "@/lib/format";
 
 const MAX_KANDIDATEN = 3;
 const JAREN = [2025, 2026, 2027, 2028, 2029, 2030];
@@ -24,6 +25,9 @@ const JAREN = [2025, 2026, 2027, 2028, 2029, 2030];
 type Metric = "tco" | "vaa" | "aftrek";
 
 export default function VergelijkingPagina() {
+  const t = useTranslations("vergelijking");
+  const locale = useLocale();
+  const { euro, getal, pct } = formatters(locale);
   const [ctx, setCtx] = useState<FiscaleContext | null>(null);
   const [wagens, setWagens] = useState<Vehicle[]>([]);
   const [catalogus, setCatalogus] = useState<CatalogCar[]>([]);
@@ -98,13 +102,13 @@ export default function VergelijkingPagina() {
 
   // Vergelijkingstabel-rijen met "beste waarde"-detectie.
   const rowsDef: Array<{ label: string; get: (c: (typeof cmp)[number]) => number; fmt: (c: (typeof cmp)[number]) => string; best: "min" | "max" | "none" }> = [
-    { label: "Cataloguswaarde", get: (c) => c.cataloguswaarde, fmt: (c) => euro(c.cataloguswaarde), best: "min" },
-    { label: "Fiscale aftrek", get: (c) => c.aftrekPct, fmt: (c) => pct(c.aftrekPct), best: "max" },
-    { label: "Voordeel alle aard / jaar", get: (c) => c.vaa, fmt: (c) => euro(c.vaa), best: "min" },
-    { label: "CO₂-uitstoot", get: (c) => c.co2, fmt: (c) => `${c.co2} g/km`, best: "min" },
-    { label: "Verworpen uitgaven / jaar", get: (c) => c.verworpen, fmt: (c) => euro(c.verworpen), best: "min" },
-    { label: "RSZ-bijdrage / jaar", get: (c) => c.rsz, fmt: (c) => euro(c.rsz), best: "min" },
-    { label: "Totale kost / maand", get: (c) => c.tcoM, fmt: (c) => euro(c.tcoM), best: "min" },
+    { label: t("rijCataloguswaarde"), get: (c) => c.cataloguswaarde, fmt: (c) => euro(c.cataloguswaarde), best: "min" },
+    { label: t("rijAftrek"), get: (c) => c.aftrekPct, fmt: (c) => pct(c.aftrekPct), best: "max" },
+    { label: t("rijVaa"), get: (c) => c.vaa, fmt: (c) => euro(c.vaa), best: "min" },
+    { label: t("rijCo2"), get: (c) => c.co2, fmt: (c) => `${c.co2} g/km`, best: "min" },
+    { label: t("rijVu"), get: (c) => c.verworpen, fmt: (c) => euro(c.verworpen), best: "min" },
+    { label: t("rijRsz"), get: (c) => c.rsz, fmt: (c) => euro(c.rsz), best: "min" },
+    { label: t("rijTco"), get: (c) => c.tcoM, fmt: (c) => euro(c.tcoM), best: "min" },
   ];
 
   function bestIndex(get: (c: (typeof cmp)[number]) => number, best: "min" | "max" | "none") {
@@ -120,21 +124,33 @@ export default function VergelijkingPagina() {
     if (bi >= 0 && winner && cmp[bi].id === winner.id) winnerBest++;
   });
 
+  /** Criteriumnamen staan in de rekenkern in het Nederlands; hier vertalen we
+      ze op basis van de code, zodat de kern taalvrij blijft. */
+  const critSleutel: Record<string, string> = {
+    tco: "Tco",
+    aftrek: "Aftrek",
+    vu: "Vu",
+    flex: "Flex",
+    co2: "Co2",
+    rest: "Rest",
+  };
+  const critNaam = (code: string) => t(`crit${critSleutel[code] ?? "Tco"}`);
+
   const typeWoord = winner
     ? winner.type === "BEV"
-      ? "volledig elektrische"
+      ? t("typeBev")
       : winner.type === "PHEV"
-        ? "plug-in hybride"
+        ? t("typePhev")
         : winner.type === "HEV"
-          ? "hybride"
-          : "fossiele"
+          ? t("typeHev")
+          : t("typeFossiel")
     : "";
 
   // Grafiekdata.
   const metricDefs: Record<Metric, { label: string; get: (c: (typeof cmp)[number]) => number; best: "min" | "max"; fmt: (v: number) => string }> = {
-    tco: { label: "Totale kost per maand", get: (c) => c.tcoM, best: "min", fmt: (v) => euro(v) },
-    vaa: { label: "Voordeel alle aard per jaar", get: (c) => c.vaa, best: "min", fmt: (v) => euro(v) },
-    aftrek: { label: "Fiscale aftrekbaarheid", get: (c) => c.aftrekPct, best: "max", fmt: (v) => pct(v) },
+    tco: { label: t("grafiekTco"), get: (c) => c.tcoM, best: "min", fmt: (v) => euro(v) },
+    vaa: { label: t("grafiekVaa"), get: (c) => c.vaa, best: "min", fmt: (v) => euro(v) },
+    aftrek: { label: t("grafiekAftrek"), get: (c) => c.aftrekPct, best: "max", fmt: (v) => pct(v) },
   };
 
   async function bewaarBeslissing() {
@@ -143,7 +159,7 @@ export default function VergelijkingPagina() {
     setFout(null);
     try {
       await bewaarEvaluatie({
-        titel: titel || `Vergelijking ${new Date().toLocaleDateString("nl-BE")}`,
+        titel: titel || t("standaardTitel", { datum: new Date().toLocaleDateString(locale) }),
         vehicle_ids: geselecteerd,
         resultaten: scores,
         aanbeveling: `${winner.name}: ${winner.advies} (${getal(winner.eindscore)}/10)`,
@@ -165,13 +181,12 @@ export default function VergelijkingPagina() {
       {/* Kop */}
       <div className="mb-8 flex flex-wrap items-end justify-between gap-6">
         <div>
-          <Eyebrow>Vergelijking · {cmp.length} wagens</Eyebrow>
+          <Eyebrow>{t("eyebrow", { aantal: cmp.length })}</Eyebrow>
           <h1 className="m-0 mb-2.5 text-[clamp(30px,4vw,46px)] font-bold tracking-[-0.02em]">
-            Het scoredashboard
+            {t("kop")}
           </h1>
           <p className="m-0 max-w-[42em] text-[16.5px] text-ink-700">
-            Een onderbouwde rangschikking op basis van fiscale aftrek, voordeel alle aard, totale
-            kost en milieu-impact.
+            {t("intro")}
           </p>
         </div>
         <div className="bs-no-print flex gap-3">
@@ -180,14 +195,14 @@ export default function VergelijkingPagina() {
             className="inline-flex h-[46px] items-center gap-2 rounded-[11px] border-[1.5px] border-line bg-white px-5 text-[14.5px] font-bold text-ink transition-colors hover:border-ink"
           >
             <Icon name="sliders-horizontal" size={17} />
-            Pas selectie aan
+            {t("pasSelectieAan")}
           </Link>
           <button
             onClick={() => window.print()}
             className="inline-flex h-[46px] items-center gap-2 rounded-[11px] bg-ink px-5 text-[14.5px] font-bold text-white transition-colors hover:bg-ink-600"
           >
             <Icon name="printer" size={17} />
-            Print / PDF
+            {t("printPdf")}
           </button>
         </div>
       </div>
@@ -199,7 +214,7 @@ export default function VergelijkingPagina() {
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <div className="mb-2.5 text-[13px] font-bold text-ink">
-              Kandidaten ({kandidaten.length}/{MAX_KANDIDATEN})
+              {t("kandidaten", { aantal: kandidaten.length, max: MAX_KANDIDATEN })}
             </div>
             <div className="flex flex-wrap gap-2">
               {wagens.map((w) => (
@@ -214,18 +229,20 @@ export default function VergelijkingPagina() {
               ))}
               {wagens.length === 0 && (
                 <p className="m-0 text-sm text-ink-500">
-                  Voeg eerst wagens toe via de{" "}
-                  <Link href="/catalogus" className="font-bold text-ink underline">
-                    catalogus
-                  </Link>
-                  .
+                  {t.rich("voegEerstToe", {
+                    catalogus: (chunks) => (
+                      <Link href="/catalogus" className="font-bold text-ink underline">
+                        {chunks}
+                      </Link>
+                    ),
+                  })}
                 </p>
               )}
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-5 text-[14px]">
             <label className="flex items-center gap-2">
-              <span className="text-[12px] font-bold text-ink-500">Eerste gebruiksjaar</span>
+              <span className="text-[12px] font-bold text-ink-500">{t("eersteGebruiksjaar")}</span>
               <select
                 value={startjaar}
                 onChange={(e) => setStartjaar(Number(e.target.value))}
@@ -240,7 +257,7 @@ export default function VergelijkingPagina() {
             </label>
             <label className="flex cursor-pointer items-center gap-2 font-medium text-ink-700">
               <input type="checkbox" checked={kmoTarief} onChange={(e) => setKmoTarief(e.target.checked)} />
-              Verlaagd KMO-tarief (20%)
+              {t("kmoTarief")}
             </label>
           </div>
         </div>
@@ -252,7 +269,7 @@ export default function VergelijkingPagina() {
             <Icon name="scale" size={26} />
           </span>
           <p className="m-0 text-[16px] text-ink-700">
-            Selecteer minstens één kandidaat om de vergelijking te zien.
+            {t("selecteerKandidaat")}
           </p>
         </div>
       ) : (
@@ -264,7 +281,7 @@ export default function VergelijkingPagina() {
                 className="pointer-events-none absolute inset-0"
                 style={{
                   background:
-                    "radial-gradient(120% 140% at 100% 0%, rgba(174,154,100,0.18), transparent 55%)",
+                    "radial-gradient(120% 140% at 100% 0%, color-mix(in srgb, var(--gold) 26%, transparent), transparent 55%)",
                 }}
               />
               <div className="relative flex flex-wrap items-center justify-between gap-8 p-9">
@@ -280,14 +297,17 @@ export default function VergelijkingPagina() {
                   </div>
                   <div>
                     <div className="mb-2 text-[12px] font-bold uppercase tracking-[0.16em] text-gold">
-                      Beste keuze · {winner.advies}
+                      {t("besteKeuze", { advies: t(`advies${winner.advies[0].toUpperCase()}${winner.advies.slice(1)}`) })}
                     </div>
                     <div className="text-[30px] font-bold leading-[1.1] tracking-[-0.01em] text-white">
                       {winner.name}
                     </div>
                     <div className="mt-2 max-w-[38em] text-[15px] text-white/70">
-                      Beste totaalscore op {winnerBest} van {rowsDef.length} kerncijfers. Een{" "}
-                      {typeWoord} keuze met de scherpste fiscale balans.
+                      {t("besteTotaalscore", {
+                        aantal: winnerBest,
+                        totaal: rowsDef.length,
+                        type: typeWoord,
+                      })}
                     </div>
                   </div>
                 </div>
@@ -297,16 +317,16 @@ export default function VergelijkingPagina() {
                       {getal(winner.eindscore)}
                     </div>
                     <div className="mt-1.5 text-[11px] uppercase tracking-[0.14em] text-white/55">
-                      Score / 10
+                      {t("scoreOp10")}
                     </div>
                   </div>
                   <div className="flex flex-col gap-3.5 border-l border-white/[0.12] pl-[30px]">
                     <div>
-                      <div className="text-[12px] text-white/55">Fiscale aftrek</div>
+                      <div className="text-[12px] text-white/55">{t("fiscaleAftrek")}</div>
                       <div className="text-[18px] font-bold text-white">{pct(winner.aftrekPct)}</div>
                     </div>
                     <div>
-                      <div className="text-[12px] text-white/55">Totale kost / maand</div>
+                      <div className="text-[12px] text-white/55">{t("totaleKostMaand")}</div>
                       <div className="text-[18px] font-bold text-white">{euro(winner.tcoM)}</div>
                     </div>
                   </div>
@@ -317,14 +337,14 @@ export default function VergelijkingPagina() {
 
           {/* VERGELIJKINGSTABEL */}
           <div className="mb-11">
-            <h2 className="m-0 mb-[18px] text-[22px] font-bold">Fiscale kerncijfers naast elkaar</h2>
+            <h2 className="m-0 mb-[18px] text-[22px] font-bold">{t("kerncijfersTitel")}</h2>
             <div className="overflow-hidden rounded-[14px] border border-line">
               <div className="bs-cmp-scroll">
                 <table className="bs-cmp-table w-full text-[15px]">
                   <thead>
                     <tr>
                       <th className="bs-sticky-col min-w-[200px] border-b border-line px-5 py-[18px] text-left align-bottom text-[12px] font-bold uppercase tracking-[0.1em] text-ink-500">
-                        Criterium
+                        {t("criterium")}
                       </th>
                       {cmp.map((c) => (
                         <th
@@ -369,20 +389,21 @@ export default function VergelijkingPagina() {
               <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-gold text-white">
                 <Icon name="check" size={11} />
               </span>
-              Gunstigste waarde per criterium
+              {t("gunstigsteWaarde")}
             </div>
           </div>
 
           {/* SCORINGSMATRIX */}
           <div className="mb-11">
-            <h2 className="m-0 mb-[18px] text-[22px] font-bold">Scoringsmatrix</h2>
+            <h2 className="m-0 mb-[18px] text-[22px] font-bold">{t("scoringsmatrix")}</h2>
             <div className="overflow-hidden rounded-[14px] border border-line">
               <div className="bs-cmp-scroll">
                 <table className="bs-cmp-table w-full text-[15px]">
                   <thead>
                     <tr>
                       <th className="bs-sticky-col min-w-[220px] border-b border-line px-5 py-4 text-left text-[12px] font-bold uppercase tracking-[0.1em] text-ink-500">
-                        Criterium <span className="font-normal normal-case tracking-normal">· gewicht</span>
+                        {t("criterium")}{" "}
+                        <span className="font-normal normal-case tracking-normal">{t("gewicht")}</span>
                       </th>
                       {cmp.map((c) => (
                         <th
@@ -402,7 +423,7 @@ export default function VergelijkingPagina() {
                       return (
                         <tr key={cr.code} className="border-b border-line">
                           <td className="bs-sticky-col px-5 py-4 text-ink-700">
-                            <span className="font-bold">{cr.naam}</span>{" "}
+                            <span className="font-bold">{critNaam(cr.code)}</span>{" "}
                             <span className="text-[13px] text-ink-500">· {Math.round(cr.weging * 100)}%</span>
                           </td>
                           {cmp.map((c) => {
@@ -428,7 +449,7 @@ export default function VergelijkingPagina() {
                     })}
                     <tr style={{ background: "var(--paper)" }}>
                       <td className="bs-sticky-col px-5 py-[18px] text-[16px] font-bold text-ink" style={{ background: "var(--paper)" }}>
-                        Eindscore
+                        {t("eindscore")}
                       </td>
                       {cmp.map((c) => (
                         <td key={c.id} data-win={winner?.id === c.id} className="px-5 py-[18px]">
@@ -439,7 +460,7 @@ export default function VergelijkingPagina() {
                             {winner?.id === c.id && (
                               <span className="inline-flex items-center gap-1.5 rounded-full bg-gold-soft px-2.5 py-1 text-[11.5px] font-bold text-ink">
                                 <Icon name="award" size={12} />
-                                Winnaar
+                                {t("winnaar")}
                               </span>
                             )}
                           </span>
@@ -459,10 +480,7 @@ export default function VergelijkingPagina() {
               <Icon name="info" size={18} />
             </span>
             <p className="m-0 text-[14px] leading-relaxed text-ink-700">
-              Deze berekening is een hulpmiddel, geen fiscaal advies. Ze houdt geen rekening met de
-              regionale belasting op inverkeerstelling en verkeersbelasting, noch met de
-              bijzonderheden van jouw dossier. Bespreek elke beslissing met je boekhouder of
-              belastingadviseur.
+              {t("disclaimer")}
             </p>
           </div>
 
@@ -471,13 +489,13 @@ export default function VergelijkingPagina() {
             <div className="mb-[18px] flex flex-wrap items-end justify-between gap-5">
               <div>
                 <h2 className="m-0 mb-1 text-[22px] font-bold">{metricDefs[metric].label}</h2>
-                <p className="m-0 text-[14px] text-ink-500">De gekleurde balk markeert de gunstigste waarde.</p>
+                <p className="m-0 text-[14px] text-ink-500">{t("gekleurdeBalk")}</p>
               </div>
               <div className="bs-no-print inline-flex overflow-hidden rounded-[10px] border border-line">
                 {([
-                  { id: "tco", label: "TCO / maand" },
-                  { id: "vaa", label: "VAA / jaar" },
-                  { id: "aftrek", label: "Aftrek %" },
+                  { id: "tco", label: t("metricTco") },
+                  { id: "vaa", label: t("metricVaa") },
+                  { id: "aftrek", label: t("metricAftrek") },
                 ] as Array<{ id: Metric; label: string }>).map((b) => (
                   <button
                     key={b.id}
@@ -492,6 +510,7 @@ export default function VergelijkingPagina() {
             </div>
             <div className="rounded-[14px] border border-line px-5 pb-3 pt-6">
               <BarChart
+                label={t("grafiek")}
                 items={cmp.map((c) => ({
                   short: c.cat?.model ?? c.name,
                   type: c.type,
@@ -506,21 +525,21 @@ export default function VergelijkingPagina() {
 
           {/* BEWAREN */}
           <div className="bs-no-print rounded-[14px] border border-line bg-white p-6">
-            <h2 className="m-0 mb-1 text-[18px] font-bold">Beslissing bewaren</h2>
+            <h2 className="m-0 mb-1 text-[18px] font-bold">{t("bewarenTitel")}</h2>
             <p className="m-0 mb-4 text-[14px] text-ink-500">
-              Leg deze vergelijking vast voor de directievergadering.
+              {t("bewarenIntro")}
             </p>
             <div className="grid gap-3 sm:grid-cols-2">
               <input
                 value={titel}
                 onChange={(e) => setTitel(e.target.value)}
-                placeholder="Titel (bv. Vervanging vloot 2026)"
+                placeholder={t("titelPlaceholder")}
                 className="bs-inp h-[44px] rounded-[10px] px-3.5 text-[15px]"
               />
               <input
                 value={notitie}
                 onChange={(e) => setNotitie(e.target.value)}
-                placeholder="Korte motivering (optioneel)"
+                placeholder={t("notitiePlaceholder")}
                 className="bs-inp h-[44px] rounded-[10px] px-3.5 text-[15px]"
               />
             </div>
@@ -531,23 +550,23 @@ export default function VergelijkingPagina() {
                 className="inline-flex h-[46px] items-center gap-2 rounded-[11px] bg-gold px-6 text-[15px] font-bold text-white transition-colors hover:bg-gold-hover disabled:opacity-50"
               >
                 <Icon name="check" size={17} />
-                {bezig ? "Bezig…" : "Bewaar beslissing"}
+                {bezig ? t("bezig") : t("bewaarBeslissing")}
               </button>
-              {bewaard && <span className="text-sm font-medium text-emerald-700">Bewaard ✓</span>}
+              {bewaard && <span className="text-sm font-medium text-emerald-700">{t("bewaard")}</span>}
             </div>
           </div>
 
           {/* HISTORIEK */}
           {evaluaties.length > 0 && (
             <div className="mt-8">
-              <h2 className="m-0 mb-[18px] text-[22px] font-bold">Beslissingshistoriek</h2>
+              <h2 className="m-0 mb-[18px] text-[22px] font-bold">{t("historiek")}</h2>
               <div className="flex flex-col gap-3">
                 {evaluaties.map((e) => (
                   <div key={e.id} className="rounded-[12px] border border-line bg-white p-4">
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <span className="font-bold text-ink">{e.titel}</span>
                       <span className="text-[13px] text-ink-500">
-                        {new Date(e.created_at).toLocaleDateString("nl-BE")}
+                        {new Date(e.created_at).toLocaleDateString(locale)}
                       </span>
                     </div>
                     <p className="m-0 mt-1 text-[14px] text-ink-700">{e.aanbeveling}</p>
@@ -569,11 +588,13 @@ function BarChart({
   fmt,
   best,
   isPct,
+  label,
 }: {
   items: Array<{ short: string; type: string; value: number }>;
   fmt: (v: number) => string;
   best: "min" | "max";
   isPct: boolean;
+  label: string;
 }) {
   const W = 760,
     H = 340,
@@ -597,7 +618,7 @@ function BarChart({
   }));
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label="grafiek" style={{ display: "block", height: "auto" }}>
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label={label} style={{ display: "block", height: "auto" }}>
       {grid.map((g, i) => (
         <g key={i}>
           <line x1={padL} x2={W - padR} y1={g.y} y2={g.y} stroke="#e9ecef" strokeWidth={1} />
