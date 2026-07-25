@@ -25,7 +25,8 @@
     "menu": "Menu",
     "aangemeldAls": "Connecté en tant que {bedrijf}",
     "taal": "Langue",
-    "vloot": "Flotte"
+    "vloot": "Flotte",
+    "simulator": "Simulateur"
   },
   "footer": {
     "intro": "Un outil de calcul gratuit pour l'impact fiscal et financier des voitures de société en Belgique. Pour toute entreprise, de l'indépendant à la flotte complète.",
@@ -45,7 +46,8 @@
     "vergelijking": "Comparaison",
     "fiscaalKader": "Cadre fiscal",
     "handleiding": "Mode d'emploi",
-    "vloot": "Flotte"
+    "vloot": "Flotte",
+    "simulator": "Simulateur"
   },
   "auth": {
     "terugNaarSite": "← Retour au site",
@@ -698,5 +700,36 @@
     "verlopen": "Échu",
     "maandenTeGaan": "Encore {maanden} mois",
     "csvUitleg": "Le fichier CSV utilise le point-virgule comme séparateur et compte {kolommen} colonnes."
+  },
+  "simulator": {
+    "eyebrow": "Gratuit, sans compte",
+    "titel": "Simulateur",
+    "intro": "Calculez entièrement une voiture de société. Aucune inscription requise ; elle ne l'est que pour enregistrer ou comparer.",
+    "invoerTitel": "Vos données",
+    "model": "Modèle",
+    "startjaar": "Première année d'utilisation",
+    "autokosten": "Coûts annuels du véhicule",
+    "autokostenHint": "Estimation basée sur la valeur catalogue. Adaptez selon votre offre.",
+    "eigenBijdrage": "Contribution personnelle du travailleur par mois",
+    "tankkaart": "Carte carburant ou de recharge",
+    "kmoTarief": "Taux réduit PME",
+    "kpiAftrek": "Déduction fiscale",
+    "kpiAftrekDetail": "en {jaar}",
+    "kpiVaa": "Avantage de toute nature",
+    "kpiVaaDetail": "par an, après contribution personnelle",
+    "kpiVu": "Dépenses non admises",
+    "kpiVuDetail": "par an",
+    "kpiTco": "Coût total",
+    "kpiTcoDetail": "par mois sur quatre ans",
+    "tijdlijnTitel": "Ce qui se passe dans les années à venir",
+    "tijdlijnIntro": "La déductibilité de ce véhicule change d'année en année. C'est là que se cache le coût que vous ne voyez pas aujourd'hui.",
+    "verderTitel": "Aller plus loin",
+    "verderIntro": "Créez un compte gratuit pour enregistrer ce calcul, comparer plusieurs véhicules et suivre l'ensemble de votre parc.",
+    "verderTitelAangemeld": "Continuer dans votre dossier",
+    "verderIntroAangemeld": "Vous êtes connecté. Placez ce véhicule à côté de deux autres candidats et enregistrez la décision dans votre dossier.",
+    "registreren": "Créer un compte gratuit",
+    "naarVergelijking": "Vers la comparaison",
+    "naarKader": "Comment est-ce calculé ?",
+    "disclaimer": "Cette simulation est une estimation basée sur des valeurs indicatives et les paramètres fiscaux de l'année choisie. Elle ne remplace pas l'avis de votre comptable ou conseiller fiscal."
   }
 }

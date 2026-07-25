@@ -25,7 +25,8 @@
     "menu": "Menu",
     "aangemeldAls": "Signed in as {bedrijf}",
     "taal": "Language",
-    "vloot": "Fleet"
+    "vloot": "Fleet",
+    "simulator": "Simulator"
   },
   "footer": {
     "intro": "A free calculator for the tax and financial impact of company cars in Belgium. For every business, from sole trader to full fleet.",
@@ -45,7 +46,8 @@
     "vergelijking": "Comparison",
     "fiscaalKader": "Tax framework",
     "handleiding": "User guide",
-    "vloot": "Fleet"
+    "vloot": "Fleet",
+    "simulator": "Simulator"
   },
   "auth": {
     "terugNaarSite": "← Back to the site",
@@ -698,5 +700,36 @@
     "verlopen": "Expired",
     "maandenTeGaan": "{maanden} months left",
     "csvUitleg": "The CSV file uses a semicolon as separator and has {kolommen} columns."
+  },
+  "simulator": {
+    "eyebrow": "Free, no account",
+    "titel": "Simulator",
+    "intro": "Work out one company car in full. No sign-up needed; that only comes in to save or compare.",
+    "invoerTitel": "Your details",
+    "model": "Model",
+    "startjaar": "First year of use",
+    "autokosten": "Annual car costs",
+    "autokostenHint": "Estimate based on the catalogue value. Adjust to match your quote.",
+    "eigenBijdrage": "Employee contribution per month",
+    "tankkaart": "Fuel or charge card",
+    "kmoTarief": "Reduced SME rate",
+    "kpiAftrek": "Tax deduction",
+    "kpiAftrekDetail": "in {jaar}",
+    "kpiVaa": "Benefit in kind",
+    "kpiVaaDetail": "per year, after employee contribution",
+    "kpiVu": "Disallowed expenses",
+    "kpiVuDetail": "per year",
+    "kpiTco": "Total cost",
+    "kpiTcoDetail": "per month over four years",
+    "tijdlijnTitel": "What happens in the years ahead",
+    "tijdlijnIntro": "This car's deductibility changes from year to year. That is where the cost you cannot see today is hiding.",
+    "verderTitel": "Go further",
+    "verderIntro": "Create a free account to save this calculation, compare several cars side by side and track your whole fleet.",
+    "verderTitelAangemeld": "Continue in your own file",
+    "verderIntroAangemeld": "You are signed in. Put this car next to two other candidates and save the decision in your file.",
+    "registreren": "Create a free account",
+    "naarVergelijking": "To the comparison",
+    "naarKader": "How is this calculated?",
+    "disclaimer": "This simulation is an estimate based on indicative values and the tax parameters of the chosen year. It does not replace advice from your accountant or tax adviser."
   }
 }

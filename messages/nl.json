@@ -25,7 +25,8 @@
     "menu": "Menu",
     "aangemeldAls": "Aangemeld als {bedrijf}",
     "taal": "Taal",
-    "vloot": "Vloot"
+    "vloot": "Vloot",
+    "simulator": "Simulator"
   },
   "footer": {
     "intro": "Een gratis rekeninstrument voor de fiscale en financiële impact van bedrijfswagens in België. Voor elke onderneming, van eenmanszaak tot vloot.",
@@ -45,7 +46,8 @@
     "vergelijking": "Vergelijking",
     "fiscaalKader": "Fiscaal kader",
     "handleiding": "Handleiding",
-    "vloot": "Vloot"
+    "vloot": "Vloot",
+    "simulator": "Simulator"
   },
   "auth": {
     "terugNaarSite": "← Terug naar de site",
@@ -698,5 +700,36 @@
     "verlopen": "Verlopen",
     "maandenTeGaan": "Nog {maanden} maanden",
     "csvUitleg": "Het CSV-bestand gebruikt een puntkomma als scheidingsteken en telt {kolommen} kolommen."
+  },
+  "simulator": {
+    "eyebrow": "Gratis, zonder account",
+    "titel": "Simulator",
+    "intro": "Reken één bedrijfswagen volledig door. Geen registratie nodig; die is pas nodig om te bewaren of te vergelijken.",
+    "invoerTitel": "Jouw gegevens",
+    "model": "Model",
+    "startjaar": "Eerste gebruiksjaar",
+    "autokosten": "Jaarlijkse autokosten",
+    "autokostenHint": "Raming op basis van de cataloguswaarde. Pas aan volgens je offerte.",
+    "eigenBijdrage": "Eigen bijdrage werknemer per maand",
+    "tankkaart": "Tank- of laadkaart",
+    "kmoTarief": "Verlaagd KMO-tarief",
+    "kpiAftrek": "Fiscale aftrek",
+    "kpiAftrekDetail": "in {jaar}",
+    "kpiVaa": "Voordeel alle aard",
+    "kpiVaaDetail": "per jaar, na eigen bijdrage",
+    "kpiVu": "Verworpen uitgaven",
+    "kpiVuDetail": "per jaar",
+    "kpiTco": "Totale kost",
+    "kpiTcoDetail": "per maand over vier jaar",
+    "tijdlijnTitel": "Wat er de komende jaren gebeurt",
+    "tijdlijnIntro": "De aftrekbaarheid van deze wagen verandert met het jaar. Dit is waar de kost zit die je vandaag nog niet ziet.",
+    "verderTitel": "Verder gaan",
+    "verderIntro": "Maak een gratis account om deze berekening te bewaren, meerdere wagens naast elkaar te leggen en je volledige wagenpark op te volgen.",
+    "verderTitelAangemeld": "Verder in je eigen dossier",
+    "verderIntroAangemeld": "Je bent aangemeld. Leg deze wagen naast twee andere kandidaten en bewaar de beslissing in je dossier.",
+    "registreren": "Gratis account maken",
+    "naarVergelijking": "Naar de vergelijking",
+    "naarKader": "Hoe wordt dit berekend?",
+    "disclaimer": "Deze simulatie is een raming op basis van richtwaarden en de fiscale parameters van het gekozen jaar. Ze vervangt geen advies van je boekhouder of belastingadviseur."
   }
 }
