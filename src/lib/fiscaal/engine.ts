@@ -9,9 +9,10 @@ import type {
 } from "./types";
 
 /**
- * Rekenkern van de beslissingstool. Alle formules komen letterlijk uit het
- * rapport "Autofiscaliteit: impact van autokosten op verworpen uitgaven bij
- * B-sure NV" (paragraaf 1.4.1 en Bijlagen 1 en 3).
+ * Rekenkern van Autofiscaliteit. De formules volgen de Belgische wetgeving:
+ * de aftrekkalender en het voordeel van alle aard uit het WIB 92, de
+ * uitdoofregeling uit de programmawet van 2023 en de CO2-solidariteitsbijdrage
+ * uit de RSZ-instructies.
  */
 
 /** Coëfficiënt in de gramformule per brandstoftype (FOD Financiën, 2025). */

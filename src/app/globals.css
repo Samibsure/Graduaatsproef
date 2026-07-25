@@ -1,18 +1,22 @@
 @import "tailwindcss";
 
 /*
- * Huisstijl B-sure × PXL — navy (ink) + goud, Trebuchet MS.
- * Tokens afgestemd op het B-sure design system (handoff).
+ * Huisstijl Autofiscaliteit — diep marineblauw (ink) met een groen accent.
+ *
+ * Het groen verwijst naar de elektrificatie waar de fiscaliteit naartoe stuurt
+ * en haalt bovendien voldoende contrast op wit, wat het vorige, lichtere accent
+ * niet deed. De tokennamen blijven --gold* zodat de honderd klassennamen in de
+ * pagina's ongemoeid blijven; alleen de waarden veranderen.
  */
 :root {
   --ink: #0b1f33;
   --ink-700: #2b3f52;
   --ink-600: #16314c;
   --ink-500: #5c6b7a;
-  --gold: #ae9a64;
-  --gold-hover: #97844f;
-  --gold-soft: #f4efe2;
-  --gold-line: rgba(174, 154, 100, 0.45);
+  --gold: #0f766e;
+  --gold-hover: #115e59;
+  --gold-soft: #e8f4f1;
+  --gold-line: color-mix(in srgb, var(--gold) 45%, transparent);
   --paper: #f7f8fa;
   --line: #e6e9ed;
   --danger: #a23b34;
@@ -30,6 +34,7 @@
   --color-gold: var(--gold);
   --color-gold-hover: var(--gold-hover);
   --color-gold-soft: var(--gold-soft);
+  --color-gold-line: var(--gold-line);
   --color-paper: var(--paper);
   --color-line: var(--line);
   --color-danger: var(--danger);
@@ -114,7 +119,7 @@ body {
 }
 .bs-cat-card[data-selected="true"] {
   border: 1.5px solid var(--gold);
-  box-shadow: 0 12px 30px rgba(174, 154, 100, 0.18);
+  box-shadow: 0 12px 30px color-mix(in srgb, var(--gold) 18%, transparent);
 }
 .bs-cat-add {
   background: #fff;
@@ -144,7 +149,7 @@ body {
 }
 .bs-cmp-table th[data-win="true"],
 .bs-cmp-table td[data-win="true"] {
-  background: rgba(174, 154, 100, 0.09);
+  background: color-mix(in srgb, var(--gold) 9%, transparent);
 }
 .bs-cmp-bar {
   transition: opacity 0.15s;

@@ -1,42 +1,41 @@
 /**
- * Eigen wordmark-lockup in de gecombineerde B-sure × PXL huisstijl.
- * Bewust een eigen tekstlockup (geen kopie van de officiële, handelsmerk-
- * beschermde logo's), in ink + PXL-goud. Werkt volledig offline (inline SVG).
+ * Eigen wordmark van Autofiscaliteit. Volledig inline SVG, dus geen externe
+ * lettertypes of afbeeldingen nodig.
  */
-export function BrandLockup({ variant = "light" }: { variant?: "light" | "dark" }) {
+export function Wordmerk({ variant = "light" }: { variant?: "light" | "dark" }) {
   const ink = variant === "dark" ? "#ffffff" : "var(--ink)";
-  const sub = variant === "dark" ? "rgba(255,255,255,.65)" : "rgba(11,31,51,.55)";
+  const sub = variant === "dark" ? "rgba(255,255,255,.62)" : "var(--ink-500)";
   return (
-    <span className="inline-flex items-center gap-2.5 leading-none">
-      <BSureMark />
-      <span className="flex flex-col">
-        <span className="flex items-baseline gap-1.5">
-          <span className="text-[15px] font-semibold tracking-tight" style={{ color: ink }}>
-            B&#8209;sure
-          </span>
-          <span className="text-[11px] font-medium" style={{ color: "var(--gold)" }}>
-            ×
-          </span>
-          <span className="text-[15px] font-bold tracking-[0.18em]" style={{ color: ink }}>
-            PXL
-          </span>
-        </span>
-        <span className="text-[9.5px] font-medium uppercase tracking-[0.14em]" style={{ color: sub }}>
+    <span className="inline-flex items-center gap-3 leading-none">
+      <Logomerk />
+      <span className="flex flex-col gap-0.5">
+        <span className="text-[17px] font-bold tracking-[-0.01em]" style={{ color: ink }}>
           Autofiscaliteit
+        </span>
+        <span
+          className="text-[9.5px] font-bold uppercase tracking-[0.15em]"
+          style={{ color: sub }}
+        >
+          Bedrijfswagens in België
         </span>
       </span>
     </span>
   );
 }
 
-/** Compacte "b" met goud-cirkel, als herkenbaar merkpunt. */
-export function BSureMark({ size = 30 }: { size?: number }) {
+/** Compact merkteken: een procentteken in de accentkleur op een donker vlak. */
+export function Logomerk({ size = 36 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 36 36" fill="none" aria-hidden="true">
       <rect width="36" height="36" rx="9" fill="var(--ink)" />
-      <circle cx="18" cy="14" r="6.4" fill="none" stroke="var(--gold)" strokeWidth="2.4" />
-      <path d="M18 21.5v6.2" stroke="#ffffff" strokeWidth="2.4" strokeLinecap="round" />
-      <circle cx="18" cy="14" r="1.9" fill="var(--gold)" />
+      <circle cx="13.6" cy="13.6" r="3.1" fill="none" stroke="var(--gold)" strokeWidth="2.2" />
+      <circle cx="22.4" cy="22.4" r="3.1" fill="none" stroke="var(--gold)" strokeWidth="2.2" />
+      <path
+        d="M24.6 11.4 11.4 24.6"
+        stroke="#ffffff"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+      />
     </svg>
   );
 }

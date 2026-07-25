@@ -72,7 +72,7 @@ describe("advies", () => {
   });
 });
 
-describe("scoreVergelijking op het B-sure dossier", () => {
+describe("scoreVergelijking op het referentiedossier", () => {
   const projecties = [bev, phev, diesel].map((v) => berekenProjectie(DEFAULT_CONTEXT, v, 2026));
   const resultaten = scoreVergelijking(projecties);
   const perId = Object.fromEntries(resultaten.map((r) => [r.vehicleId, r]));
