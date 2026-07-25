@@ -12,18 +12,42 @@ Het volledige schema van Autofiscaliteit staat in `migrations/`, in volgorde uit
 | `0006_bedrijfsprofiel_en_validatie.sql` | Bedrijfsprofiel (KMO, boekjaar, adres, logo), schrijfrechten per rol en de CHECK-constraints op wagens |
 | `0007_rekenkern_uitbreiden.sql` | Financiering, btw-methode, eigen bijdrage, laadinfrastructuur en contractdata op wagens |
 | `0008_hulpfuncties_afschermen.sql` | `EXECUTE` op de vier RLS-hulpfuncties weg bij `PUBLIC` en `anon` |
+| `0009_profielrechten_afdwingen.sql` | Kolomrechten en een trigger op `profiles`: geen zelfpromotie meer tot beheerder of platformbeheerder |
 
 `0005` en `0006` horen bij elkaar maar staan bewust apart: PostgreSQL weigert een nieuwe
 enumwaarde te gebruiken in dezelfde transactie waarin ze is aangemaakt.
 
 ### Status van dit project
 
-De migraties `0001` tot en met `0008` zijn uitgevoerd op het project `fkmulfdpuphedfakmmsd`. De
+De migraties `0001` tot en met `0009` zijn uitgevoerd op het project `fkmulfdpuphedfakmmsd`. De
 zes permissieve `USING (true)`-policies uit de periode zonder accounts zijn daarmee verdwenen; de
 tien bestaande wagens staan in het archiefbedrijf `00000000-0000-0000-0000-000000000001`.
 
-Gecontroleerd na `0008`: elke tabel in `public` heeft RLS aan, geen enkele policy laat `anon`
-schrijven, en de Security Advisor meldt geen anon-toegang tot `security definer`-functies meer.
+Gecontroleerd na `0009`, met testgebruikers in een teruggedraaide transactie:
+
+| Poging | Uitkomst |
+| --- | --- |
+| Gewoon lid maakt zichzelf platformbeheerder | geweigerd |
+| Gewoon lid waardeert zijn eigen rol op | geweigerd |
+| Gebruiker verhuist zichzelf naar een ander bedrijf | geweigerd |
+| Bedrijf B leest de wagens van bedrijf A | 0 rijen |
+| Rol `lezer` schrijft | `mag_schrijven()` is false |
+| Eigen naam aanpassen, rol van collega wijzigen, bedrijfsprofiel en wagens bewerken | werkt |
+
+Verder: elke tabel in `public` heeft RLS aan, geen enkele policy laat `anon` schrijven, en de
+Security Advisor meldt geen anon-toegang tot `security definer`-functies meer.
+
+### Wat de database niet kan afdwingen
+
+De uitnodigingsflow koppelt een nieuwe registratie aan een bedrijf **op e-mailadres**: registreert
+iemand zich met een adres waarvoor een uitnodiging openstaat, dan komt die in dat bedrijf terecht.
+Dat is veilig zolang Supabase de e-mailbevestiging afdwingt, want dan moet je het adres echt
+bezitten. Staat *Confirm email* uit, dan kan iemand die een uitgenodigd adres kent zich als die
+persoon registreren en het bedrijf binnenwandelen.
+
+Die instelling staat buiten de database (GoTrue), dus geen enkele migratie kan ze garanderen.
+Controleer ze in het dashboard onder Authentication → Providers → Email, samen met de
+bot-bescherming op registratie.
 
 ## Uitvoeren
 
