@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { useSessie } from "@/components/SessieProvider";
 import { Card, Container, PageHead } from "@/components/ui";
@@ -10,30 +11,19 @@ import {
   herstelStandaardwaarden,
 } from "@/lib/beheer";
 import { laadFiscaleContext } from "@/lib/data";
-import type { DeductionRule, FiscaleContext, TaxParameters, Voertuigtype } from "@/lib/fiscaal/types";
+import type {
+  DeductionRule,
+  FiscaleContext,
+  TaxParameters,
+  Voertuigtype,
+} from "@/lib/fiscaal/types";
+import { PARAM_VELDEN } from "@/lib/parameterVelden";
 
 const TYPES: Voertuigtype[] = ["BEV", "PHEV", "HEV", "fossiel"];
 
-const PARAM_VELDEN: Array<{ veld: keyof TaxParameters; label: string }> = [
-  { veld: "vaa_minimum", label: "Minimum VAA (€/jaar)" },
-  { veld: "ref_co2_benzine", label: "Referentie-CO₂ benzine/LPG/CNG (g/km)" },
-  { veld: "ref_co2_diesel", label: "Referentie-CO₂ diesel (g/km)" },
-  { veld: "co2_pct_min", label: "Minimum CO₂-percentage (%)" },
-  { veld: "co2_pct_max", label: "Maximum CO₂-percentage (%)" },
-  { veld: "co2_pct_basis", label: "Basis CO₂-percentage (%)" },
-  { veld: "co2_pct_per_gram", label: "Stijging per gram (%)" },
-  { veld: "rsz_index", label: "RSZ-indexatiecoëfficiënt" },
-  { veld: "rsz_min_maand", label: "RSZ-minimum vanaf 1/7/2023 (€/maand)" },
-  { veld: "rsz_min_basis", label: "RSZ-basisminimum / BEV (€/maand)" },
-  { veld: "rsz_multiplicator", label: "RSZ-multiplicator (vanaf 1/7/2023)" },
-  { veld: "venb_tarief", label: "VenB-tarief (%)" },
-  { veld: "kmo_tarief", label: "Verlaagd KMO-tarief (%)" },
-  { veld: "kmo_min_bezoldiging", label: "Minimumbezoldiging KMO-tarief (€)" },
-  { veld: "vu_pct_met_kaart", label: "VAA → VU met tank-/laadkaart (%)" },
-  { veld: "vu_pct_zonder_kaart", label: "VAA → VU zonder kaart (%)" },
-];
 
 export default function BeheerParametersPagina() {
+  const t = useTranslations("parameters");
   const sessie = useSessie();
   const [ctx, setCtx] = useState<FiscaleContext | null>(null);
   const [jaar, setJaar] = useState(2026);
@@ -105,16 +95,15 @@ export default function BeheerParametersPagina() {
       for (const r of ctx.regels) {
         await bewaarAftrekRegel(r);
       }
-    }, "Parameters bewaard.");
+    }, t("beheerBewaard"));
   }
 
   async function herstel() {
-    if (!confirm("Alle parameters en de aftrekkalender terugzetten naar de gepubliceerde waarden?"))
-      return;
+    if (!confirm(t("beheerBevestig"))) return;
     await doe(async () => {
       await herstelStandaardwaarden();
       await herlaad();
-    }, "Standaardwaarden hersteld.");
+    }, t("beheerHersteld"));
   }
 
   // De database weigert schrijfacties van niet-beheerders hoe dan ook; dit
@@ -123,9 +112,9 @@ export default function BeheerParametersPagina() {
     return (
       <Container className="py-16">
         <PageHead
-          eyebrow="Beheer"
-          title="Geen toegang"
-          sub="Deze pagina is voorbehouden aan het beheer van Autofiscaliteit. De fiscale parameters gelden voor heel België en kunnen niet per bedrijf worden aangepast."
+          eyebrow={t("beheerEyebrow")}
+          title={t("geenToegangTitel")}
+          sub={t("geenToegangTekst")}
         />
       </Container>
     );
@@ -134,9 +123,9 @@ export default function BeheerParametersPagina() {
   return (
     <Container className="space-y-6 py-[52px]">
       <PageHead
-        eyebrow="Beheer"
-        title="Fiscale parameters bijwerken"
-        sub="Jaarlijks bij te werken na het federale begrotingsakkoord. Wijzigingen werken meteen door in de berekeningen van álle gebruikers."
+        eyebrow={t("beheerEyebrow")}
+        title={t("beheerTitel")}
+        sub={t("beheerIntro")}
         action={
           <div className="flex gap-3">
             <button
@@ -144,14 +133,14 @@ export default function BeheerParametersPagina() {
               disabled={bezig}
               className="inline-flex h-[46px] items-center rounded-[11px] bg-gold px-5 text-[14.5px] font-bold text-white transition-colors hover:bg-gold-hover disabled:opacity-50"
             >
-              {bezig ? "Bezig…" : "Bewaar wijzigingen"}
+              {bezig ? t("beheerBezig") : t("beheerBewaar")}
             </button>
             <button
               onClick={herstel}
               disabled={bezig}
               className="inline-flex h-[46px] items-center rounded-[11px] border-[1.5px] border-line px-5 text-[14.5px] font-bold text-ink transition-colors hover:bg-paper disabled:opacity-50"
             >
-              Herstel standaardwaarden
+              {t("beheerHerstel")}
             </button>
           </div>
         }
@@ -164,7 +153,7 @@ export default function BeheerParametersPagina() {
 
       <Card className="p-5">
         <div className="flex items-center justify-between">
-          <h2 className="font-semibold">Parameters per jaar</h2>
+          <h2 className="font-semibold">{t("perJaar")}</h2>
           <select
             className="rounded-lg border border-line px-2 py-1.5 text-sm"
             value={jaar}
@@ -179,9 +168,9 @@ export default function BeheerParametersPagina() {
         </div>
         {params && (
           <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {PARAM_VELDEN.map(({ veld, label }) => (
+            {PARAM_VELDEN.map(({ veld, sleutel }) => (
               <label key={veld} className="block text-sm">
-                <span className="mb-1 block text-xs font-medium text-slate-500">{label}</span>
+                <span className="mb-1 block text-xs font-medium text-slate-500">{t(sleutel)}</span>
                 <input
                   type="number"
                   step="any"
@@ -196,7 +185,7 @@ export default function BeheerParametersPagina() {
       </Card>
 
       <Card className="p-5">
-        <h2 className="font-semibold">RSZ-multiplicator per bestelperiode</h2>
+        <h2 className="font-semibold">{t("multiplicatorTitel")}</h2>
         <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {ctx?.periodes.map((p) => (
             <label key={p.code} className="block text-sm">
@@ -214,11 +203,8 @@ export default function BeheerParametersPagina() {
       </Card>
 
       <Card className="p-5">
-        <h2 className="font-semibold">Aftrekkalender</h2>
-        <p className="mt-1 text-sm text-slate-500">
-          Aftrekbaarheid in VenB per voertuigtype en bestelperiode. “Hele gebruiksduur” geldt voor
-          elk gebruiksjaar; bestellingen vóór 1 juli 2023 volgen automatisch de gramformule.
-        </p>
+        <h2 className="font-semibold">{t("kalenderTitel")}</h2>
+        <p className="mt-1 text-sm text-slate-500">{t("kalenderIntro")}</p>
         {TYPES.map((type) => {
           const regels = ctx?.regels.filter((r) => r.voertuigtype === type) ?? [];
           if (regels.length === 0) return null;
@@ -229,9 +215,9 @@ export default function BeheerParametersPagina() {
                 <table className="w-full text-sm">
                   <thead className="border-y border-line bg-paper text-left text-xs uppercase tracking-wide text-slate-500">
                     <tr>
-                      <th className="px-3 py-2">Bestelperiode</th>
-                      <th className="px-3 py-2">Gebruiksjaar</th>
-                      <th className="px-3 py-2 text-right">Aftrek %</th>
+                      <th className="px-3 py-2">{t("kolomBestelperiode")}</th>
+                      <th className="px-3 py-2">{t("kolomGebruiksjaar")}</th>
+                      <th className="px-3 py-2 text-right">{t("kolomAftrek")}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
@@ -241,7 +227,7 @@ export default function BeheerParametersPagina() {
                           {ctx?.periodes.find((p) => p.code === r.bestelperiode)?.label ??
                             r.bestelperiode}
                         </td>
-                        <td className="px-3 py-1.5">{r.gebruiksjaar ?? "Hele gebruiksduur"}</td>
+                        <td className="px-3 py-1.5">{r.gebruiksjaar ?? t("heleGebruiksduur")}</td>
                         <td className="px-3 py-1.5 text-right">
                           <input
                             type="number"
