@@ -122,6 +122,11 @@ Het project wordt rechtstreeks vanuit deze repository op Vercel gedeployed, op
 | --- | --- | --- |
 | `NEXT_PUBLIC_SUPABASE_URL` | ja | URL van het Supabase-project |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | ja | Publishable key (publiek; RLS doet de afscherming) |
+
+Beide mogen ook onder de namen staan die de Vercel-marketplace-integratie zet: `SUPABASE_URL`
+en `SUPABASE_ANON_KEY` of `SUPABASE_PUBLISHABLE_KEY`. `next.config.ts` neemt de eerste naam die
+gevuld is en zet ze door, ook naar de browser. Een secret of service_role-sleutel wordt geweigerd:
+die zou in de browserbundel belanden en alle RLS-policies omzeilen.
 | `NEXT_PUBLIC_SITE_URL` | nee | Basis-URL voor metadata, standaard `https://autofiscaliteit.com` |
 | `NEXT_PUBLIC_DONATIE_URL` | nee | Externe donatiepagina; leeg laten verbergt de knop |
 
