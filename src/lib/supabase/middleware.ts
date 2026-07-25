@@ -8,7 +8,14 @@ import { supabaseConfig } from "./env";
  * Routes die aanmelden vereisen, zonder taalvoorvoegsel. Alles wat hier niet in
  * staat, is publiek.
  */
-const AFGESCHERMD = ["/wagens", "/vergelijking", "/instellingen", "/beheer", "/welkom"];
+const AFGESCHERMD = [
+  "/wagens",
+  "/vergelijking",
+  "/vloot",
+  "/instellingen",
+  "/beheer",
+  "/welkom",
+];
 
 /** De onboarding zelf mag uiteraard niet naar de onboarding omleiden. */
 const ONBOARDING_PAD = "/welkom";

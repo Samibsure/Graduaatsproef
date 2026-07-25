@@ -51,6 +51,15 @@ const leegFormulier: Formulier = {
   km_per_jaar: 25000,
   flex_score: 7,
   restwaarde_score: 5,
+  // De uitbreidingen defaulten naar "verandert niets", net als in de rekenkern.
+  btw_methode: "geen",
+  btw_tarief: 21,
+  kosten_financiering: null,
+  financieringsvorm: null,
+  eigen_bijdrage_maand: 0,
+  laadpaal_jaarkost: 0,
+  laadstroom_jaar: 0,
+  einde_contract: null,
 };
 
 export default function WagensPagina() {
@@ -253,6 +262,88 @@ export default function WagensPagina() {
                 {t("thuislaadpunt")}
               </label>
             </div>
+
+            {/* Verfijning. Ingeklapt omdat een gewone invoer prima werkt zonder,
+                maar wie het invult krijgt een merkbaar nauwkeuriger resultaat:
+                BTW en financieringskosten verlagen de verworpen uitgaven. */}
+            <details className="mt-6 rounded-[12px] border border-line">
+              <summary className="cursor-pointer px-4 py-3 text-[14.5px] font-bold text-ink">
+                {t("verfijningTitel")}
+              </summary>
+              <div className="border-t border-line px-4 pb-4 pt-4">
+                <p className="mb-4 text-[13.5px] leading-relaxed text-ink-700">
+                  {t("verfijningIntro")}
+                </p>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <Veld label={t("btwMethode")} hint={t("btwMethodeHint")}>
+                    <select
+                      className={invoer}
+                      value={formulier.btw_methode ?? "geen"}
+                      onChange={(e) => zet("btw_methode", e.target.value as Formulier["btw_methode"])}
+                    >
+                      <option value="geen">{t("btwGeen")}</option>
+                      <option value="forfait35">{t("btwForfait")}</option>
+                      <option value="werkelijk">{t("btwWerkelijk")}</option>
+                    </select>
+                  </Veld>
+                  <Veld label={t("financieringsvorm")}>
+                    <select
+                      className={invoer}
+                      value={formulier.financieringsvorm ?? ""}
+                      onChange={(e) =>
+                        zet(
+                          "financieringsvorm",
+                          (e.target.value || null) as Formulier["financieringsvorm"],
+                        )
+                      }
+                    >
+                      <option value="">{t("financieringOnbekend")}</option>
+                      <option value="operationele_leasing">{t("financieringOperationeel")}</option>
+                      <option value="financiele_leasing">{t("financieringFinancieel")}</option>
+                      <option value="renting">{t("financieringRenting")}</option>
+                      <option value="aankoop">{t("financieringAankoop")}</option>
+                    </select>
+                  </Veld>
+                  <Veld label={t("kostenFinanciering")} hint={t("kostenFinancieringHint")}>
+                    <input
+                      type="number" min={0} className={invoer}
+                      value={formulier.kosten_financiering ?? ""}
+                      onChange={(e) =>
+                        zet("kosten_financiering", e.target.value === "" ? null : Number(e.target.value))
+                      }
+                    />
+                  </Veld>
+                  <Veld label={t("eigenBijdrage")} hint={t("eigenBijdrageHint")}>
+                    <input
+                      type="number" min={0} className={invoer}
+                      value={formulier.eigen_bijdrage_maand ?? 0}
+                      onChange={(e) => zet("eigen_bijdrage_maand", Number(e.target.value))}
+                    />
+                  </Veld>
+                  <Veld label={t("laadpaalJaarkost")} hint={t("laadpaalJaarkostHint")}>
+                    <input
+                      type="number" min={0} className={invoer}
+                      value={formulier.laadpaal_jaarkost ?? 0}
+                      onChange={(e) => zet("laadpaal_jaarkost", Number(e.target.value))}
+                    />
+                  </Veld>
+                  <Veld label={t("laadstroomJaar")} hint={t("laadstroomJaarHint")}>
+                    <input
+                      type="number" min={0} className={invoer}
+                      value={formulier.laadstroom_jaar ?? 0}
+                      onChange={(e) => zet("laadstroom_jaar", Number(e.target.value))}
+                    />
+                  </Veld>
+                  <Veld label={t("eindeContract")} hint={t("eindeContractHint")}>
+                    <input
+                      type="date" className={invoer}
+                      value={formulier.einde_contract ?? ""}
+                      onChange={(e) => zet("einde_contract", e.target.value || null)}
+                    />
+                  </Veld>
+                </div>
+              </div>
+            </details>
 
             <div className="mt-6 flex items-center gap-3">
               <button

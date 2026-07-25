@@ -78,6 +78,7 @@ export default async function RootLayout({
       links: [
         { href: "/catalogus", label: t("catalogus") },
         { href: "/vergelijking", label: t("vergelijking") },
+        { href: "/vloot", label: t("vloot") },
         { href: "/wagens", label: t("wagensBeheren") },
       ],
     },

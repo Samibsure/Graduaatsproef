@@ -12,6 +12,7 @@ const links = [
   { href: "/", sleutel: "dashboard" },
   { href: "/catalogus", sleutel: "catalogus" },
   { href: "/vergelijking", sleutel: "vergelijking" },
+  { href: "/vloot", sleutel: "vloot" },
   { href: "/wagens", sleutel: "wagens" },
   { href: "/fiscaal-kader", sleutel: "fiscaalKader" },
   { href: "/handleiding", sleutel: "handleiding" },
