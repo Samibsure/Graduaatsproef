@@ -1,0 +1,75 @@
+/**
+ * Onder welke namen de Supabase-configuratie kan binnenkomen.
+ *
+ * De applicatie leest zelf alleen NEXT_PUBLIC_SUPABASE_URL en
+ * NEXT_PUBLIC_SUPABASE_ANON_KEY. Maar wie zijn Supabase-project via de
+ * Vercel-marketplace aanmaakt, krijgt de waarden onder de namen van díe
+ * integratie geïnjecteerd — meestal zonder NEXT_PUBLIC_-voorvoegsel. Zonder
+ * vertaalslag faalt de build dan met "variabele ontbreekt", terwijl ze er wel
+ * degelijk staat.
+ *
+ * next.config.ts zoekt daarom de eerste naam die gevuld is en zet de waarde
+ * door naar de canonieke naam, ook richting de browser.
+ */
+export const URL_NAMEN = [
+  "NEXT_PUBLIC_SUPABASE_URL",
+  "SUPABASE_URL",
+  "NEXT_PUBLIC_SUPABASE_PROJECT_URL",
+  "SUPABASE_PROJECT_URL",
+] as const;
+
+export const SLEUTEL_NAMEN = [
+  "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+  "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
+  "SUPABASE_ANON_KEY",
+  "SUPABASE_PUBLISHABLE_KEY",
+] as const;
+
+/**
+ * Het Supabase-project van Autofiscaliteit, als terugval wanneer de omgeving
+ * niets aanlevert.
+ *
+ * Dit zijn geen geheimen. De publishable key wordt sowieso naar de browser van
+ * elke bezoeker gestuurd; ze identificeert het project, ze geeft geen rechten.
+ * Wat een sessie mag lezen of schrijven bepalen de RLS-policies, en die kennen
+ * alleen `auth.uid()`. Een geheime sleutel hoort hier dus nooit; daar waakt
+ * `isGeheimeSleutel()` over.
+ *
+ * Waarom een terugval, terwijl de eerste opzet die bewust schrapte? Omdat dit
+ * één publieke dienst met één database is. Zonder terugval faalt de build zodra
+ * de hosting de variabelen niet doorgeeft, en dan ligt de site plat. Een
+ * omgevingsvariabele wint nog altijd van deze waarden, dus wie een eigen
+ * Supabase-project gebruikt hoeft niets in de code te wijzigen.
+ */
+export const STANDAARD_URL = "https://fkmulfdpuphedfakmmsd.supabase.co";
+export const STANDAARD_SLEUTEL = "sb_publishable_0dhAntmc3Y9Eo9NJkno-Nw_PDT1zaM0";
+
+/** De eerste naam uit de lijst die een niet-lege waarde heeft. */
+export function eersteWaarde(
+  namen: readonly string[],
+  omgeving: Record<string, string | undefined>,
+): string | undefined {
+  for (const naam of namen) {
+    const waarde = omgeving[naam]?.trim();
+    if (waarde) return waarde;
+  }
+  return undefined;
+}
+
+/**
+ * Een geheime sleutel hoort nooit in de browserbundel. De publishable key mag
+ * publiek zijn; een secret key of een service-role token omzeilt alle
+ * RLS-policies. Liever een gefaalde build dan een sleutel die alles opent in
+ * de JavaScript van elke bezoeker.
+ */
+export function isGeheimeSleutel(sleutel: string): boolean {
+  if (sleutel.startsWith("sb_secret_")) return true;
+  try {
+    const payload = JSON.parse(
+      Buffer.from(sleutel.split(".")[1] ?? "", "base64").toString("utf8"),
+    );
+    return payload?.role === "service_role";
+  } catch {
+    return false;
+  }
+}

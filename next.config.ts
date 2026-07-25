@@ -1,9 +1,34 @@
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
+import {
+  SLEUTEL_NAMEN,
+  STANDAARD_SLEUTEL,
+  STANDAARD_URL,
+  URL_NAMEN,
+  eersteWaarde,
+  isGeheimeSleutel,
+} from "./src/lib/supabase/envnamen";
 
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
 const ontwikkeling = process.env.NODE_ENV === "development";
+
+/**
+ * De Supabase-configuratie kan onder verschillende namen binnenkomen; zie
+ * src/lib/supabase/envnamen.ts. Hier wordt de gevonden waarde doorgezet naar
+ * de canonieke naam, zodat de rest van de applicatie maar één naam hoeft te
+ * kennen en de browserbundel ze ook krijgt.
+ */
+const supabaseUrl = eersteWaarde(URL_NAMEN, process.env) ?? STANDAARD_URL;
+const supabaseSleutel = eersteWaarde(SLEUTEL_NAMEN, process.env) ?? STANDAARD_SLEUTEL;
+
+if (isGeheimeSleutel(supabaseSleutel)) {
+  throw new Error(
+    "De gevonden Supabase-sleutel is een geheime sleutel (secret of service_role). " +
+      "Die hoort niet in de browserbundel: ze omzeilt alle RLS-policies. " +
+      "Gebruik de publishable key (anon).",
+  );
+}
 
 /**
  * De enige externe bestemming die de applicatie nodig heeft, is het eigen
@@ -11,7 +36,7 @@ const ontwikkeling = process.env.NODE_ENV === "development";
  * nergens anders gegevens naartoe sturen.
  */
 const supabaseOrigin = (() => {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const url = supabaseUrl;
   if (!url) return "";
   try {
     const { origin, host } = new URL(url);
@@ -47,6 +72,14 @@ const csp = [
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+
+  // De gevonden waarde onder de canonieke naam zetten, ook richting de
+  // browserbundel. Zo heeft de applicatie altijd een geldige configuratie,
+  // ongeacht onder welke naam de hosting ze aanlevert.
+  env: {
+    NEXT_PUBLIC_SUPABASE_URL: supabaseUrl,
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: supabaseSleutel,
+  },
 
   async headers() {
     return [

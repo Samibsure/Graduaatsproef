@@ -111,19 +111,30 @@ npm run lint
 npm run build
 ```
 
-Beide environment variables zijn verplicht; zonder deze waarden start de applicatie niet.
+Zonder `.env.local` draait de applicatie tegen het publieke Supabase-project van Autofiscaliteit.
+Wil je met je eigen database werken, zet dan de twee variabelen hieronder.
 
 ## Deployment
 
 Het project wordt rechtstreeks vanuit deze repository op Vercel gedeployed, op
-`autofiscaliteit.com`.
+`autofiscaliteit.com`. `vercel.json` legt framework, install- en buildcommando vast, zodat een
+deployment niet afhangt van instellingen in het dashboard.
 
 | Variabele | Verplicht | Wat |
 | --- | --- | --- |
-| `NEXT_PUBLIC_SUPABASE_URL` | ja | URL van het Supabase-project |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | ja | Publishable key (publiek; RLS doet de afscherming) |
+| `NEXT_PUBLIC_SUPABASE_URL` | nee | URL van het Supabase-project; standaard het publieke project |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | nee | Publishable key (publiek; RLS doet de afscherming) |
 | `NEXT_PUBLIC_SITE_URL` | nee | Basis-URL voor metadata, standaard `https://autofiscaliteit.com` |
 | `NEXT_PUBLIC_DONATIE_URL` | nee | Externe donatiepagina; leeg laten verbergt de knop |
+
+De Supabase-waarden mogen ook onder de namen staan die de Vercel-marketplace-integratie zet:
+`SUPABASE_URL` en `SUPABASE_ANON_KEY` of `SUPABASE_PUBLISHABLE_KEY`. `next.config.ts` neemt de
+eerste naam die gevuld is en zet ze door, ook naar de browser. Een secret of service_role-sleutel
+wordt geweigerd: die zou in de browserbundel belanden en alle RLS-policies omzeilen.
+
+De standaardwaarden staan in `src/lib/supabase/envnamen.ts`. Ze zijn er zodat een build nooit
+struikelt over een ontbrekende variabele — de site plat leggen weegt zwaarder dan een publieke
+sleutel in de broncode, want die sleutel gaat sowieso naar elke bezoeker.
 
 Voor publiek gebruik moet in Supabase daarnaast eigen SMTP geconfigureerd zijn (de ingebouwde
 mailserver is te beperkt en levert slecht af), met de redirect-URL's op het productiedomein.
