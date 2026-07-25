@@ -56,7 +56,7 @@ Alle formules komen letterlijk uit paragraaf 1.4.1 en Bijlage 1 van het rapport:
 
 ```bash
 npm install
-cp .env.example .env.local   # bevat de Supabase-URL en publishable key
+cp .env.example .env.local   # vul je eigen Supabase-URL en publishable key in
 npm run dev                  # http://localhost:3000
 npm test                     # unit tests rekenkern (valideert tegen Bijlage 1)
 npm run build                # productie-build
@@ -97,11 +97,14 @@ aangeraden Supabase Auth toe te voegen en de policies te beperken tot aangemelde
 
 ## Deployment op Vercel
 
-Het project wordt rechtstreeks vanuit deze repository op Vercel gedeployed. Optionele environment
-variables (vallen terug op de ingebouwde standaardwaarden):
+Het project wordt rechtstreeks vanuit deze repository op Vercel gedeployed. Beide environment
+variables zijn **verplicht**; zonder deze waarden start de applicatie niet:
 
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+
+Het databaseschema staat in `supabase/migrations/`. Voer de migraties uit met `supabase db push` of
+via de SQL-editor van Supabase.
 
 ## Jaarlijkse parameter-update (aanbeveling 5 van het rapport)
 
