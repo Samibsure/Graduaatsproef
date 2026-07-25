@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { routing } from "@/i18n/routing";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://autofiscaliteit.com";
 
@@ -14,10 +15,22 @@ const PUBLIEK = [
   { pad: "/voorwaarden", prioriteit: 0.3 },
 ];
 
+/** De standaardtaal staat zonder voorvoegsel in de URL. */
+const voorvoegsel = (locale: string) => (locale === routing.defaultLocale ? "" : `/${locale}`);
+
 export default function sitemap(): MetadataRoute.Sitemap {
-  return PUBLIEK.map(({ pad, prioriteit }) => ({
-    url: `${SITE_URL}${pad}`,
-    changeFrequency: "monthly" as const,
-    priority: prioriteit,
-  }));
+  return PUBLIEK.flatMap(({ pad, prioriteit }) =>
+    routing.locales.map((locale) => ({
+      url: `${SITE_URL}${voorvoegsel(locale)}${pad}`,
+      changeFrequency: "monthly" as const,
+      priority: prioriteit,
+      // Elke taalversie verwijst naar de andere, zodat een zoekmachine ze als
+      // vertalingen behandelt en niet als duplicaten.
+      alternates: {
+        languages: Object.fromEntries(
+          routing.locales.map((l) => [l, `${SITE_URL}${voorvoegsel(l)}${pad}`]),
+        ),
+      },
+    })),
+  );
 }

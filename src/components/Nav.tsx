@@ -1,33 +1,35 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 import { Wordmerk } from "@/components/Brand";
 import Icon from "@/components/Icon";
 import { useSessie } from "@/components/SessieProvider";
+import Taalkiezer from "@/components/Taalkiezer";
+import { Link, usePathname } from "@/i18n/navigation";
 
 const links = [
-  { href: "/", label: "Dashboard" },
-  { href: "/catalogus", label: "Catalogus" },
-  { href: "/vergelijking", label: "Vergelijking" },
-  { href: "/wagens", label: "Wagens" },
-  { href: "/fiscaal-kader", label: "Fiscaal kader" },
-  { href: "/handleiding", label: "Handleiding" },
-];
+  { href: "/", sleutel: "dashboard" },
+  { href: "/catalogus", sleutel: "catalogus" },
+  { href: "/vergelijking", sleutel: "vergelijking" },
+  { href: "/wagens", sleutel: "wagens" },
+  { href: "/fiscaal-kader", sleutel: "fiscaalKader" },
+  { href: "/handleiding", sleutel: "handleiding" },
+] as const;
 
 /** Afmelden gebeurt via POST, zodat een prefetch niemand ongewenst uitlogt. */
-function AfmeldKnop({ className }: { className: string }) {
+function AfmeldKnop({ className, label }: { className: string; label: string }) {
   return (
     <form action="/afmelden" method="post">
       <button type="submit" className={className}>
-        Afmelden
+        {label}
       </button>
     </form>
   );
 }
 
 function Accountmenu() {
+  const t = useTranslations("nav");
   const sessie = useSessie();
   const [open, setOpen] = useState(false);
   const menu = useRef<HTMLDivElement>(null);
@@ -45,13 +47,13 @@ function Accountmenu() {
     return (
       <>
         <Link href="/aanmelden" className="text-[14.5px] font-bold text-ink-500 hover:text-ink">
-          Aanmelden
+          {t("aanmelden")}
         </Link>
         <Link
           href="/registreren"
           className="inline-flex h-[42px] items-center gap-2 rounded-[10px] bg-gold px-5 text-[14.5px] font-bold text-white transition-colors hover:bg-gold-hover"
         >
-          Gratis starten
+          {t("gratisStarten")}
         </Link>
       </>
     );
@@ -81,14 +83,14 @@ function Accountmenu() {
             onClick={() => setOpen(false)}
             className="block px-4 py-2.5 text-[14px] text-ink hover:bg-paper"
           >
-            Mijn wagens
+            {t("mijnWagens")}
           </Link>
           <Link
             href="/instellingen"
             onClick={() => setOpen(false)}
             className="block px-4 py-2.5 text-[14px] text-ink hover:bg-paper"
           >
-            Instellingen
+            {t("instellingen")}
           </Link>
           {sessie.isPlatformAdmin && (
             <Link
@@ -96,11 +98,14 @@ function Accountmenu() {
               onClick={() => setOpen(false)}
               className="block px-4 py-2.5 text-[14px] text-ink hover:bg-paper"
             >
-              Parameters beheren
+              {t("parametersBeheren")}
             </Link>
           )}
           <div className="border-t border-line pt-1">
-            <AfmeldKnop className="block w-full px-4 py-2.5 text-left text-[14px] text-ink hover:bg-paper" />
+            <AfmeldKnop
+              label={t("afmelden")}
+              className="block w-full px-4 py-2.5 text-left text-[14px] text-ink hover:bg-paper"
+            />
           </div>
         </div>
       )}
@@ -109,6 +114,7 @@ function Accountmenu() {
 }
 
 export default function Nav() {
+  const t = useTranslations("nav");
   const pathname = usePathname();
   const sessie = useSessie();
   const [open, setOpen] = useState(false);
@@ -137,18 +143,19 @@ export default function Nav() {
               data-active={isActief(l.href)}
               className="bs-nav-link cursor-pointer py-2 text-[15px] font-bold transition-colors"
             >
-              {l.label}
+              {t(l.sleutel)}
             </Link>
           ))}
         </nav>
 
         <div className="hidden items-center gap-3 lg:flex">
+          <Taalkiezer />
           <Accountmenu />
         </div>
 
         <button
           onClick={() => setOpen((o) => !o)}
-          aria-label="Menu"
+          aria-label={t("menu")}
           className="inline-flex h-[42px] w-[42px] items-center justify-center rounded-[9px] border border-line text-ink lg:hidden"
         >
           <Icon name="menu" size={21} />
@@ -165,7 +172,7 @@ export default function Nav() {
               onClick={() => setOpen(false)}
               className="bs-mob-link block rounded-lg px-3 py-3 text-base font-bold"
             >
-              {l.label}
+              {t(l.sleutel)}
             </Link>
           ))}
 
@@ -173,16 +180,19 @@ export default function Nav() {
             {sessie ? (
               <>
                 <p className="px-3 pb-2 text-[13px] text-ink-500">
-                  Aangemeld als {sessie.bedrijf.naam}
+                  {t("aangemeldAls", { bedrijf: sessie.bedrijf.naam })}
                 </p>
                 <Link
                   href="/instellingen"
                   onClick={() => setOpen(false)}
                   className="bs-mob-link block rounded-lg px-3 py-3 text-base font-bold"
                 >
-                  Instellingen
+                  {t("instellingen")}
                 </Link>
-                <AfmeldKnop className="block w-full rounded-lg px-3 py-3 text-left text-base font-bold text-ink-500" />
+                <AfmeldKnop
+                  label={t("afmelden")}
+                  className="block w-full rounded-lg px-3 py-3 text-left text-base font-bold text-ink-500"
+                />
               </>
             ) : (
               <>
@@ -191,17 +201,22 @@ export default function Nav() {
                   onClick={() => setOpen(false)}
                   className="bs-mob-link block rounded-lg px-3 py-3 text-base font-bold"
                 >
-                  Aanmelden
+                  {t("aanmelden")}
                 </Link>
                 <Link
                   href="/registreren"
                   onClick={() => setOpen(false)}
                   className="mt-1 block rounded-lg bg-gold px-3 py-3 text-base font-bold text-white"
                 >
-                  Gratis starten
+                  {t("gratisStarten")}
                 </Link>
               </>
             )}
+          </div>
+
+          <div className="mt-3 flex items-center justify-between border-t border-line px-3 pt-3">
+            <span className="text-[13px] text-ink-500">{t("taal")}</span>
+            <Taalkiezer variant="compact" />
           </div>
         </div>
       )}

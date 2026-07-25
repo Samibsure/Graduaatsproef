@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import {
   AuthKaart,
@@ -9,9 +9,11 @@ import {
   invoerKlasse,
   knopKlasse,
 } from "@/components/AuthKaart";
+import { Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 export default function WachtwoordVergetenPagina() {
+  const t = useTranslations("auth");
   const [email, setEmail] = useState("");
   const [bezig, setBezig] = useState(false);
   const [fout, setFout] = useState<string | null>(null);
@@ -37,32 +39,24 @@ export default function WachtwoordVergetenPagina() {
 
   if (verstuurd) {
     return (
-      <AuthKaart
-        titel="Kijk in je mailbox"
-        intro={
-          <>
-            Bestaat er een account voor <strong>{email}</strong>, dan is er een herstellink
-            onderweg.
-          </>
-        }
-      >
-        <Melding soort="ok">De link blijft één uur geldig.</Melding>
+      <AuthKaart titel={t("mailboxTitel")} intro={t("herstellinkVerstuurd", { email })}>
+        <Melding soort="ok">{t("eenUurGeldig")}</Melding>
       </AuthKaart>
     );
   }
 
   return (
     <AuthKaart
-      titel="Wachtwoord vergeten"
-      intro="Vul je e-mailadres in, dan sturen we je een link om een nieuw wachtwoord in te stellen."
+      titel={t("vergetenTitel")}
+      intro={t("vergetenIntro")}
       voettekst={
         <Link href="/aanmelden" className="font-bold text-ink underline underline-offset-2">
-          Terug naar aanmelden
+          {t("terugAanmelden")}
         </Link>
       }
     >
       <form onSubmit={versturen} className="space-y-4">
-        <Veld label="E-mailadres">
+        <Veld label={t("email")}>
           <input
             type="email"
             required
@@ -76,7 +70,7 @@ export default function WachtwoordVergetenPagina() {
         {fout && <Melding soort="fout">{fout}</Melding>}
 
         <button type="submit" disabled={bezig} className={knopKlasse}>
-          {bezig ? "Bezig…" : "Stuur herstellink"}
+          {bezig ? t("bezig") : t("stuurHerstellink")}
         </button>
       </form>
     </AuthKaart>

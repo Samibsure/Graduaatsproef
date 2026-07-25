@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import {
   AuthKaart,
@@ -10,11 +10,13 @@ import {
   invoerKlasse,
   knopKlasse,
 } from "@/components/AuthKaart";
+import { Link, useRouter } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 type Methode = "wachtwoord" | "link";
 
 function AanmeldFormulier() {
+  const t = useTranslations("auth");
   const router = useRouter();
   const params = useSearchParams();
   const verder = params.get("verder") ?? "/wagens";
@@ -36,7 +38,7 @@ function AanmeldFormulier() {
       if (methode === "wachtwoord") {
         const { error } = await supabase.auth.signInWithPassword({ email, password: wachtwoord });
         if (error) throw error;
-        router.push(verder);
+        router.push(verder as "/wagens");
         router.refresh();
       } else {
         const { error } = await supabase.auth.signInWithOtp({
@@ -50,11 +52,7 @@ function AanmeldFormulier() {
       }
     } catch (e) {
       const bericht = e instanceof Error ? e.message : String(e);
-      setFout(
-        bericht.includes("Invalid login credentials")
-          ? "E-mailadres of wachtwoord klopt niet."
-          : bericht,
-      );
+      setFout(bericht.includes("Invalid login credentials") ? t("foutInloggegevens") : bericht);
     } finally {
       setBezig(false);
     }
@@ -62,18 +60,8 @@ function AanmeldFormulier() {
 
   if (linkVerstuurd) {
     return (
-      <AuthKaart
-        titel="Kijk in je mailbox"
-        intro={
-          <>
-            We stuurden een inloglink naar <strong>{email}</strong>. De link blijft één uur geldig.
-          </>
-        }
-      >
-        <Melding soort="ok">
-          Zie je niets binnenkomen, controleer dan je ongewenste e-mail. Lukt het niet, meld je dan
-          aan met je wachtwoord.
-        </Melding>
+      <AuthKaart titel={t("mailboxTitel")} intro={t("linkVerstuurd", { email })}>
+        <Melding soort="ok">{t("linkSpam")}</Melding>
         <button
           type="button"
           onClick={() => {
@@ -82,7 +70,7 @@ function AanmeldFormulier() {
           }}
           className="mt-5 text-[14px] font-bold text-ink underline underline-offset-2"
         >
-          Toch met een wachtwoord aanmelden
+          {t("tochWachtwoord")}
         </button>
       </AuthKaart>
     );
@@ -90,13 +78,13 @@ function AanmeldFormulier() {
 
   return (
     <AuthKaart
-      titel="Aanmelden"
-      intro="Meld je aan om het wagenpark van je bedrijf te beheren en te vergelijken."
+      titel={t("aanmeldenTitel")}
+      intro={t("aanmeldenIntro")}
       voettekst={
         <>
-          Nog geen account?{" "}
+          {t("nogGeenAccount")}{" "}
           <Link href="/registreren" className="font-bold text-ink underline underline-offset-2">
-            Registreer je bedrijf gratis
+            {t("registreerGratis")}
           </Link>
         </>
       }
@@ -104,9 +92,9 @@ function AanmeldFormulier() {
       <div className="mb-6 flex rounded-[10px] border border-line p-1">
         {(
           [
-            ["wachtwoord", "Met wachtwoord"],
-            ["link", "Met inloglink"],
-          ] as const
+            ["wachtwoord", t("metWachtwoord")],
+            ["link", t("metLink")],
+          ] as Array<[Methode, string]>
         ).map(([waarde, label]) => (
           <button
             key={waarde}
@@ -121,7 +109,7 @@ function AanmeldFormulier() {
       </div>
 
       <form onSubmit={aanmelden} className="space-y-4">
-        <Veld label="E-mailadres">
+        <Veld label={t("email")}>
           <input
             type="email"
             required
@@ -129,12 +117,12 @@ function AanmeldFormulier() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className={invoerKlasse}
-            placeholder="jij@bedrijf.be"
+            placeholder={t("emailPlaceholder")}
           />
         </Veld>
 
         {methode === "wachtwoord" && (
-          <Veld label="Wachtwoord">
+          <Veld label={t("wachtwoord")}>
             <input
               type="password"
               required
@@ -149,14 +137,14 @@ function AanmeldFormulier() {
         {fout && <Melding soort="fout">{fout}</Melding>}
 
         <button type="submit" disabled={bezig} className={knopKlasse}>
-          {bezig ? "Bezig…" : methode === "wachtwoord" ? "Aanmelden" : "Stuur me een inloglink"}
+          {bezig ? t("bezig") : methode === "wachtwoord" ? t("aanmeldenTitel") : t("stuurLink")}
         </button>
       </form>
 
       {methode === "wachtwoord" && (
         <p className="mt-5 text-center text-[13.5px]">
           <Link href="/wachtwoord-vergeten" className="text-ink-500 hover:text-ink">
-            Wachtwoord vergeten?
+            {t("wachtwoordVergeten")}
           </Link>
         </p>
       )}

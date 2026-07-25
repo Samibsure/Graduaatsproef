@@ -1,7 +1,6 @@
 "use client";
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import {
   AuthKaart,
@@ -10,9 +9,11 @@ import {
   invoerKlasse,
   knopKlasse,
 } from "@/components/AuthKaart";
+import { Link, useRouter } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 export default function RegistreerPagina() {
+  const t = useTranslations("auth");
   const router = useRouter();
   const [naam, setNaam] = useState("");
   const [bedrijfsnaam, setBedrijfsnaam] = useState("");
@@ -54,11 +55,7 @@ export default function RegistreerPagina() {
       }
     } catch (e) {
       const bericht = e instanceof Error ? e.message : String(e);
-      setFout(
-        bericht.includes("already registered")
-          ? "Er bestaat al een account met dit e-mailadres. Meld je aan of herstel je wachtwoord."
-          : bericht,
-      );
+      setFout(bericht.includes("already registered") ? t("bestaatAl") : bericht);
     } finally {
       setBezig(false);
     }
@@ -66,38 +63,27 @@ export default function RegistreerPagina() {
 
   if (bevestigNodig) {
     return (
-      <AuthKaart
-        titel="Bevestig je e-mailadres"
-        intro={
-          <>
-            We stuurden een bevestigingslink naar <strong>{email}</strong>. Klik erop om je account
-            te activeren.
-          </>
-        }
-      >
-        <Melding soort="ok">
-          Niets ontvangen? Controleer je ongewenste e-mail. Bij een zakelijk adres houdt de
-          spamfilter de mail soms even vast.
-        </Melding>
+      <AuthKaart titel={t("bevestigTitel")} intro={t("bevestigIntro", { email })}>
+        <Melding soort="ok">{t("bevestigSpam")}</Melding>
       </AuthKaart>
     );
   }
 
   return (
     <AuthKaart
-      titel="Registreer je bedrijf"
-      intro="Gratis, zonder beperkingen. Je wagenpark en je bewaarde beslissingen zijn alleen zichtbaar voor je eigen bedrijf."
+      titel={t("registreerTitel")}
+      intro={t("registreerIntro")}
       voettekst={
         <>
-          Heb je al een account?{" "}
+          {t("alAccount")}{" "}
           <Link href="/aanmelden" className="font-bold text-ink underline underline-offset-2">
-            Aanmelden
+            {t("aanmeldenTitel")}
           </Link>
         </>
       }
     >
       <form onSubmit={registreren} className="space-y-4">
-        <Veld label="Je naam">
+        <Veld label={t("jeNaam")}>
           <input
             type="text"
             required
@@ -108,7 +94,7 @@ export default function RegistreerPagina() {
           />
         </Veld>
 
-        <Veld label="Bedrijfsnaam">
+        <Veld label={t("bedrijfsnaam")}>
           <input
             type="text"
             required
@@ -120,7 +106,7 @@ export default function RegistreerPagina() {
           />
         </Veld>
 
-        <Veld label="Ondernemingsnummer" hint="Optioneel, bijvoorbeeld 0123.456.789">
+        <Veld label={t("ondernemingsnummer")} hint={t("ondernemingsnummerHint")}>
           <input
             type="text"
             value={ondernemingsnummer}
@@ -129,7 +115,7 @@ export default function RegistreerPagina() {
           />
         </Veld>
 
-        <Veld label="E-mailadres">
+        <Veld label={t("email")}>
           <input
             type="email"
             required
@@ -137,11 +123,11 @@ export default function RegistreerPagina() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className={invoerKlasse}
-            placeholder="jij@bedrijf.be"
+            placeholder={t("emailPlaceholder")}
           />
         </Veld>
 
-        <Veld label="Wachtwoord" hint="Minstens 8 tekens.">
+        <Veld label={t("wachtwoord")} hint={t("wachtwoordHint")}>
           <input
             type="password"
             required
@@ -156,20 +142,23 @@ export default function RegistreerPagina() {
         {fout && <Melding soort="fout">{fout}</Melding>}
 
         <button type="submit" disabled={bezig} className={knopKlasse}>
-          {bezig ? "Bezig…" : "Gratis starten"}
+          {bezig ? t("bezig") : t("gratisStartenKnop")}
         </button>
       </form>
 
       <p className="mt-5 text-[12.5px] leading-relaxed text-ink-500">
-        Door te registreren ga je akkoord met de{" "}
-        <Link href="/voorwaarden" className="underline underline-offset-2">
-          gebruiksvoorwaarden
-        </Link>{" "}
-        en het{" "}
-        <Link href="/privacy" className="underline underline-offset-2">
-          privacybeleid
-        </Link>
-        .
+        {t.rich("akkoord", {
+          voorwaarden: (chunks) => (
+            <Link href="/voorwaarden" className="underline underline-offset-2">
+              {chunks}
+            </Link>
+          ),
+          privacy: (chunks) => (
+            <Link href="/privacy" className="underline underline-offset-2">
+              {chunks}
+            </Link>
+          ),
+        })}
       </p>
     </AuthKaart>
   );

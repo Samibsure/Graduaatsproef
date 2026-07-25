@@ -1,6 +1,7 @@
-import Link from "next/link";
+import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
 import { Card } from "@/components/ui";
+import { Link } from "@/i18n/navigation";
 
 /** Gedeelde omkadering voor de aanmeld-, registratie- en herstelpagina's. */
 export function AuthKaart({
@@ -14,10 +15,11 @@ export function AuthKaart({
   children: ReactNode;
   voettekst?: ReactNode;
 }) {
+  const t = useTranslations("auth");
   return (
     <div className="mx-auto flex w-full max-w-[460px] flex-col px-6 py-16">
       <Link href="/" className="mb-8 text-[13px] font-bold text-ink-500 hover:text-ink">
-        ← Terug naar de site
+        {t("terugNaarSite")}
       </Link>
       <Card className="p-7 sm:p-9">
         <h1 className="m-0 text-[26px] font-bold tracking-[-0.02em] text-ink">{titel}</h1>

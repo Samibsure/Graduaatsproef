@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import {
   AuthKaart,
@@ -9,9 +9,11 @@ import {
   invoerKlasse,
   knopKlasse,
 } from "@/components/AuthKaart";
+import { useRouter } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 export default function WachtwoordHerstellenPagina() {
+  const t = useTranslations("auth");
   const router = useRouter();
   const [wachtwoord, setWachtwoord] = useState("");
   const [herhaal, setHerhaal] = useState("");
@@ -23,7 +25,7 @@ export default function WachtwoordHerstellenPagina() {
     setFout(null);
 
     if (wachtwoord !== herhaal) {
-      setFout("De twee wachtwoorden komen niet overeen.");
+      setFout(t("wachtwoordenVerschillen"));
       return;
     }
 
@@ -42,12 +44,9 @@ export default function WachtwoordHerstellenPagina() {
   }
 
   return (
-    <AuthKaart
-      titel="Nieuw wachtwoord"
-      intro="Kies een nieuw wachtwoord voor je account. Daarna ben je meteen aangemeld."
-    >
+    <AuthKaart titel={t("nieuwWachtwoordTitel")} intro={t("nieuwWachtwoordIntro")}>
       <form onSubmit={opslaan} className="space-y-4">
-        <Veld label="Nieuw wachtwoord" hint="Minstens 8 tekens.">
+        <Veld label={t("nieuwWachtwoord")} hint={t("wachtwoordHint")}>
           <input
             type="password"
             required
@@ -59,7 +58,7 @@ export default function WachtwoordHerstellenPagina() {
           />
         </Veld>
 
-        <Veld label="Herhaal wachtwoord">
+        <Veld label={t("herhaalWachtwoord")}>
           <input
             type="password"
             required
@@ -74,7 +73,7 @@ export default function WachtwoordHerstellenPagina() {
         {fout && <Melding soort="fout">{fout}</Melding>}
 
         <button type="submit" disabled={bezig} className={knopKlasse}>
-          {bezig ? "Bezig…" : "Wachtwoord opslaan"}
+          {bezig ? t("bezig") : t("wachtwoordOpslaan")}
         </button>
       </form>
     </AuthKaart>

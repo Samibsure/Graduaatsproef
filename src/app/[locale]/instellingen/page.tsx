@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
+import { useCallback, useEffect, useState } from "react";
 import { Melding, Veld, invoerKlasse } from "@/components/AuthKaart";
 import Icon from "@/components/Icon";
 import { useSessie } from "@/components/SessieProvider";
@@ -18,6 +19,7 @@ import {
 } from "@/lib/team";
 
 export default function InstellingenPagina() {
+  const t = useTranslations("instellingen");
   const sessie = useSessie();
   const isBeheerder = sessie?.rol === "beheerder";
 
@@ -37,15 +39,18 @@ export default function InstellingenPagina() {
     setNummer(sessie.bedrijf.ondernemingsnummer ?? "");
   }, [sessie]);
 
-  const herlaad = () =>
-    Promise.all([laadTeam(), laadUitnodigingen()]).then(([t, u]) => {
-      setTeam(t);
-      setUitnodigingen(u);
-    });
+  const herlaad = useCallback(
+    () =>
+      Promise.all([laadTeam(), laadUitnodigingen()]).then(([teamlijst, uitnodiginglijst]) => {
+        setTeam(teamlijst);
+        setUitnodigingen(uitnodiginglijst);
+      }),
+    [],
+  );
 
   useEffect(() => {
     herlaad().catch((e) => setFout(String(e)));
-  }, []);
+  }, [herlaad]);
 
   async function voerUit(actie: () => Promise<void>, bericht: string) {
     setFout(null);
@@ -66,11 +71,7 @@ export default function InstellingenPagina() {
 
   return (
     <Container className="py-12">
-      <PageHead
-        eyebrow="Instellingen"
-        title={sessie.bedrijf.naam}
-        sub="Beheer je bedrijfsgegevens, je collega's en je gegevens."
-      />
+      <PageHead eyebrow={t("eyebrow")} title={sessie.bedrijf.naam} sub={t("intro")} />
 
       {melding && (
         <div className="mb-6">
@@ -85,12 +86,10 @@ export default function InstellingenPagina() {
 
       <div className="grid gap-6 lg:grid-cols-2">
         <Card className="p-6 sm:p-7">
-          <SectionTitle sub="Deze naam staat op je afdrukken en vergelijkingen.">
-            Bedrijfsgegevens
-          </SectionTitle>
+          <SectionTitle sub={t("bedrijfsgegevensSub")}>{t("bedrijfsgegevens")}</SectionTitle>
 
           <div className="space-y-4">
-            <Veld label="Bedrijfsnaam">
+            <Veld label={t("bedrijfsnaam")}>
               <input
                 className={invoerKlasse}
                 value={naam}
@@ -98,7 +97,7 @@ export default function InstellingenPagina() {
                 onChange={(e) => setNaam(e.target.value)}
               />
             </Veld>
-            <Veld label="Ondernemingsnummer" hint="Optioneel.">
+            <Veld label={t("ondernemingsnummer")} hint={t("optioneel")}>
               <input
                 className={invoerKlasse}
                 value={nummer}
@@ -110,25 +109,19 @@ export default function InstellingenPagina() {
             {isBeheerder ? (
               <button
                 disabled={bezig}
-                onClick={() =>
-                  voerUit(() => bewaarBedrijf(naam, nummer), "Bedrijfsgegevens bewaard.")
-                }
+                onClick={() => voerUit(() => bewaarBedrijf(naam, nummer), t("bewaard"))}
                 className="inline-flex h-[44px] items-center rounded-[10px] bg-ink px-5 text-[14.5px] font-bold text-white hover:bg-ink-600 disabled:opacity-60"
               >
-                Bewaren
+                {t("bewaren")}
               </button>
             ) : (
-              <p className="text-[13.5px] text-ink-500">
-                Alleen een beheerder van je bedrijf kan deze gegevens wijzigen.
-              </p>
+              <p className="text-[13.5px] text-ink-500">{t("alleenBeheerder")}</p>
             )}
           </div>
         </Card>
 
         <Card className="p-6 sm:p-7">
-          <SectionTitle sub="Collega's zien dezelfde wagens en bewaarde beslissingen.">
-            Collega&apos;s
-          </SectionTitle>
+          <SectionTitle sub={t("collegasSub")}>{t("collegas")}</SectionTitle>
 
           <ul className="m-0 list-none space-y-2 p-0">
             {team.map((lid) => (
@@ -138,22 +131,24 @@ export default function InstellingenPagina() {
               >
                 <span className="min-w-0">
                   <span className="block truncate text-[14.5px] font-bold text-ink">
-                    {lid.volledige_naam ?? "Naamloos"}
+                    {lid.volledige_naam ?? t("naamloos")}
                     {lid.id === sessie.gebruikerId && (
-                      <span className="font-normal text-ink-500"> · jij</span>
+                      <span className="font-normal text-ink-500">{t("jij")}</span>
                     )}
                   </span>
-                  <Badge tint={lid.rol === "beheerder" ? "gold" : "slate"}>{lid.rol}</Badge>
+                  <Badge tint={lid.rol === "beheerder" ? "gold" : "slate"}>
+                    {lid.rol === "beheerder" ? t("rolBeheerder") : t("rolLid")}
+                  </Badge>
                 </span>
                 {isBeheerder && lid.id !== sessie.gebruikerId && (
                   <button
                     disabled={bezig}
                     onClick={() =>
-                      voerUit(() => verwijderTeamlid(lid.id), "Collega verwijderd uit het bedrijf.")
+                      voerUit(() => verwijderTeamlid(lid.id), t("collegaVerwijderd"))
                     }
                     className="shrink-0 text-[13.5px] font-bold text-danger hover:underline"
                   >
-                    Verwijderen
+                    {t("verwijderen")}
                   </button>
                 )}
               </li>
@@ -162,16 +157,13 @@ export default function InstellingenPagina() {
 
           {isBeheerder && (
             <div className="mt-6 border-t border-line pt-5">
-              <Veld
-                label="Collega uitnodigen"
-                hint="Zij registreren zich met dit e-mailadres en komen automatisch in je bedrijf terecht."
-              >
+              <Veld label={t("uitnodigen")} hint={t("uitnodigenHint")}>
                 <div className="flex gap-2">
                   <input
                     type="email"
                     className={invoerKlasse}
                     value={nieuwEmail}
-                    placeholder="collega@bedrijf.be"
+                    placeholder={t("uitnodigenPlaceholder")}
                     onChange={(e) => setNieuwEmail(e.target.value)}
                   />
                   <button
@@ -180,12 +172,12 @@ export default function InstellingenPagina() {
                       voerUit(async () => {
                         await nodigUit(nieuwEmail);
                         setNieuwEmail("");
-                      }, "Uitnodiging genoteerd.")
+                      }, t("uitnodigingGenoteerd"))
                     }
                     className="inline-flex h-[44px] shrink-0 items-center gap-1.5 rounded-[10px] bg-ink px-4 text-[14.5px] font-bold text-white hover:bg-ink-600 disabled:opacity-60"
                   >
                     <Icon name="plus" size={16} />
-                    Uitnodigen
+                    {t("uitnodigenKnop")}
                   </button>
                 </div>
               </Veld>
@@ -201,11 +193,11 @@ export default function InstellingenPagina() {
                       <button
                         disabled={bezig}
                         onClick={() =>
-                          voerUit(() => trekUitnodigingIn(u.id), "Uitnodiging ingetrokken.")
+                          voerUit(() => trekUitnodigingIn(u.id), t("uitnodigingIngetrokken"))
                         }
                         className="shrink-0 text-[13px] font-bold text-ink-500 hover:text-ink"
                       >
-                        Intrekken
+                        {t("intrekken")}
                       </button>
                     </li>
                   ))}
@@ -218,11 +210,9 @@ export default function InstellingenPagina() {
 
       {isBeheerder && (
         <Card className="mt-6 border-danger/30 p-6 sm:p-7">
-          <SectionTitle sub="Dit verwijdert je bedrijf, alle collega-accounts, alle wagens en alle bewaarde beslissingen. Dit kan niet ongedaan gemaakt worden.">
-            Alle gegevens verwijderen
-          </SectionTitle>
+          <SectionTitle sub={t("verwijderSub")}>{t("verwijderTitel")}</SectionTitle>
 
-          <Veld label={`Typ "${sessie.bedrijf.naam}" om te bevestigen`}>
+          <Veld label={t("verwijderBevestig", { naam: sessie.bedrijf.naam })}>
             <input
               className={invoerKlasse}
               value={bevestigVerwijderen}
@@ -240,7 +230,7 @@ export default function InstellingenPagina() {
             }
             className="mt-4 inline-flex h-[44px] items-center rounded-[10px] bg-danger px-5 text-[14.5px] font-bold text-white disabled:cursor-not-allowed disabled:opacity-50"
           >
-            Definitief verwijderen
+            {t("verwijderKnop")}
           </button>
         </Card>
       )}
