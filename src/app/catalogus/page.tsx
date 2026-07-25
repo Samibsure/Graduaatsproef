@@ -205,7 +205,7 @@ export default function CatalogusPagina() {
             </div>
             <Link
               href="/vergelijking"
-              className="inline-flex h-12 items-center gap-2.5 rounded-[11px] bg-gold px-[26px] text-[15.5px] font-bold text-ink transition-colors hover:bg-gold-hover"
+              className="inline-flex h-12 items-center gap-2.5 rounded-[11px] bg-gold px-[26px] text-[15.5px] font-bold text-white transition-colors hover:bg-gold-hover"
             >
               Naar de vergelijking <Icon name="arrow-right" size={18} />
             </Link>

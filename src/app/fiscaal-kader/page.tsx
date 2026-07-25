@@ -2,7 +2,7 @@ import Icon from "@/components/Icon";
 import { Eyebrow } from "@/components/ui";
 
 export const metadata = {
-  title: "Fiscaal kader · B-sure × PXL Autofiscaliteit",
+  title: "Fiscaal kader",
 };
 
 const toc = [

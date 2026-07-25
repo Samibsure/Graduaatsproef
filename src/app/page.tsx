@@ -81,15 +81,15 @@ export default function Dashboard() {
             </h1>
             <p className="m-0 mb-8 max-w-[30em] text-[19px] leading-relaxed text-ink-700">
               Wij brengen de fiscale impact van uw bedrijfswagens helder in kaart. U vergelijkt
-              rustig, op basis van cijfers, en kiest met vertrouwen. De complexiteit handelen wij
-              voor u af.
+              rustig, op basis van cijfers, en kiest met vertrouwen. Gratis voor elk Belgisch
+              bedrijf, zonder limiet op het aantal wagens.
             </p>
             <div className="flex flex-wrap gap-3.5">
               <Link
-                href="/vergelijking"
-                className="inline-flex h-[52px] items-center gap-2.5 rounded-[11px] bg-gold px-7 text-[16px] font-bold text-ink transition-colors hover:bg-gold-hover"
+                href="/registreren"
+                className="inline-flex h-[52px] items-center gap-2.5 rounded-[11px] bg-gold px-7 text-[16px] font-bold text-white transition-colors hover:bg-gold-hover"
               >
-                Start een vergelijking <Icon name="arrow-right" size={18} />
+                Gratis starten <Icon name="arrow-right" size={18} />
               </Link>
               <Link
                 href="/catalogus"

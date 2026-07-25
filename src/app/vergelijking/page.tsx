@@ -514,7 +514,7 @@ export default function VergelijkingPagina() {
               <button
                 onClick={bewaarBeslissing}
                 disabled={bezig}
-                className="inline-flex h-[46px] items-center gap-2 rounded-[11px] bg-gold px-6 text-[15px] font-bold text-ink transition-colors hover:bg-gold-hover disabled:opacity-50"
+                className="inline-flex h-[46px] items-center gap-2 rounded-[11px] bg-gold px-6 text-[15px] font-bold text-white transition-colors hover:bg-gold-hover disabled:opacity-50"
               >
                 <Icon name="check" size={17} />
                 {bezig ? "Bezig…" : "Bewaar beslissing"}
@@ -601,7 +601,7 @@ function BarChart({
         const isBest = it.value === target;
         return (
           <g key={i}>
-            <rect x={x} y={y} width={barW} height={Math.max(h, 2)} rx={8} fill={isBest ? "#AE9A64" : "#0B1F33"} className="bs-cmp-bar" />
+            <rect x={x} y={y} width={barW} height={Math.max(h, 2)} rx={8} fill={isBest ? "var(--gold)" : "var(--ink)"} className="bs-cmp-bar" />
             <text x={cx} y={y - 12} textAnchor="middle" fontSize={15} fontWeight={700} fill="#0B1F33">
               {fmt(it.value)}
             </text>

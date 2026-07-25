@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import Icon from "@/components/Icon";
 
-/** Herbruikbare UI-primitieven in de B-sure × PXL huisstijl. */
+/** Herbruikbare UI-primitieven in de huisstijl van Autofiscaliteit. */
 
 export function Container({
   children,

@@ -126,7 +126,7 @@ export default function WagensPagina() {
         action={
           <button
             onClick={() => setFormulier({ ...leegFormulier })}
-            className="inline-flex h-[46px] items-center gap-2 rounded-[11px] bg-gold px-5 text-[14.5px] font-bold text-ink transition-colors hover:bg-gold-hover"
+            className="inline-flex h-[46px] items-center gap-2 rounded-[11px] bg-gold px-5 text-[14.5px] font-bold text-white transition-colors hover:bg-gold-hover"
           >
             <Icon name="plus" size={17} /> Nieuwe wagen
           </button>
@@ -242,7 +242,7 @@ export default function WagensPagina() {
               <button
                 onClick={bewaar}
                 disabled={bezig || !formulier.omschrijving}
-                className="inline-flex h-[46px] items-center gap-2 rounded-[11px] bg-gold px-6 text-[15px] font-bold text-ink transition-colors hover:bg-gold-hover disabled:opacity-50"
+                className="inline-flex h-[46px] items-center gap-2 rounded-[11px] bg-gold px-6 text-[15px] font-bold text-white transition-colors hover:bg-gold-hover disabled:opacity-50"
               >
                 <Icon name="check" size={17} /> {bezig ? "Bezig…" : "Wagen bewaren"}
               </button>

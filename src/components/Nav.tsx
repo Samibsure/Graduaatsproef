@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { Wordmerk } from "@/components/Brand";
 import Icon from "@/components/Icon";
 import { useSessie } from "@/components/SessieProvider";
 
@@ -48,7 +49,7 @@ function Accountmenu() {
         </Link>
         <Link
           href="/registreren"
-          className="inline-flex h-[42px] items-center gap-2 rounded-[10px] bg-gold px-5 text-[14.5px] font-bold text-ink transition-colors hover:bg-gold-hover"
+          className="inline-flex h-[42px] items-center gap-2 rounded-[10px] bg-gold px-5 text-[14.5px] font-bold text-white transition-colors hover:bg-gold-hover"
         >
           Gratis starten
         </Link>
@@ -124,19 +125,8 @@ export default function Nav() {
       }}
     >
       <div className="mx-auto flex h-[68px] max-w-[1200px] items-center justify-between gap-6 px-6">
-        <Link href="/" className="flex items-center gap-3" onClick={() => setOpen(false)}>
-          <span className="inline-flex h-10 w-10 items-center justify-center rounded-[9px] bg-ink text-white">
-            <Icon name="gauge" size={21} />
-          </span>
-          <span className="flex flex-col items-start gap-0.5 whitespace-nowrap leading-none">
-            <span className="text-[17px] font-bold tracking-[-0.01em] text-ink">
-              B-sure <span className="font-normal text-ink-500">×</span>{" "}
-              <span className="text-gold">PXL</span>
-            </span>
-            <span className="text-[10px] font-bold uppercase leading-none tracking-[0.15em] text-ink-500">
-              Autofiscaliteit
-            </span>
-          </span>
+        <Link href="/" className="flex items-center" onClick={() => setOpen(false)}>
+          <Wordmerk />
         </Link>
 
         <nav className="hidden items-center gap-[30px] lg:flex">
@@ -206,7 +196,7 @@ export default function Nav() {
                 <Link
                   href="/registreren"
                   onClick={() => setOpen(false)}
-                  className="mt-1 block rounded-lg bg-gold px-3 py-3 text-base font-bold text-ink"
+                  className="mt-1 block rounded-lg bg-gold px-3 py-3 text-base font-bold text-white"
                 >
                   Gratis starten
                 </Link>

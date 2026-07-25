@@ -142,7 +142,7 @@ export default function BeheerParametersPagina() {
             <button
               onClick={bewaarAlles}
               disabled={bezig}
-              className="inline-flex h-[46px] items-center rounded-[11px] bg-gold px-5 text-[14.5px] font-bold text-ink transition-colors hover:bg-gold-hover disabled:opacity-50"
+              className="inline-flex h-[46px] items-center rounded-[11px] bg-gold px-5 text-[14.5px] font-bold text-white transition-colors hover:bg-gold-hover disabled:opacity-50"
             >
               {bezig ? "Bezig…" : "Bewaar wijzigingen"}
             </button>

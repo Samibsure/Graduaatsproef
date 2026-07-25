@@ -2,7 +2,7 @@ import Link from "next/link";
 import Icon from "@/components/Icon";
 
 export const metadata = {
-  title: "Handleiding · B-sure × PXL Autofiscaliteit",
+  title: "Handleiding",
 };
 
 const stappen = [
