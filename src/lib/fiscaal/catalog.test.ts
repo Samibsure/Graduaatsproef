@@ -15,6 +15,7 @@ const teslaModelY: CatalogCar = {
   segment: "SUV middenklasse",
   populariteit_rang: 1,
   opmerking: null,
+  image_url: null,
 };
 
 const bmw320d: CatalogCar = {
@@ -28,6 +29,7 @@ const bmw320d: CatalogCar = {
   segment: "Premium berline",
   populariteit_rang: 24,
   opmerking: null,
+  image_url: null,
 };
 
 describe("catalogNaarWagen", () => {

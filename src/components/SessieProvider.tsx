@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext } from "react";
-import type { Sessie } from "@/lib/sessie";
+import type { Sessie } from "@/lib/rollen";
 
 const SessieContext = createContext<Sessie | null>(null);
 

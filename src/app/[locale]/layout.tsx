@@ -77,7 +77,9 @@ export default async function RootLayout({
       titel: t("navigatie"),
       links: [
         { href: "/catalogus", label: t("catalogus") },
+        { href: "/simulator", label: t("simulator") },
         { href: "/vergelijking", label: t("vergelijking") },
+        { href: "/vloot", label: t("vloot") },
         { href: "/wagens", label: t("wagensBeheren") },
       ],
     },

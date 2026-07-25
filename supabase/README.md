@@ -8,6 +8,17 @@ Het volledige schema van Autofiscaliteit staat in `migrations/`, in volgorde uit
 | `0002_bedrijven_en_profielen.sql` | `companies`, `profiles`, `uitnodigingen`, de hulpfuncties en de registratietrigger |
 | `0003_tenantdata_en_rls.sql` | `company_id` op wagens en beslissingen, plus alle RLS-policies |
 | `0004_referentiedata_readonly.sql` | Referentiedata publiek leesbaar, alleen schrijfbaar door een platformbeheerder |
+| `0005_rollen_uitbreiden.sql` | De rollen `lezer` en `fiscalist` naast `lid` en `beheerder` |
+| `0006_bedrijfsprofiel_en_validatie.sql` | Bedrijfsprofiel (KMO, boekjaar, adres, logo), schrijfrechten per rol en de CHECK-constraints op wagens |
+
+`0005` en `0006` horen bij elkaar maar staan bewust apart: PostgreSQL weigert een nieuwe
+enumwaarde te gebruiken in dezelfde transactie waarin ze is aangemaakt.
+
+### Status van dit project
+
+De migraties `0001` tot en met `0006` zijn uitgevoerd op het project `fkmulfdpuphedfakmmsd`. De
+zes permissieve `USING (true)`-policies uit de periode zonder accounts zijn daarmee verdwenen; de
+tien bestaande wagens staan in het archiefbedrijf `00000000-0000-0000-0000-000000000001`.
 
 ## Uitvoeren
 
@@ -51,6 +62,12 @@ bestaande database kunnen draaien.
    ```
 
    Draai daarna ook de Security Advisor in het Supabase-dashboard.
+
+   De Advisor blijft na `0006` melden dat `huidig_bedrijf_id()`, `is_platform_admin()`,
+   `mag_schrijven()` en `is_beheerder()` als `security definer` aanroepbaar zijn. Dat is bedoeld:
+   de RLS-policies steunen erop, dus de rol `authenticated` moet ze mogen uitvoeren. Ze geven
+   uitsluitend informatie terug over de aanroeper zelf en lekken niets van een ander bedrijf.
+   `handle_new_user()` is wél afgeschermd: die hoort alleen door de trigger aangeroepen te worden.
 
 ## Wagencatalogus
 

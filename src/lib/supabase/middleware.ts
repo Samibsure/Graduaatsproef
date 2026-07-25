@@ -8,7 +8,17 @@ import { supabaseConfig } from "./env";
  * Routes die aanmelden vereisen, zonder taalvoorvoegsel. Alles wat hier niet in
  * staat, is publiek.
  */
-const AFGESCHERMD = ["/wagens", "/vergelijking", "/instellingen", "/beheer"];
+const AFGESCHERMD = [
+  "/wagens",
+  "/vergelijking",
+  "/vloot",
+  "/instellingen",
+  "/beheer",
+  "/welkom",
+];
+
+/** De onboarding zelf mag uiteraard niet naar de onboarding omleiden. */
+const ONBOARDING_PAD = "/welkom";
 
 const intlMiddleware = createIntlMiddleware(routing);
 
@@ -58,15 +68,34 @@ export async function updateSession(request: NextRequest) {
 
   const pad = padZonderTaal(request.nextUrl.pathname);
   const moetAangemeld = AFGESCHERMD.some((p) => pad === p || pad.startsWith(`${p}/`));
+  const taal = request.nextUrl.pathname.split("/")[1];
+  const voorvoegsel = (routing.locales as readonly string[]).includes(taal) ? `/${taal}` : "";
 
   if (!user && moetAangemeld) {
     const aanmelden = request.nextUrl.clone();
-    const taal = request.nextUrl.pathname.split("/")[1];
-    const voorvoegsel = (routing.locales as readonly string[]).includes(taal) ? `/${taal}` : "";
     aanmelden.pathname = `${voorvoegsel}/aanmelden`;
     aanmelden.search = "";
     aanmelden.searchParams.set("verder", pad);
     return NextResponse.redirect(aanmelden);
+  }
+
+  // Wie zich net registreerde heeft een bedrijf zonder gegevens en zonder
+  // wagens. Die sturen we eerst door de wizard, anders is de eerste indruk een
+  // lege tabel. Eén extra opzoeking, en alleen op de afgeschermde routes.
+  if (user && moetAangemeld && pad !== ONBOARDING_PAD) {
+    const { data: profiel } = await supabase
+      .from("profiles")
+      .select("companies (onboarding_voltooid)")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    const bedrijf = profiel?.companies as unknown as { onboarding_voltooid: boolean } | null;
+    if (bedrijf && !bedrijf.onboarding_voltooid) {
+      const welkom = request.nextUrl.clone();
+      welkom.pathname = `${voorvoegsel}${ONBOARDING_PAD}`;
+      welkom.search = "";
+      return NextResponse.redirect(welkom);
+    }
   }
 
   return response;

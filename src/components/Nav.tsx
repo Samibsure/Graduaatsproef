@@ -11,7 +11,9 @@ import { Link, usePathname } from "@/i18n/navigation";
 const links = [
   { href: "/", sleutel: "dashboard" },
   { href: "/catalogus", sleutel: "catalogus" },
+  { href: "/simulator", sleutel: "simulator" },
   { href: "/vergelijking", sleutel: "vergelijking" },
+  { href: "/vloot", sleutel: "vloot" },
   { href: "/wagens", sleutel: "wagens" },
   { href: "/fiscaal-kader", sleutel: "fiscaalKader" },
   { href: "/handleiding", sleutel: "handleiding" },

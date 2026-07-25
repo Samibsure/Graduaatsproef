@@ -3,6 +3,7 @@ import type { CatalogCar, FiscaleContext, Vehicle } from "./fiscaal/types";
 import type { Bestelperiode, DeductionRule, TaxParameters } from "./fiscaal/types";
 import { DEFAULT_CONTEXT } from "./fiscaal/defaults";
 import type { ScoreResultaat } from "./fiscaal/scoring";
+import { valideer, wagenSchema } from "./validatie";
 
 export interface Evaluatie {
   id: string;
@@ -62,6 +63,11 @@ export async function laadCatalogus(): Promise<CatalogCar[]> {
 
 export async function bewaarWagen(wagen: Omit<Vehicle, "id"> & { id?: string }): Promise<void> {
   const { id, ...velden } = wagen;
+
+  // Vóór het netwerkverzoek, zodat de gebruiker "co2: getal mag niet kleiner
+  // zijn dan 0" leest in plaats van een constraintnaam uit PostgREST. De
+  // database controleert dezelfde grenzen nog eens; dit vervangt haar niet.
+  valideer(wagenSchema, velden);
 
   if (!id) {
     const { error } = await supabase.from("vehicles").insert(velden);

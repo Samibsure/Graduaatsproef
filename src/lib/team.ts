@@ -1,5 +1,5 @@
 import { supabase } from "./supabase";
-import type { Bedrijfsrol } from "./sessie";
+import type { Bedrijfsrol } from "./rollen";
 
 export interface Teamlid {
   id: string;
@@ -70,12 +70,8 @@ export async function verwijderMijnBedrijf(): Promise<void> {
   if (error) throw new Error(`Verwijderen mislukt: ${error.message}`);
 }
 
-export async function bewaarBedrijf(naam: string, ondernemingsnummer: string): Promise<void> {
-  const { data, error } = await supabase
-    .from("companies")
-    .update({ naam: naam.trim(), ondernemingsnummer: ondernemingsnummer.trim() || null })
-    .neq("id", "00000000-0000-0000-0000-000000000000")
-    .select("id");
-  if (error) throw new Error(`Bedrijf bewaren mislukt: ${error.message}`);
-  if (!data?.length) throw new Error("Bedrijf bewaren mislukt: alleen een beheerder kan dit.");
-}
+/**
+ * Het bewaren van de bedrijfsgegevens is verhuisd naar src/lib/bedrijf.ts, waar
+ * het hele profiel (adres, BTW, KMO-status, boekjaar) samen behandeld en
+ * gevalideerd wordt. Zie bewaarBedrijfsprofiel().
+ */

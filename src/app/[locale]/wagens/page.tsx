@@ -3,7 +3,9 @@
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import Icon from "@/components/Icon";
+import { useSessie } from "@/components/SessieProvider";
 import { Badge, Card, Container, PageHead, TypeDot } from "@/components/ui";
+import { magSchrijven } from "@/lib/rollen";
 import {
   bewaarWagen,
   laadCatalogus,
@@ -49,11 +51,24 @@ const leegFormulier: Formulier = {
   km_per_jaar: 25000,
   flex_score: 7,
   restwaarde_score: 5,
+  // De uitbreidingen defaulten naar "verandert niets", net als in de rekenkern.
+  btw_methode: "geen",
+  btw_tarief: 21,
+  kosten_financiering: null,
+  financieringsvorm: null,
+  eigen_bijdrage_maand: 0,
+  laadpaal_jaarkost: 0,
+  laadstroom_jaar: 0,
+  einde_contract: null,
 };
 
 export default function WagensPagina() {
   const t = useTranslations("wagens");
   const { euro, pct } = formatters(useLocale());
+  // Een lezer mag de vloot bekijken maar niets wijzigen. De policies in de
+  // database weigeren zijn schrijfacties sowieso; dit voorkomt dat hij knoppen
+  // ziet die toch op een foutmelding uitlopen.
+  const magBewerken = magSchrijven(useSessie());
   const [ctx, setCtx] = useState<FiscaleContext | null>(null);
   const [wagens, setWagens] = useState<Vehicle[]>([]);
   const [catalogus, setCatalogus] = useState<CatalogCar[]>([]);
@@ -127,12 +142,16 @@ export default function WagensPagina() {
         title={t("titel")}
         sub={t("intro")}
         action={
-          <button
-            onClick={() => setFormulier({ ...leegFormulier })}
-            className="inline-flex h-[46px] items-center gap-2 rounded-[11px] bg-gold px-5 text-[14.5px] font-bold text-white transition-colors hover:bg-gold-hover"
-          >
-            <Icon name="plus" size={17} /> {t("nieuweWagen")}
-          </button>
+          magBewerken ? (
+            <button
+              onClick={() => setFormulier({ ...leegFormulier })}
+              className="inline-flex h-[46px] items-center gap-2 rounded-[11px] bg-gold px-5 text-[14.5px] font-bold text-white transition-colors hover:bg-gold-hover"
+            >
+              <Icon name="plus" size={17} /> {t("nieuweWagen")}
+            </button>
+          ) : (
+            <Badge tint="slate">{t("alleenLezen")}</Badge>
+          )
         }
       />
 
@@ -244,6 +263,88 @@ export default function WagensPagina() {
               </label>
             </div>
 
+            {/* Verfijning. Ingeklapt omdat een gewone invoer prima werkt zonder,
+                maar wie het invult krijgt een merkbaar nauwkeuriger resultaat:
+                BTW en financieringskosten verlagen de verworpen uitgaven. */}
+            <details className="mt-6 rounded-[12px] border border-line">
+              <summary className="cursor-pointer px-4 py-3 text-[14.5px] font-bold text-ink">
+                {t("verfijningTitel")}
+              </summary>
+              <div className="border-t border-line px-4 pb-4 pt-4">
+                <p className="mb-4 text-[13.5px] leading-relaxed text-ink-700">
+                  {t("verfijningIntro")}
+                </p>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <Veld label={t("btwMethode")} hint={t("btwMethodeHint")}>
+                    <select
+                      className={invoer}
+                      value={formulier.btw_methode ?? "geen"}
+                      onChange={(e) => zet("btw_methode", e.target.value as Formulier["btw_methode"])}
+                    >
+                      <option value="geen">{t("btwGeen")}</option>
+                      <option value="forfait35">{t("btwForfait")}</option>
+                      <option value="werkelijk">{t("btwWerkelijk")}</option>
+                    </select>
+                  </Veld>
+                  <Veld label={t("financieringsvorm")}>
+                    <select
+                      className={invoer}
+                      value={formulier.financieringsvorm ?? ""}
+                      onChange={(e) =>
+                        zet(
+                          "financieringsvorm",
+                          (e.target.value || null) as Formulier["financieringsvorm"],
+                        )
+                      }
+                    >
+                      <option value="">{t("financieringOnbekend")}</option>
+                      <option value="operationele_leasing">{t("financieringOperationeel")}</option>
+                      <option value="financiele_leasing">{t("financieringFinancieel")}</option>
+                      <option value="renting">{t("financieringRenting")}</option>
+                      <option value="aankoop">{t("financieringAankoop")}</option>
+                    </select>
+                  </Veld>
+                  <Veld label={t("kostenFinanciering")} hint={t("kostenFinancieringHint")}>
+                    <input
+                      type="number" min={0} className={invoer}
+                      value={formulier.kosten_financiering ?? ""}
+                      onChange={(e) =>
+                        zet("kosten_financiering", e.target.value === "" ? null : Number(e.target.value))
+                      }
+                    />
+                  </Veld>
+                  <Veld label={t("eigenBijdrage")} hint={t("eigenBijdrageHint")}>
+                    <input
+                      type="number" min={0} className={invoer}
+                      value={formulier.eigen_bijdrage_maand ?? 0}
+                      onChange={(e) => zet("eigen_bijdrage_maand", Number(e.target.value))}
+                    />
+                  </Veld>
+                  <Veld label={t("laadpaalJaarkost")} hint={t("laadpaalJaarkostHint")}>
+                    <input
+                      type="number" min={0} className={invoer}
+                      value={formulier.laadpaal_jaarkost ?? 0}
+                      onChange={(e) => zet("laadpaal_jaarkost", Number(e.target.value))}
+                    />
+                  </Veld>
+                  <Veld label={t("laadstroomJaar")} hint={t("laadstroomJaarHint")}>
+                    <input
+                      type="number" min={0} className={invoer}
+                      value={formulier.laadstroom_jaar ?? 0}
+                      onChange={(e) => zet("laadstroom_jaar", Number(e.target.value))}
+                    />
+                  </Veld>
+                  <Veld label={t("eindeContract")} hint={t("eindeContractHint")}>
+                    <input
+                      type="date" className={invoer}
+                      value={formulier.einde_contract ?? ""}
+                      onChange={(e) => zet("einde_contract", e.target.value || null)}
+                    />
+                  </Veld>
+                </div>
+              </div>
+            </details>
+
             <div className="mt-6 flex items-center gap-3">
               <button
                 onClick={bewaar}
@@ -326,12 +427,18 @@ export default function WagensPagina() {
                   <td className="px-4 py-3 text-right font-bold">{r ? euro(r.verworpenUitgaven) : "…"}</td>
                   <td className="px-4 py-3 text-right">{r ? euro(r.rszJaar) : "…"}</td>
                   <td className="whitespace-nowrap px-4 py-3 text-right">
-                    <button onClick={() => setFormulier({ ...w })} className="mr-3 text-sm font-bold text-ink hover:text-gold">
-                      {t("bewerk")}
-                    </button>
-                    <button onClick={() => verwijder(w.id)} className="text-sm font-bold text-rose-600 hover:underline">
-                      {t("verwijder")}
-                    </button>
+                    {magBewerken ? (
+                      <>
+                        <button onClick={() => setFormulier({ ...w })} className="mr-3 text-sm font-bold text-ink hover:text-gold">
+                          {t("bewerk")}
+                        </button>
+                        <button onClick={() => verwijder(w.id)} className="text-sm font-bold text-rose-600 hover:underline">
+                          {t("verwijder")}
+                        </button>
+                      </>
+                    ) : (
+                      <span className="text-sm text-ink-500">{t("geenRechten")}</span>
+                    )}
                   </td>
                 </tr>
               );
