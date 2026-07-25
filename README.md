@@ -6,6 +6,7 @@ verworpen uitgaven, de CO₂-solidariteitsbijdrage en de totale gebruikskost.
 
 Elk bedrijf registreert zich gratis en beheert zijn eigen wagenpark. Wagens en bewaarde
 beslissingen zijn strikt afgeschermd per bedrijf; collega's kunnen worden uitgenodigd.
+De applicatie is beschikbaar in het Nederlands, het Frans en het Engels.
 
 De toepassing groeide uit het eindwerk van Sami Elhamdaoui over de impact van autokosten op
 verworpen uitgaven, en is sindsdien uitgebouwd tot een publiek product.
@@ -23,6 +24,7 @@ verworpen uitgaven, en is sindsdien uitgebouwd tot een publiek product.
 | Laag | Keuze |
 | --- | --- |
 | Frontend | Next.js 15 (App Router), TypeScript, Tailwind CSS |
+| Talen | next-intl, Nederlands / Frans / Engels |
 | Rekenkern | Pure TypeScript-functies in `src/lib/fiscaal/` (geen UI- of DB-afhankelijkheid) |
 | Data & auth | Supabase (PostgreSQL, Supabase Auth), afscherming via RLS |
 | Tests | Vitest, `src/lib/fiscaal/*.test.ts` |
@@ -54,6 +56,15 @@ De database is de beveiligingsgrens, niet de frontend:
   gemaksvoorziening — de policies doen het echte werk.
 
 Zie `supabase/README.md` voor het schema en de controlestappen.
+
+### Talen
+
+Nederlands staat zonder voorvoegsel in de URL, Frans en Engels onder `/fr` en `/en`. De teksten
+staan in `messages/{nl,fr,en}.json`, de routering in `src/i18n/`. Voeg je een tekst toe, zet ze dan
+in alle drie de bestanden: een ontbrekende sleutel valt zichtbaar door de mand.
+
+Interne functie- en veldnamen blijven Nederlands (`laadWagens`, `verworpenUitgaven`). Die hernoemen
+raakt elk bestand en de tests, zonder winst voor de gebruiker.
 
 ## Lokaal draaien
 
