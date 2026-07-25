@@ -1,13 +1,7 @@
 import { supabase } from "./supabase";
-import { DEFAULT_CONTEXT, DEFAULT_PARAMETERS, DEFAULT_PERIODES, DEFAULT_REGELS } from "./fiscaal/defaults";
-import type {
-  Bestelperiode,
-  CatalogCar,
-  DeductionRule,
-  FiscaleContext,
-  TaxParameters,
-  Vehicle,
-} from "./fiscaal/types";
+import type { CatalogCar, FiscaleContext, Vehicle } from "./fiscaal/types";
+import type { Bestelperiode, DeductionRule, TaxParameters } from "./fiscaal/types";
+import { DEFAULT_CONTEXT } from "./fiscaal/defaults";
 import type { ScoreResultaat } from "./fiscaal/scoring";
 
 export interface Evaluatie {
@@ -19,6 +13,14 @@ export interface Evaluatie {
   notitie: string | null;
   created_at: string;
 }
+
+/**
+ * De wagens en beslissingen hieronder worden nergens expliciet op bedrijf
+ * gefilterd. Dat gebeurt bewust in de database: de RLS-policies beperken elke
+ * query tot het bedrijf uit de sessie, en de kolom company_id krijgt zijn
+ * waarde uit een default. De browser stuurt dus nooit zelf een company_id mee,
+ * en kan er ook geen verzinnen.
+ */
 
 /** Laadt parameters, bestelperiodes en aftrekkalender uit Supabase. */
 export async function laadFiscaleContext(): Promise<FiscaleContext> {
@@ -60,63 +62,29 @@ export async function laadCatalogus(): Promise<CatalogCar[]> {
 
 export async function bewaarWagen(wagen: Omit<Vehicle, "id"> & { id?: string }): Promise<void> {
   const { id, ...velden } = wagen;
-  const { error } = id
-    ? await supabase.from("vehicles").update(velden).eq("id", id)
-    : await supabase.from("vehicles").insert(velden);
+
+  if (!id) {
+    const { error } = await supabase.from("vehicles").insert(velden);
+    if (error) throw new Error(`Wagen bewaren mislukt: ${error.message}`);
+    return;
+  }
+
+  // .select() is hier geen detail: een update op een wagen van een ánder
+  // bedrijf wordt door RLS niet geweigerd maar raakt gewoon nul rijen. Zonder
+  // deze controle lijkt zo'n poging te slagen.
+  const { data, error } = await supabase
+    .from("vehicles")
+    .update(velden)
+    .eq("id", id)
+    .select("id");
   if (error) throw new Error(`Wagen bewaren mislukt: ${error.message}`);
+  if (!data?.length) throw new Error("Wagen bewaren mislukt: wagen niet gevonden.");
 }
 
 export async function verwijderWagen(id: string): Promise<void> {
-  const { error } = await supabase.from("vehicles").delete().eq("id", id);
+  const { data, error } = await supabase.from("vehicles").delete().eq("id", id).select("id");
   if (error) throw new Error(`Wagen verwijderen mislukt: ${error.message}`);
-}
-
-export async function bewaarParameters(params: TaxParameters): Promise<void> {
-  const { error } = await supabase
-    .from("tax_parameters")
-    .update({ ...params, updated_at: new Date().toISOString() })
-    .eq("year", params.year);
-  if (error) throw new Error(`Parameters bewaren mislukt: ${error.message}`);
-}
-
-export async function bewaarMultiplicator(code: string, multiplicator: number): Promise<void> {
-  const { error } = await supabase
-    .from("bestelperiodes")
-    .update({ rsz_multiplicator: multiplicator })
-    .eq("code", code);
-  if (error) throw new Error(`Multiplicator bewaren mislukt: ${error.message}`);
-}
-
-export async function bewaarAftrekRegel(regel: DeductionRule): Promise<void> {
-  let query = supabase
-    .from("deduction_rules")
-    .update({ aftrek_pct: regel.aftrek_pct })
-    .eq("voertuigtype", regel.voertuigtype)
-    .eq("bestelperiode", regel.bestelperiode);
-  query =
-    regel.gebruiksjaar === null
-      ? query.is("gebruiksjaar", null)
-      : query.eq("gebruiksjaar", regel.gebruiksjaar);
-  const { error } = await query;
-  if (error) throw new Error(`Aftrekregel bewaren mislukt: ${error.message}`);
-}
-
-/** Zet parameters, periodes en aftrekkalender terug naar de waarden uit het rapport. */
-export async function herstelStandaardwaarden(): Promise<void> {
-  const fouten: string[] = [];
-  for (const p of DEFAULT_PARAMETERS) {
-    const { error } = await supabase.from("tax_parameters").upsert(p, { onConflict: "year" });
-    if (error) fouten.push(error.message);
-  }
-  for (const per of DEFAULT_PERIODES) {
-    const { error } = await supabase.from("bestelperiodes").upsert(per, { onConflict: "code" });
-    if (error) fouten.push(error.message);
-  }
-  const del = await supabase.from("deduction_rules").delete().gte("id", 0);
-  if (del.error) fouten.push(del.error.message);
-  const ins = await supabase.from("deduction_rules").insert(DEFAULT_REGELS);
-  if (ins.error) fouten.push(ins.error.message);
-  if (fouten.length) throw new Error(`Herstellen mislukt: ${fouten.join("; ")}`);
+  if (!data?.length) throw new Error("Wagen verwijderen mislukt: wagen niet gevonden.");
 }
 
 export async function bewaarEvaluatie(

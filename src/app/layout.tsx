@@ -3,6 +3,8 @@ import Link from "next/link";
 import "./globals.css";
 import Icon from "@/components/Icon";
 import Nav from "@/components/Nav";
+import { SessieProvider } from "@/components/SessieProvider";
+import { laadSessie } from "@/lib/sessie";
 
 export const metadata: Metadata = {
   title: "B-sure × PXL · Autofiscaliteit-tool",
@@ -22,16 +24,20 @@ const footerKennis = [
   { href: "/over", label: "Over" },
 ];
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const sessie = await laadSessie();
+
   return (
-    <html lang="nl">
+    <html lang="nl-BE">
       <body className="antialiased flex min-h-screen flex-col">
-        <Nav />
-        <main className="flex-1">{children}</main>
+        <SessieProvider sessie={sessie}>
+          <Nav />
+          <main className="flex-1">{children}</main>
+        </SessieProvider>
 
         <footer className="bs-no-print mt-auto bg-ink text-white/[0.78]">
           <div className="mx-auto flex max-w-[1200px] flex-wrap items-start justify-between gap-10 px-6 py-12">
