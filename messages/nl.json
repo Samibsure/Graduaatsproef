@@ -623,5 +623,16 @@
     "startLeegUitleg": "Je voegt zelf je eerste wagen toe, uit de catalogus of met eigen cijfers.",
     "vorige": "Vorige",
     "volgende": "Volgende"
+  },
+  "uitfasering": {
+    "titel": "Aftrekbaarheid over de jaren",
+    "intro": "De aftrek van deze wagen per kalenderjaar. Waar de balk daalt, stijgt de fiscale meerkost.",
+    "tabelBijschrift": "Aftrekbaarheid en fiscale meerkost per kalenderjaar",
+    "kolomJaar": "Jaar",
+    "kolomAftrek": "Aftrekbaarheid",
+    "kolomMeerkost": "Fiscale meerkost",
+    "waarschuwingNul": "Deze wagen verliest zijn volledige aftrek vanaf {jaar}. De fiscale meerkost stijgt daardoor met {bedrag} per jaar tegenover vandaag.",
+    "waarschuwingDaling": "De aftrek van deze wagen begint te dalen vanaf {jaar}. De fiscale meerkost stijgt daardoor met {bedrag} per jaar tegenover vandaag.",
+    "stabiel": "De aftrek van deze wagen blijft over de hele periode op {pct} staan."
   }
 }

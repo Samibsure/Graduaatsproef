@@ -6,7 +6,8 @@ import { useEffect, useMemo, useState } from "react";
 import CarImage from "@/components/CarImage";
 import Icon from "@/components/Icon";
 import { useSessie } from "@/components/SessieProvider";
-import { Container, Eyebrow } from "@/components/ui";
+import Uitfaseringstijdlijn from "@/components/Uitfaseringstijdlijn";
+import { Container, Eyebrow, TypeDot } from "@/components/ui";
 import {
   bewaarEvaluatie,
   laadCatalogus,
@@ -16,6 +17,7 @@ import {
   type Evaluatie,
 } from "@/lib/data";
 import { berekenProjectie } from "@/lib/fiscaal/engine";
+import { berekenUitfasering, type Uitfasering } from "@/lib/fiscaal/uitfasering";
 import { CRITERIA, scoreVergelijking } from "@/lib/fiscaal/scoring";
 import type { CatalogCar, FiscaleContext, Vehicle } from "@/lib/fiscaal/types";
 import { formatters } from "@/lib/format";
@@ -27,6 +29,7 @@ type Metric = "tco" | "vaa" | "aftrek";
 
 export default function VergelijkingPagina() {
   const t = useTranslations("vergelijking");
+  const tUit = useTranslations("uitfasering");
   const locale = useLocale();
   const { euro, getal, pct } = formatters(locale);
   const sessie = useSessie();
@@ -70,6 +73,21 @@ export default function VergelijkingPagina() {
     if (!ctx || kandidaten.length === 0) return { projecties: [], scores: [] };
     const projecties = kandidaten.map((w) => berekenProjectie(ctx, w, startjaar, 4, { kmoTarief }));
     return { projecties, scores: scoreVergelijking(projecties) };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ctx, wagens, geselecteerd, startjaar, kmoTarief]);
+
+  /**
+   * De aftrekkalender per kandidaat, van het startjaar tot 2031. Apart van de
+   * vierjarige projectie hierboven: die stopt na vier jaar, terwijl net het
+   * jaar waarin de aftrek wegvalt daarbuiten kan liggen.
+   */
+  const uitfaseringPerWagen = useMemo(() => {
+    const kaart = new Map<string, Uitfasering>();
+    if (!ctx) return kaart;
+    for (const w of kandidaten) {
+      kaart.set(w.id, berekenUitfasering(ctx, w, startjaar, 2031, { kmoTarief }));
+    }
+    return kaart;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ctx, wagens, geselecteerd, startjaar, kmoTarief]);
 
@@ -400,6 +418,29 @@ export default function VergelijkingPagina() {
                 <Icon name="check" size={11} />
               </span>
               {t("gunstigsteWaarde")}
+            </div>
+          </div>
+
+          {/* UITFASERINGSTIJDLIJN: het inzicht waarvoor de tool bestaat. De
+              tabel toonde tot nu toe alleen het eerste jaar, waardoor precies
+              het moment waarop de aftrek wegvalt onzichtbaar bleef. */}
+          <div className="mb-11">
+            <h2 className="m-0 mb-1.5 text-[22px] font-bold">{tUit("titel")}</h2>
+            <p className="mb-[18px] max-w-[52em] text-[15px] text-ink-700">{tUit("intro")}</p>
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              {cmp.map((c) => {
+                const u = uitfaseringPerWagen.get(c.id);
+                if (!u) return null;
+                return (
+                  <div key={c.id} className="rounded-[14px] border border-line bg-white p-5">
+                    <div className="mb-3.5 flex items-center gap-2">
+                      <TypeDot type={c.type} />
+                      <span className="truncate text-[15px] font-bold text-ink">{c.name}</span>
+                    </div>
+                    <Uitfaseringstijdlijn uitfasering={u} euro={euro} pct={pct} />
+                  </div>
+                );
+              })}
             </div>
           </div>
 

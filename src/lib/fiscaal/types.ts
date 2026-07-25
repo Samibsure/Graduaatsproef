@@ -1,6 +1,24 @@
 export type Voertuigtype = "BEV" | "PHEV" | "HEV" | "fossiel";
 export type Brandstof = "elektrisch" | "diesel" | "benzine" | "lpg" | "cng";
 
+/**
+ * Methode voor de BTW-aftrek op autokosten (circulaire E.T. 119.650).
+ * `geen` betekent dat er geen BTW teruggevorderd wordt; dat is de standaard,
+ * zodat een bestaande wagen zonder deze keuze exact hetzelfde blijft rekenen.
+ */
+export type BtwMethode = "geen" | "forfait35" | "werkelijk";
+
+/**
+ * Hoe de wagen gefinancierd wordt. Fiscaal maakt dit één belangrijk verschil:
+ * de financieringskosten (de intrest) vallen buiten de aftrekbeperking van
+ * artikel 66 WIB92 en blijven dus volledig aftrekbaar.
+ */
+export type Financieringsvorm =
+  | "operationele_leasing"
+  | "financiele_leasing"
+  | "renting"
+  | "aankoop";
+
 /** Fiscale parameters per kalenderjaar (tabel tax_parameters). */
 export interface TaxParameters {
   year: number;
@@ -68,6 +86,33 @@ export interface Vehicle {
   km_per_jaar: number | null;
   flex_score: number;
   restwaarde_score: number;
+
+  /**
+   * De velden hieronder zijn optioneel en defaulten allemaal naar "verandert
+   * niets". Een wagen die ze niet invult, rekent exact zoals voordien. Dat is
+   * bewust: de referentietests in engine.test.ts valideren tegen een uitgewerkt
+   * dossier en mogen niet van uitkomst wijzigen door een uitbreiding.
+   */
+
+  /** Deel van de jaarlijkse autokosten dat intrest is. Volledig aftrekbaar. */
+  kosten_financiering?: number | null;
+  financieringsvorm?: Financieringsvorm | null;
+
+  /** BTW-aftrek op de autokosten. Zonder keuze wordt er niets teruggevorderd. */
+  btw_methode?: BtwMethode | null;
+  /** BTW-tarief op de autokosten, in procent. Standaard 21. */
+  btw_tarief?: number | null;
+
+  /** Maandelijkse eigen bijdrage van de werknemer. Verlaagt het VAA. */
+  eigen_bijdrage_maand?: number | null;
+
+  /** Jaarkost van een laadpunt. Valt buiten de aftrekbeperking voor wagens. */
+  laadpaal_jaarkost?: number | null;
+  /** Terugbetaalde laadstroom per jaar. Volgt de aftrekbaarheid van de wagen. */
+  laadstroom_jaar?: number | null;
+
+  /** Einde van het lease- of financieringscontract, voor de vervangplanner. */
+  einde_contract?: string | null;
 }
 
 /** Referentiemodel uit de wagencatalogus (tabel car_catalog). */
@@ -96,6 +141,7 @@ export interface FiscaleContext {
 export interface JaarResultaat {
   gebruiksjaar: number;
   aftrekPct: number;
+  /** VAA na aftrek van de eigen bijdrage. Dit bedrag voedt de verworpen uitgaven. */
   vaa: number;
   nietAftrekbaar: number;
   vuUitVaa: number;
@@ -105,8 +151,19 @@ export interface JaarResultaat {
   rszJaar: number;
   /** extra VenB + RSZ-bijdrage */
   fiscaleMeerkost: number;
-  /** autokosten + fiscale meerkost */
+  /** autokosten na BTW-teruggave, plus de fiscale meerkost, min de eigen bijdrage */
   totaleKost: number;
+
+  /** VAA vóór de eigen bijdrage van de werknemer. */
+  vaaBruto: number;
+  /** Eigen bijdrage van de werknemer over het jaar. */
+  eigenBijdrageJaar: number;
+  /** Teruggevorderde BTW op de autokosten. */
+  btwTeruggevorderd: number;
+  /** Kosten die onder de aftrekbeperking van artikel 66 WIB92 vallen. */
+  kostenOnderworpen: number;
+  /** Kosten die daarbuiten vallen en dus volledig aftrekbaar zijn. */
+  kostenVolledigAftrekbaar: number;
 }
 
 export interface Projectie {

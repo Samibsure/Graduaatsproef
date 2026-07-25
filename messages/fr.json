@@ -623,5 +623,16 @@
     "startLeegUitleg": "Vous ajoutez vous-même votre premier véhicule, depuis le catalogue ou avec vos propres chiffres.",
     "vorige": "Précédent",
     "volgende": "Suivant"
+  },
+  "uitfasering": {
+    "titel": "Déductibilité au fil des ans",
+    "intro": "La déduction de ce véhicule par année civile. Là où la barre descend, le surcoût fiscal monte.",
+    "tabelBijschrift": "Déductibilité et surcoût fiscal par année civile",
+    "kolomJaar": "Année",
+    "kolomAftrek": "Déductibilité",
+    "kolomMeerkost": "Surcoût fiscal",
+    "waarschuwingNul": "Ce véhicule perd toute sa déduction à partir de {jaar}. Le surcoût fiscal augmente dès lors de {bedrag} par an par rapport à aujourd'hui.",
+    "waarschuwingDaling": "La déduction de ce véhicule commence à baisser à partir de {jaar}. Le surcoût fiscal augmente dès lors de {bedrag} par an par rapport à aujourd'hui.",
+    "stabiel": "La déduction de ce véhicule reste à {pct} sur toute la période."
   }
 }

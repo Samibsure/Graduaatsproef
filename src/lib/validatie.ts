@@ -40,7 +40,33 @@ export const wagenSchema = z.object({
   restwaarde_score: z.number().min(1).max(10),
   tankkaart: z.boolean(),
   thuislaadpunt: z.boolean(),
-});
+
+  // De uitbreidingen uit migratie 0007. Allemaal optioneel, met dezelfde
+  // grenzen als de constraint vehicles_uitbreiding_geldig.
+  kosten_financiering: z.number().min(0).max(1_000_000).nullable().optional(),
+  financieringsvorm: z
+    .enum(["operationele_leasing", "financiele_leasing", "renting", "aankoop"])
+    .nullable()
+    .optional(),
+  btw_methode: z.enum(["geen", "forfait35", "werkelijk"]).optional(),
+  btw_tarief: z.number().min(0).max(100).optional(),
+  eigen_bijdrage_maand: z.number().min(0).max(100_000).optional(),
+  laadpaal_jaarkost: z.number().min(0).max(1_000_000).optional(),
+  laadstroom_jaar: z.number().min(0).max(1_000_000).optional(),
+  start_contract: datum.nullable().optional(),
+  einde_contract: datum.nullable().optional(),
+})
+  .refine(
+    (w) => !w.start_contract || !w.einde_contract || w.einde_contract >= w.start_contract,
+    { message: "het einde van het contract ligt vóór de start", path: ["einde_contract"] },
+  )
+  .refine(
+    (w) => (w.kosten_financiering ?? 0) <= w.jaarlijkse_autokosten,
+    {
+      message: "de financieringskosten kunnen niet groter zijn dan de jaarlijkse autokosten",
+      path: ["kosten_financiering"],
+    },
+  );
 
 export const bedrijfSchema = z.object({
   naam: z.string().trim().min(2).max(120),

@@ -20,6 +20,11 @@ jobs:
 
       - run: npm run lint
 
+      # De build controleert de types van wat hij bundelt, maar niet die van de
+      # testbestanden. Zonder deze stap kan een testfixture stilletjes uit de
+      # pas lopen met het type dat ze zegt te vullen.
+      - run: npm run typecheck
+
       - run: npm test
 
       # De build heeft de Supabase-variabelen nodig omdat de applicatie bewust

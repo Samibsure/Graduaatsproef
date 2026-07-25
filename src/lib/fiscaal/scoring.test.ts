@@ -7,6 +7,10 @@ import type { Vehicle } from "./types";
 const basis: Omit<Vehicle, "id" | "omschrijving"> = {
   werknemer: null,
   kenteken: null,
+  categorie: "kandidaat",
+  merk: null,
+  model: null,
+  catalog_id: null,
   voertuigtype: "BEV",
   brandstof: "elektrisch",
   besteldatum: "2026-01-15",

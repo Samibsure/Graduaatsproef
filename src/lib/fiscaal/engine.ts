@@ -8,6 +8,15 @@ import type {
   Vehicle,
 } from "./types";
 
+/** Standaard BTW-tarief op autokosten in België. */
+const BTW_TARIEF_STANDAARD = 21;
+
+/** De BTW-aftrek op autokosten is wettelijk begrensd op 50%. */
+const BTW_AFTREK_PLAFOND = 50;
+
+/** Forfaitair beroepsgebruik wanneer de onderneming voor het 35%-forfait kiest. */
+const BTW_FORFAIT = 35;
+
 /**
  * Rekenkern van Autofiscaliteit. De formules volgen de Belgische wetgeving:
  * de aftrekkalender en het voordeel van alle aard uit het WIB 92, de
@@ -144,6 +153,65 @@ export function rszBijdrageMaand(
   return Math.max(minimum, basis);
 }
 
+/**
+ * Percentage van de BTW op de autokosten dat teruggevorderd mag worden.
+ *
+ * De algemene regel (art. 45 §2 WBTW) begrenst de aftrek op **50%**, en nooit
+ * meer dan het werkelijke beroepsgebruik. De onderneming kiest per wagen tussen
+ * het 35%-forfait en het werkelijke beroepsgebruik; wie niets kiest, vordert
+ * niets terug.
+ */
+export function btwAftrekPct(vehicle: Vehicle): number {
+  switch (vehicle.btw_methode ?? "geen") {
+    case "forfait35":
+      return BTW_FORFAIT;
+    case "werkelijk":
+      return Math.min(BTW_AFTREK_PLAFOND, Math.max(0, vehicle.beroepsgebruik_pct));
+    default:
+      return 0;
+  }
+}
+
+/**
+ * Splitst de jaarlijkse kosten op in wat wél en wat niet onder de
+ * aftrekbeperking voor autokosten valt.
+ *
+ * `jaarlijkse_autokosten` is inclusief BTW. Wat teruggevorderd wordt is geen
+ * kost meer en gaat er dus eerst af. Van wat overblijft vallen twee posten
+ * buiten de beperking van artikel 66 WIB92 en blijven ze volledig aftrekbaar:
+ * de financieringskosten (de intrest) en de kosten van een laadpunt. De rest,
+ * inclusief de terugbetaalde laadstroom, volgt de aftrekbaarheid van de wagen.
+ */
+export function kostenBasis(vehicle: Vehicle): {
+  btwTeruggevorderd: number;
+  kostenOnderworpen: number;
+  kostenVolledigAftrekbaar: number;
+  kostenTotaal: number;
+} {
+  const tarief = vehicle.btw_tarief ?? BTW_TARIEF_STANDAARD;
+  const aftrek = btwAftrekPct(vehicle) / 100;
+  // De autokosten zijn inclusief BTW, dus het BTW-deel is kosten × t/(100+t).
+  const btwInKosten = vehicle.jaarlijkse_autokosten * (tarief / (100 + tarief));
+  const btwTeruggevorderd = btwInKosten * aftrek;
+
+  const financiering = Math.max(0, vehicle.kosten_financiering ?? 0);
+  const laadpaal = Math.max(0, vehicle.laadpaal_jaarkost ?? 0);
+  const laadstroom = Math.max(0, vehicle.laadstroom_jaar ?? 0);
+
+  const naBtw = vehicle.jaarlijkse_autokosten - btwTeruggevorderd;
+  // De financieringskosten zitten in jaarlijkse_autokosten en worden er hier
+  // uit gelicht; de laadpaal en de laadstroom komen erbovenop.
+  const kostenOnderworpen = Math.max(0, naBtw - financiering) + laadstroom;
+  const kostenVolledigAftrekbaar = Math.min(naBtw, financiering) + laadpaal;
+
+  return {
+    btwTeruggevorderd,
+    kostenOnderworpen,
+    kostenVolledigAftrekbaar,
+    kostenTotaal: kostenOnderworpen + kostenVolledigAftrekbaar,
+  };
+}
+
 /** Volledige fiscale berekening voor één gebruiksjaar (cf. Bijlage 1 van het rapport). */
 export function berekenJaar(
   ctx: FiscaleContext,
@@ -153,8 +221,18 @@ export function berekenJaar(
 ): JaarResultaat {
   const params = parametersVoorJaar(ctx, gebruiksjaar);
   const aftrek = aftrekPct(ctx, vehicle, gebruiksjaar);
-  const vaa = voordeelAlleAard(ctx, vehicle, gebruiksjaar);
-  const nietAftrekbaar = (1 - aftrek / 100) * vehicle.jaarlijkse_autokosten;
+
+  // De eigen bijdrage van de werknemer verlaagt het belastbare voordeel, maar
+  // pas nádat het wettelijk minimum is toegepast. Ze kan het VAA niet onder nul
+  // duwen.
+  const vaaBruto = voordeelAlleAard(ctx, vehicle, gebruiksjaar);
+  const eigenBijdrageJaar = Math.max(0, vehicle.eigen_bijdrage_maand ?? 0) * 12;
+  const vaa = Math.max(0, vaaBruto - eigenBijdrageJaar);
+
+  const { btwTeruggevorderd, kostenOnderworpen, kostenVolledigAftrekbaar, kostenTotaal } =
+    kostenBasis(vehicle);
+
+  const nietAftrekbaar = (1 - aftrek / 100) * kostenOnderworpen;
   const vuPct = vehicle.tankkaart ? params.vu_pct_met_kaart : params.vu_pct_zonder_kaart;
   const vuUitVaa = (vuPct / 100) * vaa;
   const verworpenUitgaven = nietAftrekbaar + vuUitVaa;
@@ -174,7 +252,14 @@ export function berekenJaar(
     rszMaand,
     rszJaar,
     fiscaleMeerkost,
-    totaleKost: vehicle.jaarlijkse_autokosten + fiscaleMeerkost,
+    // De eigen bijdrage is een opbrengst voor de vennootschap en verlaagt dus
+    // de werkelijke kost van de wagen.
+    totaleKost: kostenTotaal + fiscaleMeerkost - eigenBijdrageJaar,
+    vaaBruto,
+    eigenBijdrageJaar,
+    btwTeruggevorderd,
+    kostenOnderworpen,
+    kostenVolledigAftrekbaar,
   };
 }
 

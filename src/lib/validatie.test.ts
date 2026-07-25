@@ -68,6 +68,38 @@ describe("wagenSchema", () => {
   });
 });
 
+describe("wagenSchema, uitbreidingen", () => {
+  it("aanvaardt een wagen met BTW, financiering, eigen bijdrage en laadpaal", () => {
+    const uitgebreid = {
+      ...geldigeWagen,
+      btw_methode: "forfait35" as const,
+      btw_tarief: 21,
+      kosten_financiering: 1500,
+      financieringsvorm: "operationele_leasing" as const,
+      eigen_bijdrage_maand: 75,
+      laadpaal_jaarkost: 800,
+      laadstroom_jaar: 600,
+      start_contract: "2026-03-01",
+      einde_contract: "2030-02-28",
+    };
+    expect(() => valideer(wagenSchema, uitgebreid)).not.toThrow();
+  });
+
+  it("weigert een contracteinde dat vóór de start ligt", () => {
+    const fout = { ...geldigeWagen, start_contract: "2030-01-01", einde_contract: "2026-01-01" };
+    expect(() => valideer(wagenSchema, fout)).toThrow();
+  });
+
+  it("weigert financieringskosten die groter zijn dan de autokosten zelf", () => {
+    const fout = { ...geldigeWagen, jaarlijkse_autokosten: 6800, kosten_financiering: 9000 };
+    expect(() => valideer(wagenSchema, fout)).toThrow();
+  });
+
+  it("weigert een onbekende BTW-methode", () => {
+    expect(() => valideer(wagenSchema, { ...geldigeWagen, btw_methode: "verzonnen" })).toThrow();
+  });
+});
+
 describe("bedrijfSchema", () => {
   const geldigBedrijf = {
     naam: "Voorbeeld NV",

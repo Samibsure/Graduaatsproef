@@ -146,7 +146,6 @@
     "bekijkCatalogus": "Browse the catalogue",
     "foutLabel": "Error",
     "foutTitel": "Something went wrong",
-    "foutTitelKort": "Error",
     "foutTekst": "The page could not be loaded. Try again; if it keeps failing, let us know at {email}.",
     "referentie": "Reference: {digest}",
     "opnieuw": "Try again"
@@ -624,5 +623,16 @@
     "startLeegUitleg": "You add your first vehicle yourself, from the catalogue or with your own figures.",
     "vorige": "Previous",
     "volgende": "Next"
+  },
+  "uitfasering": {
+    "titel": "Deductibility over the years",
+    "intro": "This car's deduction per calendar year. Where the bar drops, the tax surcharge rises.",
+    "tabelBijschrift": "Deductibility and tax surcharge per calendar year",
+    "kolomJaar": "Year",
+    "kolomAftrek": "Deductibility",
+    "kolomMeerkost": "Tax surcharge",
+    "waarschuwingNul": "This car loses its deduction entirely from {jaar}. The tax surcharge therefore rises by {bedrag} per year compared with today.",
+    "waarschuwingDaling": "This car's deduction starts falling from {jaar}. The tax surcharge therefore rises by {bedrag} per year compared with today.",
+    "stabiel": "This car's deduction stays at {pct} for the whole period."
   }
 }
