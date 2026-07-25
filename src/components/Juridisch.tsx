@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { Card, Container, PageHead } from "@/components/ui";
+import { Link } from "@/i18n/navigation";
 
 /** Omkadering voor de juridische pagina's: één kolom, rustig leesbaar. */
 export function JuridischePagina({
@@ -21,9 +22,7 @@ export function JuridischePagina({
         <PageHead eyebrow={eyebrow} title={titel} sub={intro} />
         <Card className="p-6 sm:p-9">
           <div className="space-y-7">{children}</div>
-          <p className="mt-9 border-t border-line pt-5 text-[13px] text-ink-500">
-            Laatst bijgewerkt op {bijgewerkt}.
-          </p>
+          <p className="mt-9 border-t border-line pt-5 text-[13px] text-ink-500">{bijgewerkt}</p>
         </Card>
       </div>
     </Container>
@@ -50,4 +49,34 @@ export function Lijst({ items }: { items: ReactNode[] }) {
       ))}
     </ul>
   );
+}
+
+/**
+ * Opmaak die in de vertaalbestanden zelf staat. Zo blijft een zin één sleutel,
+ * ook wanneer er een vetgedrukt of cursief stuk in zit — vertalers hoeven de
+ * zin dan niet op te knippen op een plaats die in hun taal niet klopt.
+ */
+export const opmaak = {
+  b: (chunks: ReactNode) => <strong className="font-semibold text-ink">{chunks}</strong>,
+  i: (chunks: ReactNode) => <em>{chunks}</em>,
+};
+
+export function interneLink(href: "/instellingen" | "/privacy" | "/parameters") {
+  const Verwijzing = (chunks: ReactNode) => (
+    <Link href={href} className="font-medium text-ink underline underline-offset-2">
+      {chunks}
+    </Link>
+  );
+  Verwijzing.displayName = `InterneLink(${href})`;
+  return Verwijzing;
+}
+
+export function mailLink(adres: string) {
+  const Adres = () => (
+    <a href={`mailto:${adres}`} className="font-medium text-ink underline underline-offset-2">
+      {adres}
+    </a>
+  );
+  Adres.displayName = "MailLink";
+  return Adres;
 }
