@@ -12,8 +12,11 @@ export function supabaseConfig() {
 
   if (!url || !key) {
     throw new Error(
-      "NEXT_PUBLIC_SUPABASE_URL en NEXT_PUBLIC_SUPABASE_ANON_KEY zijn verplicht. " +
-        "Kopieer .env.example naar .env.local en vul de waarden van je Supabase-project in.",
+      "NEXT_PUBLIC_SUPABASE_URL en NEXT_PUBLIC_SUPABASE_ANON_KEY zijn verplicht.\n" +
+        "Lokaal: kopieer .env.example naar .env.local en vul de waarden in.\n" +
+        "Op Vercel: Project Settings → Environment Variables, voor Production, " +
+        "Preview én Development. Deze waarden worden tijdens de build ingebakken, " +
+        "dus zonder hen faalt al de build.",
     );
   }
 
