@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
   SLEUTEL_NAMEN,
+  STANDAARD_SLEUTEL,
+  STANDAARD_URL,
   URL_NAMEN,
   eersteWaarde,
   isGeheimeSleutel,
@@ -63,5 +65,20 @@ describe("isGeheimeSleutel", () => {
 
   it("beschouwt onleesbare waarden niet als geheim", () => {
     expect(isGeheimeSleutel("zomaar-wat-tekst")).toBe(false);
+  });
+});
+
+describe("standaardwaarden", () => {
+  it("wijzen naar een https-adres van Supabase", () => {
+    const { protocol, host } = new URL(STANDAARD_URL);
+    expect(protocol).toBe("https:");
+    expect(host.endsWith(".supabase.co")).toBe(true);
+  });
+
+  // Deze waarde staat in de broncode en belandt dus in elke browserbundel.
+  // Zou hier ooit een geheime sleutel worden ingeplakt, dan ligt de hele
+  // database open; deze test is de laatste horde daartegen.
+  it("bevatten geen geheime sleutel", () => {
+    expect(isGeheimeSleutel(STANDAARD_SLEUTEL)).toBe(false);
   });
 });

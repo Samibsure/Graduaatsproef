@@ -25,6 +25,25 @@ export const SLEUTEL_NAMEN = [
   "SUPABASE_PUBLISHABLE_KEY",
 ] as const;
 
+/**
+ * Het Supabase-project van Autofiscaliteit, als terugval wanneer de omgeving
+ * niets aanlevert.
+ *
+ * Dit zijn geen geheimen. De publishable key wordt sowieso naar de browser van
+ * elke bezoeker gestuurd; ze identificeert het project, ze geeft geen rechten.
+ * Wat een sessie mag lezen of schrijven bepalen de RLS-policies, en die kennen
+ * alleen `auth.uid()`. Een geheime sleutel hoort hier dus nooit; daar waakt
+ * `isGeheimeSleutel()` over.
+ *
+ * Waarom een terugval, terwijl de eerste opzet die bewust schrapte? Omdat dit
+ * één publieke dienst met één database is. Zonder terugval faalt de build zodra
+ * de hosting de variabelen niet doorgeeft, en dan ligt de site plat. Een
+ * omgevingsvariabele wint nog altijd van deze waarden, dus wie een eigen
+ * Supabase-project gebruikt hoeft niets in de code te wijzigen.
+ */
+export const STANDAARD_URL = "https://fkmulfdpuphedfakmmsd.supabase.co";
+export const STANDAARD_SLEUTEL = "sb_publishable_0dhAntmc3Y9Eo9NJkno-Nw_PDT1zaM0";
+
 /** De eerste naam uit de lijst die een niet-lege waarde heeft. */
 export function eersteWaarde(
   namen: readonly string[],
