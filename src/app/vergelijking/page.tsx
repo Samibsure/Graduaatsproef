@@ -452,12 +452,26 @@ export default function VergelijkingPagina() {
             </div>
           </div>
 
+          {/* DISCLAIMER — staat bewust hier, bij de beslissing zelf, en niet
+              alleen op een juridische pagina die niemand opent. */}
+          <div className="mb-11 flex gap-3 rounded-[12px] border border-gold-line bg-gold-soft px-5 py-4">
+            <span className="mt-0.5 shrink-0 text-gold">
+              <Icon name="info" size={18} />
+            </span>
+            <p className="m-0 text-[14px] leading-relaxed text-ink-700">
+              Deze berekening is een hulpmiddel, geen fiscaal advies. Ze houdt geen rekening met de
+              regionale belasting op inverkeerstelling en verkeersbelasting, noch met de
+              bijzonderheden van jouw dossier. Bespreek elke beslissing met je boekhouder of
+              belastingadviseur.
+            </p>
+          </div>
+
           {/* GRAFIEK */}
           <div className="mb-11">
             <div className="mb-[18px] flex flex-wrap items-end justify-between gap-5">
               <div>
                 <h2 className="m-0 mb-1 text-[22px] font-bold">{metricDefs[metric].label}</h2>
-                <p className="m-0 text-[14px] text-ink-500">De gulden balk markeert de gunstigste waarde.</p>
+                <p className="m-0 text-[14px] text-ink-500">De gekleurde balk markeert de gunstigste waarde.</p>
               </div>
               <div className="bs-no-print inline-flex overflow-hidden rounded-[10px] border border-line">
                 {([

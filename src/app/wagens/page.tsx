@@ -169,10 +169,13 @@ export default function WagensPagina() {
                   <option value="vloot">Huidige vloot</option>
                 </select>
               </Veld>
-              <Veld label="Werknemer">
-                <input className={invoer} value={formulier.werknemer ?? ""} onChange={(e) => zet("werknemer", e.target.value)} />
+              <Veld
+                label="Interne referentie"
+                hint="Optioneel. Een naam is niet nodig voor de berekening — een code zoals “wagen 3” volstaat."
+              >
+                <input className={invoer} value={formulier.werknemer ?? ""} onChange={(e) => zet("werknemer", e.target.value)} placeholder="bv. wagen 3" />
               </Veld>
-              <Veld label="Kenteken">
+              <Veld label="Kenteken" hint="Optioneel. Speelt geen rol in de berekening.">
                 <input className={invoer} value={formulier.kenteken ?? ""} onChange={(e) => zet("kenteken", e.target.value)} />
               </Veld>
               <Veld label="Merk">
@@ -344,11 +347,20 @@ export default function WagensPagina() {
 
 const invoer = "bs-inp h-[44px] w-full rounded-[10px] px-3.5 text-[15px]";
 
-function Veld({ label, children }: { label: string; children: React.ReactNode }) {
+function Veld({
+  label,
+  hint,
+  children,
+}: {
+  label: string;
+  hint?: string;
+  children: React.ReactNode;
+}) {
   return (
     <label className="block">
       <span className="mb-2 block text-[13.5px] font-bold text-ink">{label}</span>
       {children}
+      {hint && <span className="mt-1.5 block text-[12.5px] text-ink-500">{hint}</span>}
     </label>
   );
 }

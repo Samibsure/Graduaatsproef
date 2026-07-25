@@ -8,6 +8,13 @@ import { laadSessie } from "@/lib/sessie";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://autofiscaliteit.com";
 
+/**
+ * Vrijwillige donatie: één link naar een externe pagina, bewust geen
+ * betaalintegratie in de applicatie zelf. Blijft de variabele leeg, dan
+ * verdwijnt de knop gewoon.
+ */
+const DONATIE_URL = process.env.NEXT_PUBLIC_DONATIE_URL ?? "";
+
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
@@ -67,10 +74,20 @@ export default async function RootLayout({
                 Een gratis rekeninstrument voor de fiscale en financiële impact van bedrijfswagens
                 in België. Voor elke onderneming, van eenmanszaak tot vloot.
               </p>
-              <p className="m-0 text-xs leading-relaxed text-white/[0.45]">
+              <p className="mb-4 text-xs leading-relaxed text-white/[0.45]">
                 Een hulpmiddel, geen fiscaal advies. Bespreek elke beslissing met je boekhouder of
                 belastingadviseur.
               </p>
+              {DONATIE_URL && (
+                <a
+                  href={DONATIE_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-[9px] border border-white/[0.16] px-3.5 py-2 text-xs font-bold text-white/[0.78] transition-colors hover:border-white/[0.32] hover:text-white"
+                >
+                  Steun dit project
+                </a>
+              )}
             </div>
 
             <div className="flex flex-wrap gap-14">

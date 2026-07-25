@@ -78,6 +78,7 @@ Het project wordt rechtstreeks vanuit deze repository op Vercel gedeployed, op
 | `NEXT_PUBLIC_SUPABASE_URL` | ja | URL van het Supabase-project |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | ja | Publishable key (publiek; RLS doet de afscherming) |
 | `NEXT_PUBLIC_SITE_URL` | nee | Basis-URL voor metadata, standaard `https://autofiscaliteit.com` |
+| `NEXT_PUBLIC_DONATIE_URL` | nee | Externe donatiepagina; leeg laten verbergt de knop |
 
 Voor publiek gebruik moet in Supabase daarnaast eigen SMTP geconfigureerd zijn (de ingebouwde
 mailserver is te beperkt en levert slecht af), met de redirect-URL's op het productiedomein.
@@ -91,3 +92,9 @@ mailserver is te beperkt en levert slecht af), met de redirect-URL's op het prod
 
 Deze pagina is alleen toegankelijk voor platformbeheerders: de parameters gelden voor heel België
 en zijn niet per bedrijf aanpasbaar.
+
+## Licentie
+
+Alle rechten voorbehouden. De webapplicatie is gratis te gebruiken, maar de broncode staat niet
+onder een opensourcelicentie: hergebruik, verspreiding of afgeleide werken zijn niet toegestaan
+zonder schriftelijke toestemming van de auteur.
