@@ -13,11 +13,35 @@ verworpen uitgaven, en is sindsdien uitgebouwd tot een publiek product.
 
 ## Onderdelen
 
-1. **Catalogus** — de bekendste bedrijfswagens in België met een directe fiscale preview.
-2. **Mijn wagens** — eigen vloot en kandidaten, met de volledige berekening per gebruiksjaar.
-3. **Vergelijking** — scoringsmatrix met zes gewogen criteria, een grafiek en een advies
+1. **Catalogus**: de bekendste bedrijfswagens in België met een directe fiscale preview.
+2. **Mijn wagens**: eigen vloot en kandidaten, met de volledige berekening per gebruiksjaar.
+3. **Vergelijking**: scoringsmatrix met zes gewogen criteria, een grafiek en een advies
    *aanvaarden / overwegen / afwijzen*, met beslissingshistoriek.
-4. **Fiscaal kader en parameters** — de regels en cijfers achter de berekening, publiek raadpleegbaar.
+4. **Fiscaal kader en parameters**: de regels en cijfers achter de berekening, publiek raadpleegbaar.
+5. **Onboarding en instellingen**: een wizard van drie stappen bij de eerste aanmelding, en daarna
+   het bedrijfsprofiel, het fiscaal profiel en het team op `/instellingen`.
+
+### Onboarding
+
+Wie zich registreert komt op `/welkom`: bedrijfsgegevens, het fiscaal profiel (KMO-tarief en de
+startmaand van het boekjaar) en de keuze om te starten met een lege vloot of met een voorbeeldvloot
+van drie wagens. Die voorbeeldvloot is bewust een elektrische, een plug-in hybride en een diesel,
+zodat de fiscale kloof meteen zichtbaar is in plaats van een lege tabel.
+
+De middleware stuurt naar `/welkom` zolang `companies.onboarding_voltooid` op false staat.
+
+### Rollen
+
+| Rol | Mag |
+| --- | --- |
+| `lezer` | alles bekijken, niets bewaren of verwijderen |
+| `lid` | wagens en beslissingen beheren |
+| `fiscalist` | zoals lid; bedoeld als aanspreekpunt voor de fiscale beoordeling |
+| `beheerder` | alles, plus het team en de bedrijfsgegevens |
+
+De rol `lezer` bestaat voor de externe accountant of de zaakvoerder die enkel meekijkt. De rechten
+worden afgedwongen door de policies (`public.mag_schrijven()` en `public.is_beheerder()`); de
+helpers in `src/lib/rollen.ts` bepalen alleen wat de interface toont.
 
 ## Technische opbouw
 
@@ -53,9 +77,19 @@ De database is de beveiligingsgrens, niet de frontend:
 - De nationale referentiedata (parameters, bestelperiodes, aftrekkalender, catalogus) is publiek
   leesbaar maar alleen schrijfbaar door een platformbeheerder.
 - De middleware in `src/middleware.ts` stuurt niet-aangemelde bezoekers door, maar is een
-  gemaksvoorziening — de policies doen het echte werk.
+  gemaksvoorziening, de policies doen het echte werk.
+- Schrijfrechten volgen de rol: `mag_schrijven()` sluit de lezer uit, `is_beheerder()` beschermt de
+  bedrijfsgegevens, het team en de uitnodigingen.
 
 Zie `supabase/README.md` voor het schema en de controlestappen.
+
+### Validatie
+
+De grenzen op een wagen (CO₂, cataloguswaarde, beroepsgebruik, scores, datums) staan als
+CHECK-constraints in migratie `0006`. Dat is de regel die niet te omzeilen valt, want de browser
+praat rechtstreeks met PostgREST. `src/lib/validatie.ts` herhaalt dezelfde grenzen met Zod, puur om
+vóór het netwerkverzoek te kunnen zeggen wélk veld er misgaat in plaats van een constraintnaam te
+tonen. Wijzigt een grens, wijzig ze dan op beide plaatsen; `src/lib/validatie.test.ts` bewaakt dat.
 
 ### Talen
 

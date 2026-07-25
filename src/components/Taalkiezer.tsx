@@ -22,7 +22,7 @@ export default function Taalkiezer({ variant = "licht" }: { variant?: "licht" | 
     if (nieuw === locale) return;
     startOvergang(() => {
       router.replace(
-        // @ts-expect-error — pathname en params horen bij dezelfde route, maar
+        // @ts-expect-error: pathname en params horen bij dezelfde route, maar
         // dat verband kan TypeScript hier niet zelf leggen.
         { pathname, params },
         { locale: nieuw },

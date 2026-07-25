@@ -3,7 +3,9 @@
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import Icon from "@/components/Icon";
+import { useSessie } from "@/components/SessieProvider";
 import { Badge, Card, Container, PageHead, TypeDot } from "@/components/ui";
+import { magSchrijven } from "@/lib/rollen";
 import {
   bewaarWagen,
   laadCatalogus,
@@ -54,6 +56,10 @@ const leegFormulier: Formulier = {
 export default function WagensPagina() {
   const t = useTranslations("wagens");
   const { euro, pct } = formatters(useLocale());
+  // Een lezer mag de vloot bekijken maar niets wijzigen. De policies in de
+  // database weigeren zijn schrijfacties sowieso; dit voorkomt dat hij knoppen
+  // ziet die toch op een foutmelding uitlopen.
+  const magBewerken = magSchrijven(useSessie());
   const [ctx, setCtx] = useState<FiscaleContext | null>(null);
   const [wagens, setWagens] = useState<Vehicle[]>([]);
   const [catalogus, setCatalogus] = useState<CatalogCar[]>([]);
@@ -127,12 +133,16 @@ export default function WagensPagina() {
         title={t("titel")}
         sub={t("intro")}
         action={
-          <button
-            onClick={() => setFormulier({ ...leegFormulier })}
-            className="inline-flex h-[46px] items-center gap-2 rounded-[11px] bg-gold px-5 text-[14.5px] font-bold text-white transition-colors hover:bg-gold-hover"
-          >
-            <Icon name="plus" size={17} /> {t("nieuweWagen")}
-          </button>
+          magBewerken ? (
+            <button
+              onClick={() => setFormulier({ ...leegFormulier })}
+              className="inline-flex h-[46px] items-center gap-2 rounded-[11px] bg-gold px-5 text-[14.5px] font-bold text-white transition-colors hover:bg-gold-hover"
+            >
+              <Icon name="plus" size={17} /> {t("nieuweWagen")}
+            </button>
+          ) : (
+            <Badge tint="slate">{t("alleenLezen")}</Badge>
+          )
         }
       />
 
@@ -326,12 +336,18 @@ export default function WagensPagina() {
                   <td className="px-4 py-3 text-right font-bold">{r ? euro(r.verworpenUitgaven) : "…"}</td>
                   <td className="px-4 py-3 text-right">{r ? euro(r.rszJaar) : "…"}</td>
                   <td className="whitespace-nowrap px-4 py-3 text-right">
-                    <button onClick={() => setFormulier({ ...w })} className="mr-3 text-sm font-bold text-ink hover:text-gold">
-                      {t("bewerk")}
-                    </button>
-                    <button onClick={() => verwijder(w.id)} className="text-sm font-bold text-rose-600 hover:underline">
-                      {t("verwijder")}
-                    </button>
+                    {magBewerken ? (
+                      <>
+                        <button onClick={() => setFormulier({ ...w })} className="mr-3 text-sm font-bold text-ink hover:text-gold">
+                          {t("bewerk")}
+                        </button>
+                        <button onClick={() => verwijder(w.id)} className="text-sm font-bold text-rose-600 hover:underline">
+                          {t("verwijder")}
+                        </button>
+                      </>
+                    ) : (
+                      <span className="text-sm text-ink-500">{t("geenRechten")}</span>
+                    )}
                   </td>
                 </tr>
               );

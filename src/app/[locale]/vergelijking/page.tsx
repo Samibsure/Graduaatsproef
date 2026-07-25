@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useMemo, useState } from "react";
 import CarImage from "@/components/CarImage";
 import Icon from "@/components/Icon";
+import { useSessie } from "@/components/SessieProvider";
 import { Container, Eyebrow } from "@/components/ui";
 import {
   bewaarEvaluatie,
@@ -28,12 +29,21 @@ export default function VergelijkingPagina() {
   const t = useTranslations("vergelijking");
   const locale = useLocale();
   const { euro, getal, pct } = formatters(locale);
+  const sessie = useSessie();
   const [ctx, setCtx] = useState<FiscaleContext | null>(null);
   const [wagens, setWagens] = useState<Vehicle[]>([]);
   const [catalogus, setCatalogus] = useState<CatalogCar[]>([]);
   const [geselecteerd, setGeselecteerd] = useState<string[]>([]);
   const [startjaar, setStartjaar] = useState(2026);
+  // Het KMO-tarief is een eigenschap van de onderneming, niet van deze
+  // vergelijking. Het vinkje start dus op de waarde uit het bedrijfsprofiel
+  // (ingesteld tijdens de onboarding) en blijft aanpasbaar om te simuleren.
   const [kmoTarief, setKmoTarief] = useState(false);
+
+  useEffect(() => {
+    if (sessie) setKmoTarief(sessie.bedrijf.is_kmo);
+  }, [sessie]);
+
   const [metric, setMetric] = useState<Metric>("tco");
   const [evaluaties, setEvaluaties] = useState<Evaluatie[]>([]);
   const [titel, setTitel] = useState("");
@@ -473,7 +483,7 @@ export default function VergelijkingPagina() {
             </div>
           </div>
 
-          {/* DISCLAIMER — staat bewust hier, bij de beslissing zelf, en niet
+          {/* DISCLAIMER: staat bewust hier, bij de beslissing zelf, en niet
               alleen op een juridische pagina die niemand opent. */}
           <div className="mb-11 flex gap-3 rounded-[12px] border border-gold-line bg-gold-soft px-5 py-4">
             <span className="mt-0.5 shrink-0 text-gold">

@@ -3,7 +3,7 @@
  * geen fallbacks: een verkeerd geconfigureerde omgeving (denk aan een
  * Vercel-preview) mag nooit stilzwijgend naar de productiedatabase schrijven.
  *
- * De publishable key is niet geheim — die wordt naar elke browser gestuurd. De
+ * De publishable key is niet geheim, die wordt naar elke browser gestuurd. De
  * eigenlijke afscherming gebeurt door de RLS-policies in de database.
  */
 export function supabaseConfig() {

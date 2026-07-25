@@ -53,7 +53,7 @@ export function Lijst({ items }: { items: ReactNode[] }) {
 
 /**
  * Opmaak die in de vertaalbestanden zelf staat. Zo blijft een zin één sleutel,
- * ook wanneer er een vetgedrukt of cursief stuk in zit — vertalers hoeven de
+ * ook wanneer er een vetgedrukt of cursief stuk in zit, vertalers hoeven de
  * zin dan niet op te knippen op een plaats die in hun taal niet klopt.
  */
 export const opmaak = {

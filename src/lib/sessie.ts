@@ -1,21 +1,13 @@
 import { createServerSupabase } from "./supabase/server";
+import { BEDRIJF_VELDEN, type Bedrijf, type Bedrijfsrol, type Sessie } from "./rollen";
 
-export type Bedrijfsrol = "lid" | "beheerder";
-
-export interface Bedrijf {
-  id: string;
-  naam: string;
-  ondernemingsnummer: string | null;
-}
-
-export interface Sessie {
-  gebruikerId: string;
-  email: string;
-  volledigeNaam: string | null;
-  rol: Bedrijfsrol;
-  isPlatformAdmin: boolean;
-  bedrijf: Bedrijf;
-}
+/**
+ * Het ophalen van de sessie, server-side. De rollen, het bedrijfstype en de
+ * rechtenhulpjes staan in ./rollen omdat client components die nodig hebben en
+ * dit bestand next/headers meebrengt.
+ */
+export type { Bedrijf, Bedrijfsrol, Sessie };
+export { BEDRIJF_VELDEN, ROLLEN, magBeheren, magSchrijven, minstensRol } from "./rollen";
 
 /**
  * Haalt de aangemelde gebruiker met zijn bedrijf op, server-side.
@@ -31,7 +23,7 @@ export async function laadSessie(): Promise<Sessie | null> {
 
   const { data: profiel } = await supabase
     .from("profiles")
-    .select("volledige_naam, rol, is_platform_admin, companies (id, naam, ondernemingsnummer)")
+    .select(`volledige_naam, rol, is_platform_admin, companies (${BEDRIJF_VELDEN})`)
     .eq("id", user.id)
     .maybeSingle();
 
