@@ -1,5 +1,6 @@
 "use client";
 
+import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import Icon from "@/components/Icon";
 import { Badge, Card, Container, PageHead, TypeDot } from "@/components/ui";
@@ -20,7 +21,7 @@ import type {
   Vehicle,
   Voertuigtype,
 } from "@/lib/fiscaal/types";
-import { euro, pct } from "@/lib/format";
+import { formatters } from "@/lib/format";
 
 const EVALUATIEJAAR = 2026;
 
@@ -51,6 +52,8 @@ const leegFormulier: Formulier = {
 };
 
 export default function WagensPagina() {
+  const t = useTranslations("wagens");
+  const { euro, pct } = formatters(useLocale());
   const [ctx, setCtx] = useState<FiscaleContext | null>(null);
   const [wagens, setWagens] = useState<Vehicle[]>([]);
   const [catalogus, setCatalogus] = useState<CatalogCar[]>([]);
@@ -101,7 +104,7 @@ export default function WagensPagina() {
   }
 
   async function verwijder(id: string) {
-    if (!confirm("Deze wagen verwijderen?")) return;
+    if (!confirm(t("verwijderBevestig"))) return;
     setFout(null);
     try {
       await verwijderWagen(id);
@@ -120,15 +123,15 @@ export default function WagensPagina() {
   return (
     <Container className="py-[52px]">
       <PageHead
-        eyebrow="Wagens"
-        title="Mijn wagenpark"
-        sub="Identificatie, technische gegevens, financieel en beleid per wagen. Berekende cijfers gelden voor gebruiksjaar 2026."
+        eyebrow={t("eyebrow")}
+        title={t("titel")}
+        sub={t("intro")}
         action={
           <button
             onClick={() => setFormulier({ ...leegFormulier })}
             className="inline-flex h-[46px] items-center gap-2 rounded-[11px] bg-gold px-5 text-[14.5px] font-bold text-white transition-colors hover:bg-gold-hover"
           >
-            <Icon name="plus" size={17} /> Nieuwe wagen
+            <Icon name="plus" size={17} /> {t("nieuweWagen")}
           </button>
         }
       />
@@ -139,15 +142,15 @@ export default function WagensPagina() {
         <div className="mb-6 grid items-start gap-7 lg:grid-cols-[1.6fr_1fr]">
           <Card className="border-gold-line p-7">
             <h2 className="m-0 mb-5 text-[19px] font-bold text-ink">
-              {formulier.id ? "Wagen bewerken" : "Nieuwe wagen toevoegen"}
+              {formulier.id ? t("bewerkenTitel") : t("nieuwTitel")}
             </h2>
 
             {!formulier.id && (
               <div className="mb-5 rounded-[12px] bg-paper p-4">
-                <Veld label="Snel starten: kies een model uit de catalogus (vult de velden voor)">
+                <Veld label={t("snelStarten")}>
                   <select className={invoer} defaultValue="" onChange={(e) => kiesUitCatalogus(e.target.value)}>
                     <option value="" disabled>
-                      Selecteer een model…
+                      {t("selecteerModel")}
                     </option>
                     {catalogus.map((c) => (
                       <option key={c.id} value={c.id}>
@@ -160,84 +163,84 @@ export default function WagensPagina() {
             )}
 
             <div className="grid gap-4 sm:grid-cols-2">
-              <Veld label="Omschrijving">
-                <input className={invoer} value={formulier.omschrijving} onChange={(e) => zet("omschrijving", e.target.value)} placeholder="bv. Offerte BMW iX1" />
+              <Veld label={t("omschrijving")}>
+                <input className={invoer} value={formulier.omschrijving} onChange={(e) => zet("omschrijving", e.target.value)} placeholder={t("omschrijvingPlaceholder")} />
               </Veld>
-              <Veld label="Categorie">
+              <Veld label={t("categorie")}>
                 <select className={invoer} value={formulier.categorie} onChange={(e) => zet("categorie", e.target.value as Categorie)}>
-                  <option value="kandidaat">Kandidaat (offerte)</option>
-                  <option value="vloot">Huidige vloot</option>
+                  <option value="kandidaat">{t("categorieKandidaat")}</option>
+                  <option value="vloot">{t("categorieVloot")}</option>
                 </select>
               </Veld>
               <Veld
-                label="Interne referentie"
-                hint="Optioneel. Een naam is niet nodig voor de berekening — een code zoals “wagen 3” volstaat."
+                label={t("interneReferentie")}
+                hint={t("interneReferentieHint")}
               >
-                <input className={invoer} value={formulier.werknemer ?? ""} onChange={(e) => zet("werknemer", e.target.value)} placeholder="bv. wagen 3" />
+                <input className={invoer} value={formulier.werknemer ?? ""} onChange={(e) => zet("werknemer", e.target.value)} placeholder={t("interneReferentiePlaceholder")} />
               </Veld>
-              <Veld label="Kenteken" hint="Optioneel. Speelt geen rol in de berekening.">
+              <Veld label={t("kenteken")} hint={t("kentekenHint")}>
                 <input className={invoer} value={formulier.kenteken ?? ""} onChange={(e) => zet("kenteken", e.target.value)} />
               </Veld>
-              <Veld label="Merk">
+              <Veld label={t("merk")}>
                 <input className={invoer} value={formulier.merk ?? ""} onChange={(e) => zet("merk", e.target.value)} />
               </Veld>
-              <Veld label="Model">
+              <Veld label={t("model")}>
                 <input className={invoer} value={formulier.model ?? ""} onChange={(e) => zet("model", e.target.value)} />
               </Veld>
-              <Veld label="Type aandrijving">
+              <Veld label={t("aandrijving")}>
                 <select className={invoer} value={formulier.voertuigtype} onChange={(e) => zet("voertuigtype", e.target.value as Voertuigtype)}>
-                  <option value="BEV">BEV (volledig elektrisch)</option>
-                  <option value="PHEV">PHEV (plug-in hybride)</option>
-                  <option value="HEV">HEV (hybride)</option>
-                  <option value="fossiel">Fossiel (diesel/benzine)</option>
+                  <option value="BEV">{t("aandrijvingBev")}</option>
+                  <option value="PHEV">{t("aandrijvingPhev")}</option>
+                  <option value="HEV">{t("aandrijvingHev")}</option>
+                  <option value="fossiel">{t("aandrijvingFossiel")}</option>
                 </select>
               </Veld>
-              <Veld label="Brandstof">
+              <Veld label={t("brandstof")}>
                 <select className={invoer} value={formulier.brandstof} onChange={(e) => zet("brandstof", e.target.value as Brandstof)}>
-                  <option value="elektrisch">Elektrisch</option>
-                  <option value="diesel">Diesel</option>
-                  <option value="benzine">Benzine</option>
+                  <option value="elektrisch">{t("brandstofElektrisch")}</option>
+                  <option value="diesel">{t("brandstofDiesel")}</option>
+                  <option value="benzine">{t("brandstofBenzine")}</option>
                   <option value="lpg">LPG</option>
                   <option value="cng">CNG</option>
                 </select>
               </Veld>
-              <Veld label="CO₂-uitstoot (g/km)">
+              <Veld label={t("co2")}>
                 <input type="number" className={invoer} value={formulier.co2} onChange={(e) => zet("co2", Number(e.target.value))} />
               </Veld>
-              <Veld label="Besteldatum (bepaalt het regime)">
+              <Veld label={t("besteldatum")}>
                 <input type="date" className={invoer} value={formulier.besteldatum} onChange={(e) => zet("besteldatum", e.target.value)} />
               </Veld>
-              <Veld label="Eerste ingebruikname">
+              <Veld label={t("eersteIngebruikname")}>
                 <input type="date" className={invoer} value={formulier.eerste_ingebruikname} onChange={(e) => zet("eerste_ingebruikname", e.target.value)} />
               </Veld>
-              <Veld label="Cataloguswaarde (€)">
+              <Veld label={t("cataloguswaarde")}>
                 <input type="number" className={invoer} value={formulier.cataloguswaarde} onChange={(e) => zet("cataloguswaarde", Number(e.target.value))} />
               </Veld>
-              <Veld label="Jaarlijkse autokosten (€)">
+              <Veld label={t("autokosten")}>
                 <input type="number" className={invoer} value={formulier.jaarlijkse_autokosten} onChange={(e) => zet("jaarlijkse_autokosten", Number(e.target.value))} />
               </Veld>
-              <Veld label="Aankoop-/leasingprijs (€)">
+              <Veld label={t("aankoopprijs")}>
                 <input type="number" className={invoer} value={formulier.aankoopprijs ?? ""} onChange={(e) => zet("aankoopprijs", e.target.value === "" ? null : Number(e.target.value))} />
               </Veld>
-              <Veld label="Verwacht jaarlijks kilometeraantal">
+              <Veld label={t("kmPerJaar")}>
                 <input type="number" className={invoer} value={formulier.km_per_jaar ?? ""} onChange={(e) => zet("km_per_jaar", e.target.value === "" ? null : Number(e.target.value))} />
               </Veld>
-              <Veld label="Beroepsgebruik (%)">
+              <Veld label={t("beroepsgebruik")}>
                 <input type="number" min={0} max={100} className={invoer} value={formulier.beroepsgebruik_pct} onChange={(e) => zet("beroepsgebruik_pct", Number(e.target.value))} />
               </Veld>
-              <Veld label="Score operationele flexibiliteit (1-10)">
+              <Veld label={t("flexScore")}>
                 <input type="number" min={1} max={10} className={invoer} value={formulier.flex_score} onChange={(e) => zet("flex_score", Number(e.target.value))} />
               </Veld>
-              <Veld label="Score restwaarde na 4 jaar (1-10)">
+              <Veld label={t("restwaardeScore")}>
                 <input type="number" min={1} max={10} className={invoer} value={formulier.restwaarde_score} onChange={(e) => zet("restwaarde_score", Number(e.target.value))} />
               </Veld>
               <label className="flex items-center gap-2 pt-2 text-sm text-ink-700">
                 <input type="checkbox" checked={formulier.tankkaart} onChange={(e) => zet("tankkaart", e.target.checked)} />
-                Tank-/laadkaart (40% VAA → VU)
+                {t("tankkaart")}
               </label>
               <label className="flex items-center gap-2 pt-2 text-sm text-ink-700">
                 <input type="checkbox" checked={formulier.thuislaadpunt} onChange={(e) => zet("thuislaadpunt", e.target.checked)} />
-                Thuislaadinfrastructuur
+                {t("thuislaadpunt")}
               </label>
             </div>
 
@@ -247,13 +250,13 @@ export default function WagensPagina() {
                 disabled={bezig || !formulier.omschrijving}
                 className="inline-flex h-[46px] items-center gap-2 rounded-[11px] bg-gold px-6 text-[15px] font-bold text-white transition-colors hover:bg-gold-hover disabled:opacity-50"
               >
-                <Icon name="check" size={17} /> {bezig ? "Bezig…" : "Wagen bewaren"}
+                <Icon name="check" size={17} /> {bezig ? t("bezig") : t("bewaren")}
               </button>
               <button
                 onClick={() => setFormulier(null)}
                 className="h-[46px] px-3 text-[15px] font-bold text-ink-500 hover:text-ink"
               >
-                Annuleren
+                {t("annuleren")}
               </button>
             </div>
           </Card>
@@ -261,21 +264,21 @@ export default function WagensPagina() {
           <aside className="lg:sticky lg:top-[92px]">
             <Card className="bg-paper p-6">
               <div className="mb-4 text-[12px] font-bold uppercase tracking-[0.14em] text-ink-500">
-                Fiscale inschatting · 2026
+                {t("inschatting")}
               </div>
               {formPreview ? (
                 <div className="space-y-3">
                   <div className="flex items-baseline justify-between border-b border-line pb-4">
-                    <span className="text-[14.5px] text-ink-700">Fiscale aftrek</span>
+                    <span className="text-[14.5px] text-ink-700">{t("fiscaleAftrek")}</span>
                     <span className="text-[30px] font-bold leading-none text-ink">{pct(formPreview.aftrekPct)}</span>
                   </div>
-                  <Rij label="VAA / jaar" value={euro(formPreview.vaa)} />
-                  <Rij label="Verworpen uitgaven / jaar" value={euro(formPreview.verworpenUitgaven)} />
-                  <Rij label="RSZ-bijdrage / jaar" value={euro(formPreview.rszJaar)} />
-                  <Rij label="Fiscale meerkost / jaar" value={euro(formPreview.fiscaleMeerkost)} />
+                  <Rij label={t("vaaPerJaar")} value={euro(formPreview.vaa)} />
+                  <Rij label={t("vuPerJaar")} value={euro(formPreview.verworpenUitgaven)} />
+                  <Rij label={t("rszPerJaar")} value={euro(formPreview.rszJaar)} />
+                  <Rij label={t("meerkostPerJaar")} value={euro(formPreview.fiscaleMeerkost)} />
                 </div>
               ) : (
-                <p className="m-0 text-[14px] text-ink-500">Vul de velden in om de inschatting te zien.</p>
+                <p className="m-0 text-[14px] text-ink-500">{t("vulVeldenIn")}</p>
               )}
             </Card>
           </aside>
@@ -286,15 +289,15 @@ export default function WagensPagina() {
         <table className="w-full text-sm">
           <thead className="border-b border-line bg-paper text-left text-xs uppercase tracking-wide text-ink-500">
             <tr>
-              <th className="px-4 py-3">Wagen</th>
-              <th className="px-4 py-3">Categorie</th>
-              <th className="px-4 py-3">Besteld</th>
+              <th className="px-4 py-3">{t("kolomWagen")}</th>
+              <th className="px-4 py-3">{t("kolomCategorie")}</th>
+              <th className="px-4 py-3">{t("kolomBesteld")}</th>
               <th className="px-4 py-3 text-right">CO₂</th>
-              <th className="px-4 py-3 text-right">Catalogus</th>
-              <th className="px-4 py-3 text-right">Aftrek 2026</th>
-              <th className="px-4 py-3 text-right">VAA</th>
-              <th className="px-4 py-3 text-right">Verw. uitg.</th>
-              <th className="px-4 py-3 text-right">RSZ/jaar</th>
+              <th className="px-4 py-3 text-right">{t("kolomCatalogus")}</th>
+              <th className="px-4 py-3 text-right">{t("kolomAftrek")}</th>
+              <th className="px-4 py-3 text-right">{t("kolomVaa")}</th>
+              <th className="px-4 py-3 text-right">{t("kolomVu")}</th>
+              <th className="px-4 py-3 text-right">{t("kolomRsz")}</th>
               <th className="px-4 py-3" />
             </tr>
           </thead>
@@ -311,7 +314,9 @@ export default function WagensPagina() {
                     {w.werknemer && <span className="block pl-4 text-xs text-ink-500">{w.werknemer}</span>}
                   </td>
                   <td className="px-4 py-3">
-                    <Badge tint={w.categorie === "vloot" ? "ink" : "gold"}>{w.categorie}</Badge>
+                    <Badge tint={w.categorie === "vloot" ? "ink" : "gold"}>
+                      {w.categorie === "vloot" ? t("badgeVloot") : t("badgeKandidaat")}
+                    </Badge>
                   </td>
                   <td className="px-4 py-3">{w.besteldatum}</td>
                   <td className="px-4 py-3 text-right">{w.co2} g</td>
@@ -322,10 +327,10 @@ export default function WagensPagina() {
                   <td className="px-4 py-3 text-right">{r ? euro(r.rszJaar) : "…"}</td>
                   <td className="whitespace-nowrap px-4 py-3 text-right">
                     <button onClick={() => setFormulier({ ...w })} className="mr-3 text-sm font-bold text-ink hover:text-gold">
-                      Bewerk
+                      {t("bewerk")}
                     </button>
                     <button onClick={() => verwijder(w.id)} className="text-sm font-bold text-rose-600 hover:underline">
-                      Verwijder
+                      {t("verwijder")}
                     </button>
                   </td>
                 </tr>
@@ -334,7 +339,7 @@ export default function WagensPagina() {
             {wagens.length === 0 && (
               <tr>
                 <td colSpan={10} className="px-4 py-10 text-center text-ink-500">
-                  Nog geen wagens. Voeg er toe vanuit de catalogus of via “Nieuwe wagen”.
+                  {t("leeg")}
                 </td>
               </tr>
             )}
