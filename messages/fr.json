@@ -617,7 +617,8 @@
     "critCo2": "Impact CO₂ et ESG",
     "critCo2Uitleg": "Score basé sur les émissions de CO₂ du véhicule.",
     "critRest": "Valeur résiduelle",
-    "critRestUitleg": "Valeur résiduelle attendue après quatre ans ; score manuel par véhicule."
+    "critRestUitleg": "Valeur résiduelle attendue après quatre ans ; score manuel par véhicule.",
+    "critNut": "Utilité pratique"
   },
   "welkom": {
     "eyebrow": "Premiers pas",

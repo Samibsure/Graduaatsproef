@@ -617,7 +617,8 @@
     "critCo2": "CO₂-impact en ESG",
     "critCo2Uitleg": "Score op basis van de CO₂-uitstoot van de wagen.",
     "critRest": "Restwaarde",
-    "critRestUitleg": "Verwachte restwaarde na vier jaar; handmatige score per wagen."
+    "critRestUitleg": "Verwachte restwaarde na vier jaar; handmatige score per wagen.",
+    "critNut": "Praktisch nut"
   },
   "welkom": {
     "eyebrow": "Aan de slag",

@@ -18,10 +18,10 @@ import {
   laadWagens,
   type Evaluatie,
 } from "@/lib/data";
-import { zoekCatalogusmodel } from "@/lib/fiscaal/catalog";
+import { nutScore, zoekCatalogusmodel } from "@/lib/fiscaal/catalog";
 import { berekenProjectie } from "@/lib/fiscaal/engine";
 import { berekenUitfasering, type Uitfasering } from "@/lib/fiscaal/uitfasering";
-import { CRITERIA, scoreVergelijking } from "@/lib/fiscaal/scoring";
+import { CRITERIA_UITGEBREID, scoreVergelijking } from "@/lib/fiscaal/scoring";
 import type { CatalogCar, FiscaleContext, Vehicle } from "@/lib/fiscaal/types";
 import { formatters } from "@/lib/format";
 
@@ -79,7 +79,17 @@ export default function VergelijkingPagina() {
   const { projecties, scores } = useMemo(() => {
     if (!ctx || kandidaten.length === 0) return { projecties: [], scores: [] };
     const projecties = kandidaten.map((w) => berekenProjectie(ctx, w, startjaar, 4, { kmoTarief }));
-    return { projecties, scores: scoreVergelijking(projecties) };
+    // Het praktisch nut komt uit het catalogusmodel: koffervolume, zitplaatsen en
+    // trekgewicht staan daar, niet op de bewaarde wagen zelf.
+    const nutPerWagen: Record<string, number> = {};
+    for (const w of kandidaten) {
+      const model = zoekCatalogusmodel(catalogus, w);
+      if (model) nutPerWagen[w.id] = nutScore(model);
+    }
+    return {
+      projecties,
+      scores: scoreVergelijking(projecties, { criteria: CRITERIA_UITGEBREID, nutPerWagen }),
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ctx, wagens, geselecteerd, startjaar, kmoTarief]);
 
@@ -168,6 +178,7 @@ export default function VergelijkingPagina() {
     flex: "Flex",
     co2: "Co2",
     rest: "Rest",
+    nut: "Nut",
   };
   const critNaam = (code: string) => t(`crit${critSleutel[code] ?? "Tco"}`);
 
@@ -478,7 +489,7 @@ export default function VergelijkingPagina() {
                     </tr>
                   </thead>
                   <tbody>
-                    {CRITERIA.map((cr) => {
+                    {CRITERIA_UITGEBREID.map((cr) => {
                       const vals = cmp.map((c) => c.scores[cr.code] ?? 0);
                       const max = Math.max(...vals);
                       return (

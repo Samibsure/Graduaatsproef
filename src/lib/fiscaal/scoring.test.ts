@@ -1,7 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { DEFAULT_CONTEXT } from "./defaults";
 import { berekenProjectie } from "./engine";
-import { adviesVoorScore, CRITERIA, gewogenEindscore, scoreVergelijking } from "./scoring";
+import {
+  adviesVoorScore,
+  CRITERIA,
+  CRITERIA_UITGEBREID,
+  gewogenEindscore,
+  scoreVergelijking,
+} from "./scoring";
 import type { Vehicle } from "./types";
 
 const basis: Omit<Vehicle, "id" | "omschrijving"> = {
@@ -100,5 +106,39 @@ describe("scoreVergelijking op het referentiedossier", () => {
         expect(score).toBeLessThanOrEqual(10);
       }
     }
+  });
+});
+
+describe("uitgebreid wegingsprofiel", () => {
+  it("de zeven wegingen sommeren tot 100%", () => {
+    expect(CRITERIA_UITGEBREID.reduce((s, c) => s + c.weging, 0)).toBeCloseTo(1, 10);
+  });
+
+  it("laat het praktisch nut meewegen zonder de zes van het rapport te raken", () => {
+    // Dezelfde zes scores, één keer met en één keer zonder het zevende criterium.
+    const zes = scoreVergelijking([berekenProjectie(DEFAULT_CONTEXT, bev, 2026)]);
+    const zeven = scoreVergelijking([berekenProjectie(DEFAULT_CONTEXT, bev, 2026)], {
+      criteria: CRITERIA_UITGEBREID,
+      nutPerWagen: { a: 9 },
+    });
+    expect(zes[0].scores.nut).toBeUndefined();
+    expect(zeven[0].scores.nut).toBe(9);
+    // De onderliggende zes scores blijven identiek; alleen de weging verschilt.
+    expect(zeven[0].scores.tco).toBe(zes[0].scores.tco);
+    expect(zeven[0].scores.aftrek).toBe(zes[0].scores.aftrek);
+  });
+
+  it("straft een onbruikbare wagen af en beloont een bruikbare", () => {
+    const projecties = [berekenProjectie(DEFAULT_CONTEXT, bev, 2026)];
+    const ruim = scoreVergelijking(projecties, { criteria: CRITERIA_UITGEBREID, nutPerWagen: { a: 10 } });
+    const krap = scoreVergelijking(projecties, { criteria: CRITERIA_UITGEBREID, nutPerWagen: { a: 1 } });
+    expect(ruim[0].eindscore).toBeGreaterThan(krap[0].eindscore);
+  });
+
+  it("gebruikt een neutrale middenscore wanneer het model onbekend is", () => {
+    const zonder = scoreVergelijking([berekenProjectie(DEFAULT_CONTEXT, bev, 2026)], {
+      criteria: CRITERIA_UITGEBREID,
+    });
+    expect(zonder[0].scores.nut).toBe(5.5);
   });
 });
