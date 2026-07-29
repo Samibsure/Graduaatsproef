@@ -1,23 +1,43 @@
+import { useTranslations } from "next-intl";
+
 /**
  * Eigen wordmark van Autofiscaliteit. Volledig inline SVG, dus geen externe
  * lettertypes of afbeeldingen nodig.
+ *
+ * `compact` laat de ondertitel weg. In de header telde die tweede regel mee voor
+ * de hoogte van de hele balk, terwijl niemand hem daar leest: wie op de site is,
+ * weet waar hij is. In de voettekst, waar het merk zich wél moet voorstellen,
+ * staat de ondertitel er nog.
  */
-export function Wordmerk({ variant = "light" }: { variant?: "light" | "dark" }) {
+export function Wordmerk({
+  variant = "light",
+  compact = false,
+}: {
+  variant?: "light" | "dark";
+  compact?: boolean;
+}) {
+  const t = useTranslations("merk");
   const ink = variant === "dark" ? "#ffffff" : "var(--ink)";
-  const sub = variant === "dark" ? "rgba(255,255,255,.62)" : "var(--ink-500)";
+  const sub = variant === "dark" ? "rgba(255,255,255,.72)" : "var(--ink-500)";
+
   return (
-    <span className="inline-flex items-center gap-3 leading-none">
-      <Logomerk />
+    <span className="inline-flex items-center gap-2.5 leading-none">
+      <Logomerk size={compact ? 30 : 36} />
       <span className="flex flex-col gap-0.5">
-        <span className="text-[17px] font-bold tracking-[-0.01em]" style={{ color: ink }}>
-          Autofiscaliteit
-        </span>
         <span
-          className="text-[9.5px] font-bold uppercase tracking-[0.15em]"
-          style={{ color: sub }}
+          className={`font-bold tracking-[-0.01em] ${compact ? "text-[16.5px]" : "text-[17px]"}`}
+          style={{ color: ink }}
         >
-          Bedrijfswagens in België
+          {t("naam")}
         </span>
+        {!compact && (
+          <span
+            className="text-[9.5px] font-bold uppercase tracking-[0.15em]"
+            style={{ color: sub }}
+          >
+            {t("ondertitel")}
+          </span>
+        )}
       </span>
     </span>
   );

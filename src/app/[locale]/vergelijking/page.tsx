@@ -1,6 +1,8 @@
 "use client";
 
-import Link from "next/link";
+// Uit @/i18n/navigation, niet uit next/link: de gewone Link laat het
+// taalvoorvoegsel vallen en zet een Franstalige bezoeker terug in het Nederlands.
+import { Link } from "@/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useMemo, useState } from "react";
 import CarImage from "@/components/CarImage";
@@ -16,9 +18,10 @@ import {
   laadWagens,
   type Evaluatie,
 } from "@/lib/data";
+import { nutScore, zoekCatalogusmodel } from "@/lib/fiscaal/catalog";
 import { berekenProjectie } from "@/lib/fiscaal/engine";
 import { berekenUitfasering, type Uitfasering } from "@/lib/fiscaal/uitfasering";
-import { CRITERIA, scoreVergelijking } from "@/lib/fiscaal/scoring";
+import { CRITERIA_UITGEBREID, scoreVergelijking } from "@/lib/fiscaal/scoring";
 import type { CatalogCar, FiscaleContext, Vehicle } from "@/lib/fiscaal/types";
 import { formatters } from "@/lib/format";
 
@@ -54,6 +57,9 @@ export default function VergelijkingPagina() {
   const [bezig, setBezig] = useState(false);
   const [bewaard, setBewaard] = useState(false);
   const [fout, setFout] = useState<string | null>(null);
+  // Zonder deze vlag leest wie wagens heeft eerst "voeg er eerst een toe",
+  // want de lijst begint leeg en de fetch is nog onderweg.
+  const [geladen, setGeladen] = useState(false);
 
   useEffect(() => {
     Promise.all([laadFiscaleContext(), laadWagens(), laadEvaluaties(), laadCatalogus()])
@@ -64,7 +70,8 @@ export default function VergelijkingPagina() {
         setCatalogus(k);
         setGeselecteerd(w.slice(0, MAX_KANDIDATEN).map((v) => v.id));
       })
-      .catch((e) => setFout(e instanceof Error ? e.message : String(e)));
+      .catch((e) => setFout(e instanceof Error ? e.message : String(e)))
+      .finally(() => setGeladen(true));
   }, []);
 
   const kandidaten = wagens.filter((w) => geselecteerd.includes(w.id));
@@ -72,7 +79,17 @@ export default function VergelijkingPagina() {
   const { projecties, scores } = useMemo(() => {
     if (!ctx || kandidaten.length === 0) return { projecties: [], scores: [] };
     const projecties = kandidaten.map((w) => berekenProjectie(ctx, w, startjaar, 4, { kmoTarief }));
-    return { projecties, scores: scoreVergelijking(projecties) };
+    // Het praktisch nut komt uit het catalogusmodel: koffervolume, zitplaatsen en
+    // trekgewicht staan daar, niet op de bewaarde wagen zelf.
+    const nutPerWagen: Record<string, number> = {};
+    for (const w of kandidaten) {
+      const model = zoekCatalogusmodel(catalogus, w);
+      if (model) nutPerWagen[w.id] = nutScore(model);
+    }
+    return {
+      projecties,
+      scores: scoreVergelijking(projecties, { criteria: CRITERIA_UITGEBREID, nutPerWagen }),
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ctx, wagens, geselecteerd, startjaar, kmoTarief]);
 
@@ -106,7 +123,7 @@ export default function VergelijkingPagina() {
   const cmp = projecties.map((p) => {
     const j0 = p.jaren[0];
     const score = scores.find((s) => s.vehicleId === p.vehicle.id);
-    const cat = catalogus.find((c) => c.id === p.vehicle.catalog_id) ?? null;
+    const cat = zoekCatalogusmodel(catalogus, p.vehicle);
     return {
       id: p.vehicle.id,
       name: p.vehicle.omschrijving,
@@ -161,6 +178,7 @@ export default function VergelijkingPagina() {
     flex: "Flex",
     co2: "Co2",
     rest: "Rest",
+    nut: "Nut",
   };
   const critNaam = (code: string) => t(`crit${critSleutel[code] ?? "Tco"}`);
 
@@ -255,17 +273,20 @@ export default function VergelijkingPagina() {
                   {w.omschrijving}
                 </button>
               ))}
-              {wagens.length === 0 && (
-                <p className="m-0 text-sm text-ink-500">
-                  {t.rich("voegEerstToe", {
-                    catalogus: (chunks) => (
-                      <Link href="/catalogus" className="font-bold text-ink underline">
-                        {chunks}
-                      </Link>
-                    ),
-                  })}
-                </p>
-              )}
+              {wagens.length === 0 &&
+                (geladen ? (
+                  <p className="m-0 text-sm text-ink-500">
+                    {t.rich("voegEerstToe", {
+                      catalogus: (chunks) => (
+                        <Link href="/catalogus" className="font-bold text-ink underline">
+                          {chunks}
+                        </Link>
+                      ),
+                    })}
+                  </p>
+                ) : (
+                  <span className="inline-block h-[30px] w-[160px] animate-pulse rounded-full bg-paper" />
+                ))}
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-5 text-[14px]">
@@ -468,7 +489,7 @@ export default function VergelijkingPagina() {
                     </tr>
                   </thead>
                   <tbody>
-                    {CRITERIA.map((cr) => {
+                    {CRITERIA_UITGEBREID.map((cr) => {
                       const vals = cmp.map((c) => c.scores[cr.code] ?? 0);
                       const max = Math.max(...vals);
                       return (
@@ -568,6 +589,7 @@ export default function VergelijkingPagina() {
                   value: metricDefs[metric].get(c),
                 }))}
                 fmt={metricDefs[metric].fmt}
+                euro={euro}
                 best={metricDefs[metric].best}
                 isPct={metric === "aftrek"}
               />
@@ -637,12 +659,15 @@ export default function VergelijkingPagina() {
 function BarChart({
   items,
   fmt,
+  euro,
   best,
   isPct,
   label,
 }: {
   items: Array<{ short: string; type: string; value: number }>;
   fmt: (v: number) => string;
+  /** De euro-opmaak van de actieve taal, voor de aslabels. */
+  euro: (v: number) => string;
   best: "min" | "max";
   isPct: boolean;
   label: string;
@@ -665,7 +690,9 @@ function BarChart({
   const barW = Math.min(96, slot * 0.46);
   const grid = [0, 1, 2, 3, 4].map((i) => ({
     y: baseY - (i / 4) * plotH,
-    label: isPct ? `${Math.round((maxV * i) / 4)}%` : euroAxis((maxV * i) / 4),
+    // Via de formatters van de actieve taal: hier stond een vaste nl-BE-opmaak,
+    // zodat de as van de grafiek als enige onderdeel niet meevertaalde.
+    label: isPct ? `${Math.round((maxV * i) / 4)}%` : euro(Math.round((maxV * i) / 4)),
   }));
 
   return (
@@ -704,6 +731,4 @@ function BarChart({
   );
 }
 
-function euroAxis(v: number) {
-  return "€ " + Math.round(v).toLocaleString("nl-BE");
-}
+

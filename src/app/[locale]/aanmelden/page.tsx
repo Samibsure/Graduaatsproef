@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import {
@@ -17,9 +17,15 @@ type Methode = "wachtwoord" | "link";
 
 function AanmeldFormulier() {
   const t = useTranslations("auth");
+  const locale = useLocale();
   const router = useRouter();
   const params = useSearchParams();
-  const verder = params.get("verder") ?? "/wagens";
+  // Uit de queryparameter, dus van buitenaf te zetten. Zonder deze controle kan
+  // een link met ?verder=//kwaadaardig.be de gebruiker na het aanmelden naar een
+  // andere site sturen; de servercallback controleerde dit al wel.
+  const gevraagd = params.get("verder");
+  const verder =
+    gevraagd && gevraagd.startsWith("/") && !gevraagd.startsWith("//") ? gevraagd : "/wagens";
 
   const [methode, setMethode] = useState<Methode>("wachtwoord");
   const [email, setEmail] = useState("");
@@ -44,7 +50,9 @@ function AanmeldFormulier() {
         const { error } = await supabase.auth.signInWithOtp({
           email,
           options: {
-            emailRedirectTo: `${window.location.origin}/auth/callback?verder=${encodeURIComponent(verder)}`,
+            emailRedirectTo:
+              `${window.location.origin}/auth/callback` +
+              `?verder=${encodeURIComponent(verder)}&taal=${locale}`,
           },
         });
         if (error) throw error;

@@ -43,6 +43,42 @@ export const CSV_KOLOMMEN = [
 
 export type CsvKolom = (typeof CSV_KOLOMMEN)[number];
 
+/**
+ * De kolommen van een eigen wagenmodel.
+ *
+ * Een model is geen wagen: er staat geen besteldatum, geen kenteken en geen
+ * werknemer in, maar wel de specificaties waaruit het kostenmodel rekent. Dat is
+ * precies de reden dat het een tweede lijst is en geen uitbreiding van de eerste.
+ */
+export const MODEL_KOLOMMEN = [
+  "merk",
+  "model",
+  "uitvoering",
+  "voertuigtype",
+  "brandstof",
+  "carrosserie",
+  "segment",
+  "modeljaar",
+  "co2",
+  "cataloguswaarde",
+  "vermogen_kw",
+  "aandrijving",
+  "verbruik",
+  "batterij_kwh",
+  "actieradius_km",
+  "laadvermogen_dc_kw",
+  "zitplaatsen",
+  "koffer_liter",
+  "trekgewicht_kg",
+  "restwaarde_pct_4j",
+  "onderhoudsklasse",
+  "uitrusting",
+  "bron",
+  "opmerking",
+] as const;
+
+export type ModelKolom = (typeof MODEL_KOLOMMEN)[number];
+
 function ontsnap(waarde: unknown): string {
   if (waarde === null || waarde === undefined) return "";
   const tekst = String(waarde);
@@ -132,14 +168,14 @@ export function splitsRegel(regel: string, scheider: string): string[] {
   return velden;
 }
 
-export interface ImportRegel {
+export interface ImportRegel<K extends string = CsvKolom> {
   /** Regelnummer in het bestand, kopregel meegeteld. Voor de foutmelding. */
   regelnummer: number;
-  waarden: Partial<Record<CsvKolom, string>>;
+  waarden: Partial<Record<K, string>>;
 }
 
-export interface ImportResultaat {
-  regels: ImportRegel[];
+export interface ImportResultaat<K extends string = CsvKolom> {
+  regels: ImportRegel<K>[];
   /** Kolommen in het bestand die wij niet kennen. */
   onbekendeKolommen: string[];
   /** Kolommen die wij verwachten maar die ontbreken. */
@@ -150,28 +186,31 @@ export interface ImportResultaat {
  * Leest een CSV in. Detecteert zelf of er puntkomma's of komma's gebruikt zijn,
  * want beide komen in de praktijk uit Excel.
  */
-export function leesCsv(inhoud: string): ImportResultaat {
+export function leesCsv<K extends string = CsvKolom>(
+  inhoud: string,
+  kolommen: readonly K[] = CSV_KOLOMMEN as unknown as readonly K[],
+): ImportResultaat<K> {
   const regels = inhoud
     .replace(/^﻿/, "") // Byte order mark die Excel er graag voor zet.
     .split(/\r\n|\n|\r/)
     .filter((r) => r.trim() !== "");
 
   if (regels.length === 0) {
-    return { regels: [], onbekendeKolommen: [], ontbrekendeKolommen: [...CSV_KOLOMMEN] };
+    return { regels: [], onbekendeKolommen: [], ontbrekendeKolommen: [...kolommen] };
   }
 
   const scheider = (regels[0].match(/;/g)?.length ?? 0) >= (regels[0].match(/,/g)?.length ?? 0) ? ";" : ",";
   const kop = splitsRegel(regels[0], scheider).map((k) => k.trim().toLowerCase());
 
-  const bekend = new Set<string>(CSV_KOLOMMEN);
+  const bekend = new Set<string>(kolommen);
   const onbekendeKolommen = kop.filter((k) => k !== "" && !bekend.has(k));
-  const ontbrekendeKolommen = CSV_KOLOMMEN.filter((k) => !kop.includes(k));
+  const ontbrekendeKolommen = kolommen.filter((k) => !kop.includes(k));
 
-  const uitgelezen: ImportRegel[] = regels.slice(1).map((regel, i) => {
+  const uitgelezen: ImportRegel<K>[] = regels.slice(1).map((regel, i) => {
     const velden = splitsRegel(regel, scheider);
-    const waarden: Partial<Record<CsvKolom, string>> = {};
+    const waarden: Partial<Record<K, string>> = {};
     kop.forEach((kolom, index) => {
-      if (bekend.has(kolom)) waarden[kolom as CsvKolom] = (velden[index] ?? "").trim();
+      if (bekend.has(kolom)) waarden[kolom as K] = (velden[index] ?? "").trim();
     });
     return { regelnummer: i + 2, waarden };
   });
@@ -190,4 +229,65 @@ export function leesGetal(waarde: string | undefined): number | null {
   if (schoon === "") return null;
   const n = Number(schoon);
   return Number.isFinite(n) ? n : null;
+}
+
+/* ------------------------------------------------- eigen wagenmodellen ---- */
+
+/** Zet eigen modellen om naar CSV, met dezelfde puntkomma als de vloot. */
+export function modellenNaarCsv(
+  modellen: Array<Partial<Record<ModelKolom, unknown>> & { uitrusting?: string[] | null }>,
+): string {
+  const regels = [MODEL_KOLOMMEN.join(";")];
+  for (const m of modellen) {
+    regels.push(
+      MODEL_KOLOMMEN.map((k) =>
+        // Uitrusting is een lijst; die hoort in één cel te passen zonder het
+        // scheidingsteken van het bestand te gebruiken.
+        k === "uitrusting" ? ontsnap((m.uitrusting ?? []).join("|")) : ontsnap(m[k]),
+      ).join(";"),
+    );
+  }
+  return regels.join("\r\n");
+}
+
+/** Een sjabloon met één ingevulde voorbeeldregel, zodat het formaat duidelijk is. */
+export function modelSjabloon(): string {
+  const voorbeeld: Record<ModelKolom, unknown> = {
+    merk: "Volkswagen",
+    model: "ID.7",
+    uitvoering: "Pro S",
+    voertuigtype: "BEV",
+    brandstof: "elektrisch",
+    carrosserie: "berline",
+    segment: "Berline hogere middenklasse",
+    modeljaar: 2026,
+    co2: 0,
+    cataloguswaarde: 57990,
+    vermogen_kw: 210,
+    aandrijving: "achter",
+    verbruik: 13.9,
+    batterij_kwh: 86,
+    actieradius_km: 709,
+    laadvermogen_dc_kw: 200,
+    zitplaatsen: 5,
+    koffer_liter: 532,
+    trekgewicht_kg: 1200,
+    restwaarde_pct_4j: 45,
+    onderhoudsklasse: "laag",
+    uitrusting: "warmtepomp|trekhaak",
+    bron: "Offerte leasingmaatschappij, maart 2026",
+    opmerking: "",
+  };
+  return [
+    MODEL_KOLOMMEN.join(";"),
+    MODEL_KOLOMMEN.map((k) => ontsnap(voorbeeld[k])).join(";"),
+  ].join("\r\n");
+}
+
+/** Leest de uitrustingscel: items gescheiden door een verticale streep. */
+export function leesUitrusting(waarde: string | undefined): string[] {
+  return (waarde ?? "")
+    .split("|")
+    .map((s) => s.trim())
+    .filter(Boolean);
 }

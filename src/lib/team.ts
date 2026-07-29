@@ -54,8 +54,18 @@ export async function nodigUit(email: string, rol: Bedrijfsrol = "lid"): Promise
 }
 
 export async function trekUitnodigingIn(id: string): Promise<void> {
-  const { error } = await supabase.from("uitnodigingen").delete().eq("id", id);
+  // .select() zoals overal elders: RLS weigert een verwijdering zonder rechten
+  // niet met een fout, ze raakt gewoon nul rijen. Zonder deze controle meldt de
+  // interface dat de uitnodiging is ingetrokken terwijl ze blijft openstaan.
+  const { data, error } = await supabase
+    .from("uitnodigingen")
+    .delete()
+    .eq("id", id)
+    .select("id");
   if (error) throw new Error(`Uitnodiging intrekken mislukt: ${error.message}`);
+  if (!data?.length) {
+    throw new Error("Uitnodiging intrekken mislukt: geen rechten of niet gevonden.");
+  }
 }
 
 export async function verwijderTeamlid(id: string): Promise<void> {

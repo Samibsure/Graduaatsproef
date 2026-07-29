@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import type { EmailOtpType } from "@supabase/supabase-js";
 import { createServerSupabase } from "@/lib/supabase/server";
+import { metTaal } from "@/lib/taalpad";
 
 /**
  * Landingspunt voor alle links uit auth-mails: bevestiging van een registratie,
@@ -16,9 +17,11 @@ export async function GET(request: NextRequest) {
   const tokenHash = searchParams.get("token_hash");
   const type = searchParams.get("type") as EmailOtpType | null;
 
-  // Alleen relatieve paden, anders is dit een open redirect.
-  const gevraagd = searchParams.get("verder") ?? "/wagens";
-  const verder = gevraagd.startsWith("/") && !gevraagd.startsWith("//") ? gevraagd : "/wagens";
+  // metTaal() weert een open redirect (alleen relatieve paden) en zet meteen het
+  // taalvoorvoegsel terug. Zonder dat laatste belandde wie zijn e-mailadres
+  // bevestigde of zijn wachtwoord herstelde altijd in het Nederlands.
+  const taal = searchParams.get("taal");
+  const verder = metTaal(searchParams.get("verder"), taal);
 
   const supabase = await createServerSupabase();
 
@@ -30,7 +33,7 @@ export async function GET(request: NextRequest) {
     if (!error) return NextResponse.redirect(`${origin}${verder}`);
   }
 
-  const mislukt = new URL("/aanmelden", origin);
+  const mislukt = new URL(metTaal("/aanmelden", taal), origin);
   mislukt.searchParams.set("fout", "link-verlopen");
   return NextResponse.redirect(mislukt);
 }

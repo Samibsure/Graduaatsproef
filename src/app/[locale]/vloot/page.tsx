@@ -69,6 +69,9 @@ export default function VlootPagina() {
 
   const [ctx, setCtx] = useState<FiscaleContext | null>(null);
   const [wagens, setWagens] = useState<Vehicle[] | null>(null);
+  // Los van `wagens`, want die blijft null bij een laadfout. Zonder deze vlag
+  // draait het skelet eeuwig door naast de foutmelding.
+  const [geladen, setGeladen] = useState(false);
   const [startjaar, setStartjaar] = useState(new Date().getFullYear());
   const [melding, setMelding] = useState<string | null>(null);
   const [fout, setFout] = useState<string | null>(null);
@@ -84,7 +87,8 @@ export default function VlootPagina() {
         setCtx(c);
         setWagens(w);
       })
-      .catch((e) => setFout(e instanceof Error ? e.message : String(e)));
+      .catch((e) => setFout(e instanceof Error ? e.message : String(e)))
+      .finally(() => setGeladen(true));
   }, []);
 
   const prognose = useMemo(() => {
@@ -185,13 +189,13 @@ export default function VlootPagina() {
         </p>
       )}
 
-      {wagens === null ? (
+      {!geladen ? (
         <div className="grid gap-4 sm:grid-cols-3">
           {[0, 1, 2].map((i) => (
             <div key={i} className="h-[132px] animate-pulse rounded-[13px] bg-paper" />
           ))}
         </div>
-      ) : wagens.length === 0 ? (
+      ) : wagens === null ? null : wagens.length === 0 ? (
         <Card className="p-12 text-center">
           <span className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-full border border-line bg-paper text-ink-500">
             <Icon name="car" size={26} />
