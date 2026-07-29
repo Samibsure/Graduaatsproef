@@ -444,7 +444,8 @@
     "beheerNietGeladen": "The tax parameters could not be loaded from the database. The form stays closed: saving would overwrite the published figures with the source-code defaults. Try again once the connection is back.",
     "beheerBevestig": "Reset all parameters and the deduction calendar to the published values?",
     "geenToegangTitel": "No access",
-    "geenToegangTekst": "This page is reserved for the administration of Autofiscaliteit. The tax parameters apply across Belgium and cannot be adjusted per company."
+    "geenToegangTekst": "This page is reserved for the administration of Autofiscaliteit. The tax parameters apply across Belgium and cannot be adjusted per company.",
+    "beheerAnnuleer": "Cancel"
   },
   "wagens": {
     "eyebrow": "Vehicles",
@@ -508,7 +509,7 @@
     "kolomRsz": "Soc. sec./yr",
     "bewerk": "Edit",
     "verwijder": "Delete",
-    "verwijderBevestig": "Delete this vehicle?",
+    "verwijderBevestig": "This vehicle disappears from your fleet, together with the calculations on it. This cannot be undone.",
     "leeg": "No vehicles yet. Add some from the catalogue or via “New vehicle”.",
     "laden": "Loading vehicles…",
     "badgeVloot": "fleet",
@@ -537,7 +538,9 @@
     "laadstroomJaar": "Reimbursed charging electricity per year",
     "laadstroomJaarHint": "Follows the deductibility of the car itself.",
     "eindeContract": "End of contract",
-    "eindeContractHint": "Used for the replacement calendar."
+    "eindeContractHint": "Used for the replacement calendar.",
+    "verwijderTitel": "Delete vehicle",
+    "annuleer": "Cancel"
   },
   "vergelijking": {
     "titel": "Comparison",

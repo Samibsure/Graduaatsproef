@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Inter } from "next/font/google";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
@@ -11,6 +12,21 @@ import { INTL_LOCALE, routing } from "@/i18n/routing";
 import { laadSessie } from "@/lib/sessie";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://autofiscaliteit.com";
+
+/**
+ * Het lettertype wordt tijdens de build opgehaald en mee uitgeleverd vanaf het
+ * eigen domein. Dat is geen detail: de CSP staat `font-src 'self'` toe en zou een
+ * verwijzing naar Google Fonts blokkeren.
+ *
+ * Deze applicatie is één lange kolom cijfers. `tabular-nums` zorgt dat elk cijfer
+ * even breed is, zodat bedragen onder elkaar uitlijnen in plaats van te dansen
+ * bij elke herberekening.
+ */
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter",
+});
 
 /**
  * Vrijwillige donatie: één link naar een externe pagina, bewust geen
@@ -102,7 +118,7 @@ export default async function RootLayout({
   ];
 
   return (
-    <html lang={INTL_LOCALE[locale]}>
+    <html lang={INTL_LOCALE[locale]} className={inter.variable}>
       <body className="antialiased flex min-h-screen flex-col">
         <NextIntlClientProvider>
           <SessieProvider sessie={sessie}>
@@ -116,8 +132,8 @@ export default async function RootLayout({
                 <div className="mb-4">
                   <Wordmerk variant="dark" />
                 </div>
-                <p className="mb-3 text-sm leading-relaxed text-white/[0.62]">{t("intro")}</p>
-                <p className="mb-4 text-xs leading-relaxed text-white/[0.45]">{t("disclaimer")}</p>
+                <p className="mb-3 text-sm leading-relaxed text-white/[0.72]">{t("intro")}</p>
+                <p className="mb-4 text-xs leading-relaxed text-white/[0.62]">{t("disclaimer")}</p>
                 {DONATIE_URL && (
                   <a
                     href={DONATIE_URL}
@@ -133,7 +149,7 @@ export default async function RootLayout({
               <div className="flex flex-wrap gap-14">
                 {kolommen.map((kolom) => (
                   <div key={kolom.titel}>
-                    <div className="mb-3.5 text-[11.5px] font-bold uppercase tracking-[0.14em] text-white/[0.45]">
+                    <div className="mb-3.5 text-[11.5px] font-bold uppercase tracking-[0.14em] text-white/[0.62]">
                       {kolom.titel}
                     </div>
                     <div className="flex flex-col gap-2.5">
@@ -153,7 +169,7 @@ export default async function RootLayout({
             </div>
 
             <div className="border-t border-white/[0.08]">
-              <div className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-3 px-6 py-[18px] text-[12.5px] text-white/[0.42]">
+              <div className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-3 px-6 py-[18px] text-[12.5px] text-white/[0.58]">
                 <span>{t("copyright")}</span>
                 <span>{t("gratis")}</span>
               </div>

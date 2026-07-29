@@ -2,8 +2,9 @@
 
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
+import Dialoog from "@/components/Dialoog";
 import { useSessie } from "@/components/SessieProvider";
-import { Card, Container, PageHead } from "@/components/ui";
+import { Button, Card, Container, Melding, PageHead } from "@/components/ui";
 import {
   bewaarAftrekRegel,
   bewaarMultiplicator,
@@ -30,6 +31,7 @@ export default function BeheerParametersPagina() {
   const [melding, setMelding] = useState<string | null>(null);
   const [fout, setFout] = useState<string | null>(null);
   const [bezig, setBezig] = useState(false);
+  const [vraagHerstel, setVraagHerstel] = useState(false);
 
   // Strikt: deze pagina schrijft terug wat ze inleest. Zou ze de terugval op de
   // standaardwaarden krijgen zonder het te merken, dan bewaart ze die over de
@@ -107,7 +109,7 @@ export default function BeheerParametersPagina() {
   }
 
   async function herstel() {
-    if (!confirm(t("beheerBevestig"))) return;
+    setVraagHerstel(false);
     await doe(async () => {
       await herstelStandaardwaarden();
       await herlaad();
@@ -155,28 +157,29 @@ export default function BeheerParametersPagina() {
         sub={t("beheerIntro")}
         action={
           <div className="flex gap-3">
-            <button
-              onClick={bewaarAlles}
-              disabled={bezig}
-              className="inline-flex h-[46px] items-center rounded-[11px] bg-gold px-5 text-[14.5px] font-bold text-white transition-colors hover:bg-gold-hover disabled:opacity-50"
-            >
+            <Button onClick={bewaarAlles} disabled={bezig}>
               {bezig ? t("beheerBezig") : t("beheerBewaar")}
-            </button>
-            <button
-              onClick={herstel}
-              disabled={bezig}
-              className="inline-flex h-[46px] items-center rounded-[11px] border-[1.5px] border-line px-5 text-[14.5px] font-bold text-ink transition-colors hover:bg-paper disabled:opacity-50"
-            >
+            </Button>
+            <Button variant="stil" onClick={() => setVraagHerstel(true)} disabled={bezig}>
               {t("beheerHerstel")}
-            </button>
+            </Button>
           </div>
         }
       />
 
-      {melding && (
-        <p className="rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{melding}</p>
-      )}
-      {fout && <p className="rounded-lg bg-rose-50 px-4 py-3 text-sm text-rose-700">{fout}</p>}
+      {melding && <Melding soort="ok">{melding}</Melding>}
+      {fout && <Melding soort="fout">{fout}</Melding>}
+
+      <Dialoog
+        open={vraagHerstel}
+        titel={t("beheerHerstel")}
+        tekst={t("beheerBevestig")}
+        bevestigLabel={t("beheerHerstel")}
+        annuleerLabel={t("beheerAnnuleer")}
+        gevaarlijk
+        onBevestig={herstel}
+        onAnnuleer={() => setVraagHerstel(false)}
+      />
 
       <Card className="p-5">
         <div className="flex items-center justify-between">

@@ -2,6 +2,7 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
+import Dialoog from "@/components/Dialoog";
 import Icon from "@/components/Icon";
 import { useSessie } from "@/components/SessieProvider";
 import { Badge, Card, Container, PageHead, TypeDot } from "@/components/ui";
@@ -78,6 +79,7 @@ export default function WagensPagina() {
   // Zonder deze vlag leest een gebruiker met twintig wagens bij elke paginalading
   // eerst "nog geen wagens", want de lijst begint leeg.
   const [geladen, setGeladen] = useState(false);
+  const [teVerwijderen, setTeVerwijderen] = useState<Vehicle | null>(null);
 
   const herlaad = () => laadWagens().then(setWagens);
 
@@ -123,7 +125,7 @@ export default function WagensPagina() {
   }
 
   async function verwijder(id: string) {
-    if (!confirm(t("verwijderBevestig"))) return;
+    setTeVerwijderen(null);
     setFout(null);
     try {
       await verwijderWagen(id);
@@ -436,7 +438,7 @@ export default function WagensPagina() {
                         <button onClick={() => setFormulier({ ...w })} className="mr-3 text-sm font-bold text-ink hover:text-gold">
                           {t("bewerk")}
                         </button>
-                        <button onClick={() => verwijder(w.id)} className="text-sm font-bold text-rose-600 hover:underline">
+                        <button onClick={() => setTeVerwijderen(w)} className="text-sm font-bold text-danger hover:underline">
                           {t("verwijder")}
                         </button>
                       </>
@@ -457,6 +459,17 @@ export default function WagensPagina() {
           </tbody>
         </table>
       </Card>
+
+      <Dialoog
+        open={teVerwijderen !== null}
+        titel={t("verwijderTitel")}
+        tekst={t("verwijderBevestig")}
+        bevestigLabel={t("verwijder")}
+        annuleerLabel={t("annuleer")}
+        gevaarlijk
+        onBevestig={() => teVerwijderen && verwijder(teVerwijderen.id)}
+        onAnnuleer={() => setTeVerwijderen(null)}
+      />
     </Container>
   );
 }

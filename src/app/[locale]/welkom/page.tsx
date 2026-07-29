@@ -3,10 +3,10 @@
 import { useTranslations } from "next-intl";
 import { Link, useRouter } from "@/i18n/navigation";
 import { useEffect, useState } from "react";
-import { Melding, Veld, invoerKlasse, knopKlasse } from "@/components/AuthKaart";
+import { Melding, Veld, invoerKlasse } from "@/components/AuthKaart";
 import Icon from "@/components/Icon";
 import { useSessie } from "@/components/SessieProvider";
-import { Card, Container, Eyebrow } from "@/components/ui";
+import { Card, Container, Eyebrow, knopKlassen } from "@/components/ui";
 import { voltooiOnboarding, type BedrijfsInvoer } from "@/lib/bedrijf";
 import { magBeheren } from "@/lib/rollen";
 import { maakVoorbeeldvloot } from "@/lib/voorbeeldvloot";
@@ -91,7 +91,7 @@ export default function WelkomPagina() {
         <p className="mt-3 text-[16px] text-ink-700">
           {t("geenBeheerderTekst", { bedrijf: sessie.bedrijf.naam })}
         </p>
-        <Link href="/wagens" className={`${knopKlasse} mt-7 w-auto`}>
+        <Link href="/wagens" className={knopKlassen("primair", "md", "mt-7")}>
           {t("geenBeheerderKnop")}
         </Link>
       </Container>
@@ -257,7 +257,7 @@ export default function WelkomPagina() {
               type="button"
               disabled={bezig || (stap === 1 && profiel.naam.trim().length < 2)}
               onClick={() => setStap((s) => s + 1)}
-              className={`${knopKlasse} w-auto`}
+              className={knopKlassen("primair")}
             >
               {t("volgende")}
             </button>

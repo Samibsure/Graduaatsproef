@@ -444,7 +444,8 @@
     "beheerNietGeladen": "De fiscale parameters konden niet uit de databank geladen worden. Het formulier blijft gesloten: bewaren zou de gepubliceerde cijfers overschrijven met de standaardwaarden uit de broncode. Probeer opnieuw zodra de verbinding hersteld is.",
     "beheerBevestig": "Alle parameters en de aftrekkalender terugzetten naar de gepubliceerde waarden?",
     "geenToegangTitel": "Geen toegang",
-    "geenToegangTekst": "Deze pagina is voorbehouden aan het beheer van Autofiscaliteit. De fiscale parameters gelden voor heel België en kunnen niet per bedrijf worden aangepast."
+    "geenToegangTekst": "Deze pagina is voorbehouden aan het beheer van Autofiscaliteit. De fiscale parameters gelden voor heel België en kunnen niet per bedrijf worden aangepast.",
+    "beheerAnnuleer": "Annuleren"
   },
   "wagens": {
     "eyebrow": "Wagens",
@@ -508,7 +509,7 @@
     "kolomRsz": "RSZ/jaar",
     "bewerk": "Bewerk",
     "verwijder": "Verwijder",
-    "verwijderBevestig": "Deze wagen verwijderen?",
+    "verwijderBevestig": "Deze wagen verdwijnt uit je vloot, samen met de berekeningen erop. Dat kan niet ongedaan gemaakt worden.",
     "leeg": "Nog geen wagens. Voeg er toe vanuit de catalogus of via “Nieuwe wagen”.",
     "laden": "Wagens laden…",
     "badgeVloot": "vloot",
@@ -537,7 +538,9 @@
     "laadstroomJaar": "Terugbetaalde laadstroom per jaar",
     "laadstroomJaarHint": "Volgt de aftrekbaarheid van de wagen zelf.",
     "eindeContract": "Einde contract",
-    "eindeContractHint": "Gebruikt voor de vervangkalender."
+    "eindeContractHint": "Gebruikt voor de vervangkalender.",
+    "verwijderTitel": "Wagen verwijderen",
+    "annuleer": "Annuleren"
   },
   "vergelijking": {
     "titel": "Vergelijking",

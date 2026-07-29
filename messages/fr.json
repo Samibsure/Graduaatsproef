@@ -444,7 +444,8 @@
     "beheerNietGeladen": "Les paramètres fiscaux n'ont pas pu être chargés depuis la base de données. Le formulaire reste fermé : l'enregistrement écraserait les chiffres publiés par les valeurs par défaut du code source. Réessayez dès que la connexion est rétablie.",
     "beheerBevestig": "Rétablir tous les paramètres et le calendrier de déduction aux valeurs publiées ?",
     "geenToegangTitel": "Accès refusé",
-    "geenToegangTekst": "Cette page est réservée à l'administration d'Autofiscaliteit. Les paramètres fiscaux valent pour toute la Belgique et ne peuvent pas être adaptés par entreprise."
+    "geenToegangTekst": "Cette page est réservée à l'administration d'Autofiscaliteit. Les paramètres fiscaux valent pour toute la Belgique et ne peuvent pas être adaptés par entreprise.",
+    "beheerAnnuleer": "Annuler"
   },
   "wagens": {
     "eyebrow": "Véhicules",
@@ -508,7 +509,7 @@
     "kolomRsz": "ONSS/an",
     "bewerk": "Modifier",
     "verwijder": "Supprimer",
-    "verwijderBevestig": "Supprimer ce véhicule ?",
+    "verwijderBevestig": "Ce véhicule disparaît de votre flotte, avec les calculs qui s'y rapportent. Cette action est irréversible.",
     "leeg": "Pas encore de véhicule. Ajoutez-en depuis le catalogue ou via « Nouveau véhicule ».",
     "laden": "Chargement des véhicules…",
     "badgeVloot": "flotte",
@@ -537,7 +538,9 @@
     "laadstroomJaar": "Électricité de recharge remboursée par an",
     "laadstroomJaarHint": "Suit la déductibilité de la voiture elle-même.",
     "eindeContract": "Fin du contrat",
-    "eindeContractHint": "Utilisé pour le calendrier de remplacement."
+    "eindeContractHint": "Utilisé pour le calendrier de remplacement.",
+    "verwijderTitel": "Supprimer le véhicule",
+    "annuleer": "Annuler"
   },
   "vergelijking": {
     "titel": "Comparaison",
