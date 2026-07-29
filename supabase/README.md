@@ -13,6 +13,7 @@ Het volledige schema van Autofiscaliteit staat in `migrations/`, in volgorde uit
 | `0007_rekenkern_uitbreiden.sql` | Financiering, btw-methode, eigen bijdrage, laadinfrastructuur en contractdata op wagens |
 | `0008_hulpfuncties_afschermen.sql` | `EXECUTE` op de vier RLS-hulpfuncties weg bij `PUBLIC` en `anon` |
 | `0009_profielrechten_afdwingen.sql` | Kolomrechten en een trigger op `profiles`: geen zelfpromotie meer tot beheerder of platformbeheerder |
+| `0010_feedback_en_eigen_modellen.sql` | Tabel `feedback` (iedereen mag melden, alleen een platformbeheerder leest), tabel `eigen_modellen` per bedrijf, en de vreemde sleutel `vehicles.catalog_id` losgekoppeld |
 
 `0005` en `0006` horen bij elkaar maar staan bewust apart: PostgreSQL weigert een nieuwe
 enumwaarde te gebruiken in dezelfde transactie waarin ze is aangemaakt.
@@ -102,8 +103,30 @@ bestaande database kunnen draaien.
    Voor **anon** zijn die meldingen weg sinds `0008`. `handle_new_user()` is en blijft
    afgeschermd: die hoort alleen door de trigger aangeroepen te worden.
 
+## Migratie 0010
+
+Deze migratie is **niet vereist om de applicatie te laten draaien**. Zolang ze niet is uitgevoerd:
+
+- valt het feedbackformulier terug op een vooringevulde e-mail, zonder dat de gebruiker het merkt;
+- blijft de eigen modellenbibliotheek verborgen achter een uitleg in plaats van een foutmelding.
+
+Na het uitvoeren zijn drie dingen het nakijken waard, volgens hetzelfde patroon als bij `0009`:
+
+```sql
+-- een lezer mag geen eigen model toevoegen
+-- bedrijf B ziet geen enkel model van bedrijf A
+-- een gewone update op een wagen slaagt nog (de kolomrechten van 0009)
+select tablename, rowsecurity from pg_tables where schemaname = 'public';
+select tablename, policyname, roles, cmd from pg_policies where schemaname = 'public';
+```
+
 ## Wagencatalogus
 
-De 25 rijen van `car_catalog` staan niet in de migraties: die data bestaat alleen in het bestaande
-project. Exporteer ze daar eenmalig (Table Editor → `car_catalog` → Export CSV) als je het schema in
-een nieuw project opbouwt.
+De catalogus komt **niet meer uit de databank**. De 163 modellen staan in
+`src/lib/fiscaal/catalogusdata.ts` en worden mee uitgeleverd met de applicatie.
+
+De tabel `car_catalog` blijft bestaan voor bestaande verwijzingen, maar wordt niet meer gelezen.
+Reden: de vorige 25 rijen bestonden uitsluitend in het productieproject, dus uitbreiden ging alleen
+met de hand, een fout was niet terug te draaien, en viel de databank weg dan viel de hele catalogus
+mee weg. Sinds `0010` verwijst `vehicles.catalog_id` er ook niet meer met een vreemde sleutel naar;
+de koppeling tussen een wagen en een catalogusmodel gebeurt op merk en model.

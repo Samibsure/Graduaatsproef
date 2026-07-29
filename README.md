@@ -13,13 +13,20 @@ verworpen uitgaven, en is sindsdien uitgebouwd tot een publiek product.
 
 ## Onderdelen
 
-1. **Catalogus**: de bekendste bedrijfswagens in België met een directe fiscale preview.
-2. **Mijn wagens**: eigen vloot en kandidaten, met de volledige berekening per gebruiksjaar.
-3. **Vergelijking**: scoringsmatrix met zes gewogen criteria, een grafiek en een advies
+1. **Simulator**: één wagen volledig doorrekenen zonder account. Dit is de bestemming van
+   "Start hier": eerst tonen wat de applicatie kan, pas registreren om te bewaren.
+2. **Catalogus**: 163 bedrijfswagens met hun specificaties en een directe fiscale preview,
+   met filters op merk, carrosserie en voertuigtype en een keuze van besteljaar.
+3. **Eigen modellen**: een modellenbibliotheek per bedrijf, met CSV-import en -export, voor
+   uitvoeringen die niet in de catalogus staan.
+4. **Mijn wagens**: eigen vloot en kandidaten, met de volledige berekening per gebruiksjaar.
+5. **Vergelijking**: scoringsmatrix met zeven gewogen criteria, een grafiek en een advies
    *aanvaarden / overwegen / afwijzen*, met beslissingshistoriek.
-4. **Fiscaal kader en parameters**: de regels en cijfers achter de berekening, publiek raadpleegbaar.
-5. **Onboarding en instellingen**: een wizard van drie stappen bij de eerste aanmelding, en daarna
+6. **Fiscaal kader en parameters**: de regels en cijfers achter de berekening, publiek raadpleegbaar.
+7. **Onboarding en instellingen**: een wizard van drie stappen bij de eerste aanmelding, en daarna
    het bedrijfsprofiel, het fiscaal profiel en het team op `/instellingen`.
+8. **Melden**: een knop op elke pagina om een fout in een berekening te melden of een verbetering
+   te vragen.
 
 ### Onboarding
 
@@ -51,8 +58,44 @@ helpers in `src/lib/rollen.ts` bepalen alleen wat de interface toont.
 | Talen | next-intl, Nederlands / Frans / Engels |
 | Rekenkern | Pure TypeScript-functies in `src/lib/fiscaal/` (geen UI- of DB-afhankelijkheid) |
 | Data & auth | Supabase (PostgreSQL, Supabase Auth), afscherming via RLS |
-| Tests | Vitest, `src/lib/fiscaal/*.test.ts` |
+| Tests | Vitest in twee projecten: de rekenkern in node (`*.test.ts`), de componenten in jsdom (`*.test.tsx`) |
 | Hosting | Vercel |
+
+### De catalogus
+
+De 163 modellen staan in `src/lib/fiscaal/catalogusdata.ts`, niet in de databank. Dat is een
+bewuste keuze: de vorige catalogus bestond uitsluitend als rijen in het productieproject, dus
+uitbreiden ging alleen met de hand, een fout was niet terug te draaien, en viel de databank weg
+dan viel de catalogus mee weg.
+
+CO₂, cataloguswaarde, verbruik, actieradius, koffervolume en trekgewicht zijn **opgezochte**
+gegevens per model en modeljaar, uit publieke fabrikants- en WLTP-cijfers voor de Belgische markt.
+Elke rij draagt een modeljaar en een bron, zodat een cijfer na te kijken valt. Ze zijn
+richtinggevend, niet contractueel.
+
+Alles wat daaruit volgt, rekent de applicatie zelf uit. `docs/catalogus.md` is de volledige lijst,
+gegenereerd uit dezelfde data; een snapshot-test bewaakt dat beide gelijk lopen.
+
+Lichte vracht staat er bewust niet in: een bestelwagen die als lichte vracht is ingeschreven valt
+buiten de aftrekbeperking van artikel 66 WIB92, en de rekenkern kent die uitzondering nog niet.
+
+### Kostenmodel
+
+`src/lib/fiscaal/kosten.ts` berekent de jaarlijkse autokosten uit de specificaties: energie (met
+gewogen laadprijs, laadverlies en brandstofprijs), onderhoud naar klasse en vermogen, banden,
+verzekering, verkeersbelasting per gewest en afschrijving uit de restwaarde. Alle prijzen staan in
+`KOSTENPARAMETERS`, op één plaats, en horen jaarlijks bijgewerkt te worden zoals de fiscale
+parameters.
+
+De verkeersbelasting is bewust een parametertabel en geen formule: de gewestelijke regels hangen af
+van cilinderinhoud, euronorm en fiscale paardenkracht, verschillen per gewest en wijzigen geregeld.
+
+### Besteljaar
+
+Het besteljaar bepaalt onder welk regime een wagen valt en is fiscaal het zwaarste gegeven in de
+applicatie. `vergelijkBesteljaren()` in `src/lib/fiscaal/besteljaar.ts` zet dezelfde wagen naast
+elkaar voor verschillende besteljaren. Dat is het spiegelbeeld van `uitfasering.ts`, dat het
+besteljaar vasthoudt en het gebruiksjaar laat lopen.
 
 ### Rekenkern
 
@@ -61,8 +104,15 @@ helpers in `src/lib/rollen.ts` bepalen alleen wat de interface toont.
 - **VAA**: `cataloguswaarde × 6/7 × leeftijdscorrectie × CO₂-percentage`, met wettelijk minimum.
 - **RSZ CO₂-bijdrage**: `((CO₂ × 9 − 600) / 12) × indexcoëfficiënt × multiplicator`, met minimum.
 - **Verworpen uitgaven**: `(1 − aftrek%) × autokosten + (17% zonder / 40% met tank- of laadkaart) × VAA`.
-- **Scoringsmatrix**: TCO 4 jaar (40%), aftrekbaarheid VenB (20%), verworpen uitgaven (15%),
-  operationele flexibiliteit (10%), CO₂/ESG (10%), restwaarde (5%).
+- **Scoringsmatrix**: de zes criteria van het rapport (TCO 4 jaar 40%, aftrekbaarheid VenB 20%,
+  verworpen uitgaven 15%, operationele flexibiliteit 10%, CO₂/ESG 10%, restwaarde 5%) blijven de
+  referentie en worden door de tests bewaakt. De applicatie gebruikt `CRITERIA_UITGEBREID`, met
+  daarnaast **praktisch nut** (13%) uit koffervolume, zitplaatsen en trekgewicht. Zonder dat
+  criterium wint een kleine elektrische hatchback stelselmatig van een break of een zevenzitter, op
+  criteria die niets zeggen over de vraag of het gerief erin past.
+- **Afgeleide scores**: flexibiliteit en restwaarde komen uit de specificaties van het model
+  (actieradius, laadvermogen, verwacht waardebehoud) in plaats van uit een getal dat de gebruiker
+  zelf van 1 tot 10 intikt.
 
 De rekenkern is bewust vrij van UI en database, zodat de formules los te testen zijn. De unit tests
 valideren de uitkomsten tegen een uitgewerkt referentiedossier.
