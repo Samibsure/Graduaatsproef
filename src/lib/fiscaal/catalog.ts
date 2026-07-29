@@ -1,4 +1,4 @@
-import { STANDAARD_GEBRUIK, berekenKosten, type Gebruiksprofiel } from "./kosten";
+import { STANDAARD_GEBRUIK, berekenKosten, restwaardeVoor, type Gebruiksprofiel } from "./kosten";
 import type { CatalogCar, Vehicle } from "./types";
 
 /**
@@ -107,12 +107,18 @@ export function flexScore(car: CatalogCar): number {
   return klem(1 + bereikDeel + laadDeel);
 }
 
-/** Restwaardescore uit het verwachte waardebehoud na vier jaar. */
+/**
+ * Restwaardescore uit het verwachte waardebehoud na vier jaar.
+ *
+ * De band is herijkt sinds de restwaardes uit de gesourcete ranges per
+ * aandrijving komen (kosten.ts). Die liggen tussen 27% en 40% in plaats van
+ * tussen 32% en 52%; met de oude band van 30% tot 55% zou elk model op of onder
+ * de bodem uitkomen en zou dit criterium niets meer onderscheiden.
+ */
 export function restwaardeScore(car: CatalogCar): number {
-  const pct = car.restwaarde_pct_4j;
-  if (pct === null || pct === undefined) return car.voertuigtype === "BEV" ? 6 : 5;
-  // 30% restwaarde is zwak, 55% is uitstekend; daartussen lineair.
-  return klem(1 + ((pct - 30) / 25) * 9);
+  const pct = car.restwaarde_pct_4j ?? restwaardeVoor(car.voertuigtype, car.brandstof);
+  // 25% restwaarde na vier jaar is zwak, 42% is uitstekend; daartussen lineair.
+  return klem(1 + ((pct - 25) / 17) * 9);
 }
 
 /**
@@ -138,6 +144,25 @@ export function nutScore(car: CatalogCar): number {
 }
 
 const klem = (x: number) => Math.min(10, Math.max(1, Math.round(x * 10) / 10));
+
+/**
+ * Splitst een cataloguslijst in nagekeken modellen en ramingen.
+ *
+ * Elke keuzelijst in de app biedt beide aan. Ze zonder onderscheid door elkaar
+ * zetten, is precies wat de vorige versie deed: een cijfer dat niemand nakeek
+ * stond dan naast een cijfer met een bron, en niets op het scherm zei welk van
+ * de twee je aanklikte. Twee groepen met een kop lossen dat op zonder iets weg
+ * te laten.
+ */
+export function perZekerheid(catalogus: CatalogCar[]): {
+  nagekeken: CatalogCar[];
+  ramingen: CatalogCar[];
+} {
+  return {
+    nagekeken: catalogus.filter((c) => c.zekerheid === "geverifieerd"),
+    ramingen: catalogus.filter((c) => c.zekerheid !== "geverifieerd"),
+  };
+}
 
 /** Volledig Vehicle-object met tijdelijk id, handig voor preview-berekeningen. */
 export function catalogPreview(car: CatalogCar, jaar = 2026): Vehicle {

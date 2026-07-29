@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { DEFAULT_CATALOGUS, catalogusPerSlug } from "./catalogusdata";
+import { DEFAULT_CATALOGUS, GEVERIFIEERDE_MODELLEN, catalogusPerSlug } from "./catalogusdata";
 import { catalogusMarkdown } from "./catalogusdoc";
+import { restwaardeVoor } from "./kosten";
 import { wagenSchema } from "../validatie";
 import { catalogNaarWagen, zoekCatalogusmodel } from "./catalog";
 
@@ -56,6 +57,59 @@ describe("ingebouwde catalogus", () => {
         expect(c.actieradius_km, naam).toBeGreaterThan(0);
       }
     }
+  });
+
+  it("verdeelt elke rij in geverifieerd of raming, en niets ertussen", () => {
+    for (const c of DEFAULT_CATALOGUS) {
+      expect(["geverifieerd", "raming"], `${c.merk} ${c.model}`).toContain(c.zekerheid);
+    }
+    // De geverifieerde lijst is een deelverzameling en wordt nergens los
+    // bijgehouden: raakt ze uit de pas, dan is dat hier zichtbaar.
+    expect(GEVERIFIEERDE_MODELLEN.length).toBeGreaterThan(0);
+    expect(GEVERIFIEERDE_MODELLEN.length).toBeLessThan(DEFAULT_CATALOGUS.length);
+    for (const c of GEVERIFIEERDE_MODELLEN) {
+      expect(DEFAULT_CATALOGUS).toContain(c);
+      expect(c.zekerheid).toBe("geverifieerd");
+      // Geverifieerd zonder vindplaats is een bewering, geen verificatie.
+      expect(c.bron, `${c.merk} ${c.model}`).not.toContain("raming");
+    }
+  });
+
+  it("draagt de gesourcete correcties uit het onderzoeksrapport", () => {
+    // Deze vier cijfers stonden fout in de eerste versie van de catalogus, en de
+    // eerste twee zijn materieel: ze bepalen of de valse-hybridetoets kantelt.
+    // Een test hierop is geen dubbelop met de data, maar de enige plaats waar
+    // staat dat dit een gecontroleerde waarde is en geen tikfout.
+    expect(catalogusPerSlug("bmw-x1-30e")?.co2).toBe(64);
+    expect(catalogusPerSlug("bmw-x3-30e")?.co2).toBe(57);
+    expect(catalogusPerSlug("volvo-xc60-t6")?.co2).toBe(81);
+    expect(catalogusPerSlug("bmw-530e")?.co2).toBe(41);
+    // De bruikbare batterij, niet de bruto: 23,4 van 31,2 kWh.
+    expect(catalogusPerSlug("mercedes-glc-300e")?.batterij_kwh).toBe(23.4);
+    expect(catalogusPerSlug("tesla-model-y")?.cataloguswaarde).toBe(53_990);
+  });
+
+  it("markeert wat het rapport uitdrukkelijk niet kon bevestigen", () => {
+    // Deze vijf zijn geen ramingen bij gebrek aan onderzoek maar bij gebrek aan
+    // bevestiging: verkeerde generatie, verkeerde uitvoering of geen CO₂.
+    for (const slug of ["bmw-ix1", "bmw-ix3", "bmw-x5-50e", "toyota-rav4-phev"]) {
+      const c = catalogusPerSlug(slug);
+      expect(c?.zekerheid, slug).toBe("raming");
+      expect(c?.voorbehoud, slug).toBeTruthy();
+    }
+  });
+
+  it("neemt de restwaarde uit de ranges per aandrijving", () => {
+    // Niet meer per model geraden. Twee wagens met dezelfde aandrijving hebben
+    // daarom dezelfde restwaarde, en die komt uit de gesourcete tabel.
+    for (const c of DEFAULT_CATALOGUS) {
+      expect(c.restwaarde_pct_4j, `${c.merk} ${c.model}`).toBe(
+        restwaardeVoor(c.voertuigtype, c.brandstof),
+      );
+    }
+    const uniek = new Set(DEFAULT_CATALOGUS.map((c) => c.restwaarde_pct_4j));
+    // Vijf aandrijvingen: BEV, PHEV, HEV, benzine en diesel.
+    expect(uniek.size).toBe(5);
   });
 
   it("houdt elke specificatie binnen een realistische band", () => {

@@ -34,7 +34,7 @@ import {
   type EigenModel,
   type EigenModelInvoer,
 } from "@/lib/eigenModellen";
-import { berekenKosten } from "@/lib/fiscaal/kosten";
+import { berekenKosten, restwaardeVoor } from "@/lib/fiscaal/kosten";
 import type { CatalogCar } from "@/lib/fiscaal/types";
 import { formatters } from "@/lib/format";
 import { magSchrijven } from "@/lib/rollen";
@@ -61,7 +61,8 @@ const LEEG: Formulier = {
   zitplaatsen: 5,
   koffer_liter: 450,
   trekgewicht_kg: 0,
-  restwaarde_pct_4j: 45,
+  // De gesourcete range voor een elektrische wagen; zie kosten.ts.
+  restwaarde_pct_4j: restwaardeVoor("BEV", "elektrisch"),
   onderhoudsklasse: "laag",
   uitrusting: [],
   bron: null,
