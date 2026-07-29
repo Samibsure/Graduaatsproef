@@ -80,6 +80,31 @@ gegenereerd uit dezelfde data; een snapshot-test bewaakt dat beide gelijk lopen.
 Lichte vracht staat er bewust niet in: een bestelwagen die als lichte vracht is ingeschreven valt
 buiten de aftrekbeperking van artikel 66 WIB92, en de rekenkern kent die uitzondering nog niet.
 
+### Modelfoto's
+
+Elk model hoort een echte foto te hebben. Heeft het er geen, dan valt `CarImage` terug op een
+eigen SVG-illustratie per carrosserietype: bruikbaar als noodoplossing, maar op een raster van
+dertig kaarten ziet een bezoeker meteen dat het een plaatshouder is.
+
+De foto's staan lokaal in `public/cars`, niet bij een externe dienst: de CSP laat `img-src 'self'`
+toe en niets anders. Ze worden opgehaald door `scripts/wagenfotos.py` van Wikimedia Commons,
+alleen onder een licentie die hergebruik toelaat (publiek domein, CC0, CC BY, CC BY-SA), en
+bijgesneden op 960 × 600 zodat het raster niet schokt van de ene verhouding naar de andere.
+
+```bash
+python3 scripts/wagenfotos.py --check     # welke modellen hebben er nog geen?
+python3 scripts/wagenfotos.py             # de ontbrekende ophalen
+python3 scripts/wagenfotos.py --only bmw-i5 --force   # één model vervangen
+```
+
+Auteur, licentie en bronlink van elke foto staan in `public/cars/BRONNEN.md`. Dat bestand is de
+naamsvermelding die CC BY en CC BY-SA verplichten; het script schrijft het bij elke run opnieuw.
+`catalogusfotos.test.ts` bewaakt de rest: geen pad dat nergens heen wijst, geen externe URL die de
+CSP toch zou blokkeren, geen foto die twee modellen deelt, niets boven 400 kB.
+
+Het script heeft netwerktoegang tot `commons.wikimedia.org` en `upload.wikimedia.org` nodig. In
+een omgeving die alleen GitHub, npm en PyPI doorlaat, faalt het met `403` op de CONNECT.
+
 ### Kostenmodel
 
 `src/lib/fiscaal/kosten.ts` berekent de jaarlijkse autokosten uit de specificaties: energie (met
