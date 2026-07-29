@@ -1,4 +1,4 @@
-import type { CatalogCar, Onderhoudsklasse, Voertuigtype } from "./types";
+import type { CatalogCar, Gewest, Onderhoudsklasse, Voertuigtype } from "./types";
 
 /**
  * Wat een wagen per jaar kost, berekend uit zijn specificaties.
@@ -28,9 +28,14 @@ import type { CatalogCar, Onderhoudsklasse, Voertuigtype } from "./types";
  *
  * Alles wat hier uitkomt, is een vertrekpunt. De gebruiker kan elk bedrag
  * overschrijven met de cijfers uit zijn offerte.
+ *
+ * Voor wie het wettelijke bedrag nodig heeft in plaats van een richtbedrag:
+ * gewesten.ts bouwt de gewestelijke formules wél na, maar geeft geen uitkomst
+ * wanneer het barema ontbreekt. Die twee benaderingen vullen elkaar aan; ze
+ * horen niet door elkaar gebruikt te worden.
  */
 
-export type Gewest = "vlaanderen" | "wallonie" | "brussel";
+export type { Gewest };
 
 export interface KostenParameters {
   /** Brandstof en stroom, in euro. */
@@ -96,7 +101,10 @@ export const KOSTENPARAMETERS: KostenParameters = {
   verzekering_per_10_kw: 22,
 
   verkeersbelasting: {
-    vlaanderen: { BEV: 97, PHEV: 130, HEV: 310, fossiel: 420 },
+    // Vlaanderen publiceerde voor elektrische wagens ingeschreven vanaf 2026 een
+    // tarief van € 69,72 (1 fiscale pk) tot € 87,24 (5 pk). Een bedrijfswagen
+    // zit vrijwel altijd op vijf pk; vandaar dat bedrag als richtwaarde.
+    vlaanderen: { BEV: 87, PHEV: 130, HEV: 310, fossiel: 420 },
     wallonie: { BEV: 84, PHEV: 250, HEV: 350, fossiel: 480 },
     brussel: { BEV: 84, PHEV: 250, HEV: 350, fossiel: 480 },
   },

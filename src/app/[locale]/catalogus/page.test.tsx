@@ -107,8 +107,10 @@ describe("catalogus: het besteljaar", () => {
     expect((keuze as HTMLSelectElement).value).toBe("2026");
 
     // Besteld in 2026 is een diesel meteen 0% aftrekbaar; besteld in 2025 niet.
-    // Dat verschil was tot nu toe volledig onzichtbaar op deze pagina.
+    // Dat verschil was tot nu toe volledig onzichtbaar op deze pagina. In het
+    // overgangsregime van 2025 telt de gramformule: de 320d van 122 g komt op
+    // 120 − 0,5 × 122 = 59% uit, ruim onder het plafond van 75% voor dat jaar.
     await gebruiker.selectOptions(keuze, "2025");
-    await waitFor(() => expect(screen.getAllByText(/75%/).length).toBeGreaterThan(0));
+    await waitFor(() => expect(screen.getAllByText(/59%/).length).toBeGreaterThan(0));
   });
 });
