@@ -51,7 +51,7 @@ BREEDTE, HOOGTE = 960, 600
 
 # Licenties die hergebruik op een publieke site toelaten. De sleutel is het
 # begin van LicenseShortName zoals Commons het teruggeeft.
-GOEDE_LICENTIES = ("cc0", "cc by", "public domain", "pd-", "attribution")
+GOEDE_LICENTIES = ("cc0", "cc by", "public domain", "pd ", "attribution")
 SLECHTE_LICENTIES = ("nc", "nd", "fair use", "non-free")
 
 # Woorden die verraden dat een foto niet toont wat wij nodig hebben: een
@@ -158,7 +158,7 @@ def lees_modellen() -> list[Model]:
     return modellen
 
 
-def haal(url: str, binair: bool = False) -> bytes:
+def haal(url: str) -> bytes:
     """Eén GET via curl, zodat de proxy- en CA-instellingen van de omgeving gelden."""
     opdracht = [
         "curl", "-sS", "--fail", "--location", "--max-time", "60",
@@ -170,7 +170,7 @@ def haal(url: str, binair: bool = False) -> bytes:
     if klaar.returncode != 0:
         melding = klaar.stderr.decode("utf-8", "replace").strip()
         raise RuntimeError(f"ophalen mislukt ({url}): {melding}")
-    return klaar.stdout if binair else klaar.stdout
+    return klaar.stdout
 
 
 def zoek(term: str) -> list[dict]:
@@ -197,12 +197,18 @@ def tekst_uit(meta: dict, sleutel: str) -> str:
 
 
 def licentie_deugt(licentie: str) -> bool:
-    laag = licentie.lower()
-    if any(slecht in laag.split() or slecht in laag for slecht in SLECHTE_LICENTIES):
-        # 'CC BY-NC' en 'CC BY-ND' vallen af, 'CC BY-SA' niet.
-        if "-nc" in laag or "-nd" in laag or laag.startswith("nc") or "non-free" in laag:
-            return False
-    return any(laag.startswith(goed) or goed in laag for goed in GOEDE_LICENTIES)
+    """Mag deze foto op een publieke site staan?
+
+    Eerst weigeren, dan pas toelaten. Anders glipt 'CC BY-NC-SA 4.0' erdoor op
+    het stuk 'CC BY': net de licentie die commercieel gebruik verbiedt, en de
+    applicatie is publiek toegankelijk. 'CC BY-SA' moet er wél door, dus de
+    weigering kijkt naar 'nc' en 'nd' als apart deel, niet als letters.
+    """
+    laag = re.sub(r"[\s_]+", " ", licentie.lower().strip())
+    if re.search(r"(?:^|[\s-])(nc|nd)(?:[\s-]|$)|non ?free|fair use|copyright", laag):
+        return False
+    genormaliseerd = laag.replace("-", " ")
+    return any(genormaliseerd.startswith(goed) or goed in genormaliseerd for goed in GOEDE_LICENTIES)
 
 
 def beoordeel(pagina: dict, model: Model) -> Kandidaat | None:
