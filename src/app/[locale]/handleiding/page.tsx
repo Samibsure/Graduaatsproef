@@ -135,7 +135,7 @@ function HandleidingInhoud() {
               mail: () => (
                 <a
                   href={`mailto:${CONTACT}`}
-                  className="font-bold text-ink underline underline-offset-2 hover:text-gold"
+                  className="font-bold text-ink underline underline-offset-2 hover:text-accent"
                 >
                   {CONTACT}
                 </a>

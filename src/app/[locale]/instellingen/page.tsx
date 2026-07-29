@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useState } from "react";
 import { Melding, Veld, invoerKlasse } from "@/components/AuthKaart";
+import Dialoog from "@/components/Dialoog";
 import Icon from "@/components/Icon";
 import { useSessie } from "@/components/SessieProvider";
 import { Badge, Card, Container, PageHead, SectionTitle } from "@/components/ui";
@@ -50,6 +51,9 @@ export default function InstellingenPagina() {
   const [fout, setFout] = useState<string | null>(null);
   const [bezig, setBezig] = useState(false);
   const [bevestigVerwijderen, setBevestigVerwijderen] = useState("");
+  // Een collega verwijderen ging zonder enige bevestiging, terwijl het bedrijf
+  // verwijderen erom vraagt met de naam intypen. Eén misklik verwijderde iemand.
+  const [teVerwijderenLid, setTeVerwijderenLid] = useState<Teamlid | null>(null);
 
   useEffect(() => {
     if (!sessie) return;
@@ -76,8 +80,27 @@ export default function InstellingenPagina() {
   );
 
   useEffect(() => {
-    herlaad().catch((e) => setFout(String(e)));
+    herlaad().catch((e) => setFout(e instanceof Error ? e.message : String(e)));
   }, [herlaad]);
+
+  /**
+   * Het bedrijf verwijderen kan niet door voerUit(): die herlaadt achteraf het
+   * team, en window.location.href blokkeert niet. De herlading zou dus tegen een
+   * net verwijderd bedrijf draaien en een verwarrende fout tonen bovenop een
+   * geslaagde verwijdering.
+   */
+  async function verwijderBedrijf() {
+    setFout(null);
+    setMelding(null);
+    setBezig(true);
+    try {
+      await verwijderMijnBedrijf();
+      window.location.href = "/";
+    } catch (e) {
+      setFout(e instanceof Error ? e.message : String(e));
+      setBezig(false);
+    }
+  }
 
   async function voerUit(actie: () => Promise<void>, bericht: string) {
     setFout(null);
@@ -117,6 +140,23 @@ export default function InstellingenPagina() {
           <Melding soort="fout">{fout}</Melding>
         </div>
       )}
+
+      <Dialoog
+        open={teVerwijderenLid !== null}
+        titel={t("collegaVerwijderTitel")}
+        tekst={t("collegaVerwijderTekst", {
+          naam: teVerwijderenLid?.volledige_naam ?? t("naamloos"),
+        })}
+        bevestigLabel={t("verwijderen")}
+        annuleerLabel={t("annuleer")}
+        gevaarlijk
+        onBevestig={() => {
+          const lid = teVerwijderenLid;
+          setTeVerwijderenLid(null);
+          if (lid) voerUit(() => verwijderTeamlid(lid.id), t("collegaVerwijderd"));
+        }}
+        onAnnuleer={() => setTeVerwijderenLid(null)}
+      />
 
       <div className="grid gap-6 lg:grid-cols-2">
         <Card className="p-6 sm:p-7">
@@ -201,9 +241,11 @@ export default function InstellingenPagina() {
                     disabled={!isBeheerder}
                     onChange={(e) => zet("boekjaar_start_maand", Number(e.target.value))}
                   >
+                    {/* Maandnamen, zoals de onboarding die al toont. Hier stonden
+                        kale cijfers 1 tot 12, wat niemand als "maart" leest. */}
                     {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
                       <option key={m} value={m}>
-                        {m}
+                        {t(`maand${m}` as "maand1")}
                       </option>
                     ))}
                   </select>
@@ -269,7 +311,7 @@ export default function InstellingenPagina() {
                     </select>
                     <button
                       disabled={bezig}
-                      onClick={() => voerUit(() => verwijderTeamlid(lid.id), t("collegaVerwijderd"))}
+                      onClick={() => setTeVerwijderenLid(lid)}
                       className="text-[13.5px] font-bold text-danger hover:underline"
                     >
                       {t("verwijderen")}
@@ -371,12 +413,7 @@ export default function InstellingenPagina() {
 
           <button
             disabled={bezig || bevestigVerwijderen !== sessie.bedrijf.naam}
-            onClick={() =>
-              voerUit(async () => {
-                await verwijderMijnBedrijf();
-                window.location.href = "/";
-              }, "")
-            }
+            onClick={verwijderBedrijf}
             className="mt-4 inline-flex h-[44px] items-center rounded-[10px] bg-danger px-5 text-[14.5px] font-bold text-white disabled:cursor-not-allowed disabled:opacity-50"
           >
             {t("verwijderKnop")}

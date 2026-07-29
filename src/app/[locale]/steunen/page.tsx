@@ -3,7 +3,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Logomerk } from "@/components/Brand";
 import IbanKopie from "@/components/IbanKopie";
 import Icon from "@/components/Icon";
-import { Badge, Card } from "@/components/ui";
+import { Badge, Card, knopKlassen } from "@/components/ui";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { CONTACT } from "@/lib/contact";
@@ -67,7 +67,7 @@ function SteunenInhoud() {
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
           {kosten.map((k) => (
             <div key={k.naam} className="flex gap-3 rounded-[12px] border border-line p-4">
-              <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-gold-soft text-ink">
+              <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-accent-soft text-ink">
                 <Icon name={k.icon} size={18} />
               </span>
               <div>
@@ -85,11 +85,17 @@ function SteunenInhoud() {
         <p className="mb-5 mt-1.5 max-w-[52em] text-[15px] text-ink-700">{t("hoeIntro")}</p>
 
         {HEEFT_STEUNKANAAL ? (
-          <div className="grid items-start gap-6 lg:grid-cols-2">
+          // Twee kolommen alleen als er ook twee kanalen zijn: één kaart in een
+          // raster van twee laat een leeg halfrond staan.
+          <div
+            className={`grid items-start gap-6 ${
+              STEUN_URL && STEUN_IBAN ? "lg:grid-cols-2" : "max-w-[34em]"
+            }`}
+          >
             {STEUN_URL && (
               <Card className="flex flex-col p-6">
                 <div className="flex items-center gap-2.5">
-                  <span className="inline-flex h-10 w-10 items-center justify-center rounded-[11px] bg-gold-soft text-ink">
+                  <span className="inline-flex h-10 w-10 items-center justify-center rounded-[11px] bg-accent-soft text-ink">
                     <Icon name="coffee" size={21} />
                   </span>
                   <h3 className="m-0 text-[18px] font-bold text-ink">{t("koffieTitel")}</h3>
@@ -99,7 +105,7 @@ function SteunenInhoud() {
                   href={STEUN_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-5 inline-flex h-[46px] items-center gap-2 self-start rounded-[11px] bg-gold px-6 text-[15px] font-bold text-white transition-colors hover:bg-gold-hover"
+                  className={knopKlassen("primair", "md", "mt-5 self-start")}
                 >
                   <Icon name="coffee" size={17} />
                   {t("koffieKnop")}
@@ -110,7 +116,7 @@ function SteunenInhoud() {
             {STEUN_IBAN && (
               <Card className="flex flex-col p-6">
                 <div className="flex items-center gap-2.5">
-                  <span className="inline-flex h-10 w-10 items-center justify-center rounded-[11px] bg-gold-soft text-ink">
+                  <span className="inline-flex h-10 w-10 items-center justify-center rounded-[11px] bg-accent-soft text-ink">
                     <Icon name="piggy-bank" size={21} />
                   </span>
                   <h3 className="m-0 text-[18px] font-bold text-ink">{t("overschrijvingTitel")}</h3>
@@ -208,19 +214,19 @@ function SteunenInhoud() {
           <h2 className="text-lg font-semibold text-ink">{t("kleineLettersTitel")}</h2>
           <ul className="mt-3 space-y-2.5 text-sm leading-relaxed text-ink-700">
             <li className="flex gap-2.5">
-              <span className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full bg-gold" />
+              <span className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
               <span>{t("kleineLetters1")}</span>
             </li>
             <li className="flex gap-2.5">
-              <span className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full bg-gold" />
+              <span className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
               <span>{t("kleineLetters2")}</span>
             </li>
             <li className="flex gap-2.5">
-              <span className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full bg-gold" />
+              <span className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
               <span>{t("kleineLetters3")}</span>
             </li>
             <li className="flex gap-2.5">
-              <span className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full bg-gold" />
+              <span className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
               <span>{t("kleineLetters4")}</span>
             </li>
           </ul>

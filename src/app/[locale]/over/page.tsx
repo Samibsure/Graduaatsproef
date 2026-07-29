@@ -3,10 +3,11 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Logomerk } from "@/components/Brand";
 import Icon from "@/components/Icon";
 import { SteunKaart } from "@/components/Steun";
-import { Badge, Card } from "@/components/ui";
+import { Badge, Card, knopKlassen } from "@/components/ui";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { CONTACT } from "@/lib/contact";
+import { START_HIER_HREF } from "@/lib/navigatie";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: Locale }> }) {
   const { locale } = await params;
@@ -88,7 +89,7 @@ function OverInhoud() {
           <p>{t("verhaal4")}</p>
           <p>{t("verhaal5")}</p>
         </div>
-        <figure className="mt-6 border-l-[3px] border-gold bg-paper px-5 py-4">
+        <figure className="mt-6 border-l-[3px] border-accent bg-paper px-5 py-4">
           <blockquote className="m-0 text-[15px] font-medium leading-relaxed text-ink">
             {t("citaat")}
           </blockquote>
@@ -102,11 +103,11 @@ function OverInhoud() {
           {tijdlijn.map((stap, i) => (
             <li key={stap.titel} className="flex gap-4">
               <div className="flex flex-col items-center">
-                <span className="mt-1 h-3 w-3 shrink-0 rounded-full border-[2.5px] border-gold bg-white" />
+                <span className="mt-1 h-3 w-3 shrink-0 rounded-full border-[2.5px] border-accent bg-white" />
                 {i < tijdlijn.length - 1 && <span className="w-px flex-1 bg-line" />}
               </div>
               <div className={i < tijdlijn.length - 1 ? "pb-6" : ""}>
-                <p className="m-0 text-[12px] font-bold uppercase tracking-[0.12em] text-gold">
+                <p className="m-0 text-[12px] font-bold uppercase tracking-[0.12em] text-accent">
                   {stap.jaar}
                 </p>
                 <p className="m-0 mt-1 text-[16px] font-bold text-ink">{stap.titel}</p>
@@ -147,10 +148,7 @@ function OverInhoud() {
               </li>
             ))}
           </ul>
-          <Link
-            href="/registreren"
-            className="mt-5 inline-block rounded-xl bg-gold px-4 py-2 text-sm font-semibold text-white hover:bg-gold-hover"
-          >
+          <Link href={START_HIER_HREF} className={knopKlassen("primair", "md", "mt-5")}>
             {t("startKnop")}
           </Link>
         </Card>
@@ -159,7 +157,7 @@ function OverInhoud() {
       {/* WIE BOUWT EN ONDERHOUDT DIT */}
       <Card className="overflow-hidden">
         <div className="border-b border-line bg-paper px-6 py-5 sm:px-8">
-          <p className="m-0 text-[12px] font-bold uppercase tracking-[0.14em] text-gold">
+          <p className="m-0 text-[12px] font-bold uppercase tracking-[0.14em] text-accent">
             {t("ekoonEyebrow")}
           </p>
           <h2 className="m-0 mt-1.5 text-[22px] font-bold tracking-[-0.01em] text-ink">
@@ -177,7 +175,7 @@ function OverInhoud() {
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
             {diensten.map((d) => (
               <div key={d.naam} className="flex gap-3 rounded-[12px] border border-line p-4">
-                <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-gold-soft text-ink">
+                <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-accent-soft text-ink">
                   <Icon name={d.icon} size={18} />
                 </span>
                 <div>
@@ -190,7 +188,7 @@ function OverInhoud() {
           <div className="mt-6 flex flex-wrap items-center gap-4">
             <a
               href={`mailto:${CONTACT}`}
-              className="inline-flex h-[46px] items-center gap-2 rounded-[11px] border-[1.5px] border-ink bg-white px-5 text-[15px] font-bold text-ink transition-colors hover:bg-ink hover:text-white"
+              className={knopKlassen("secundair", "md")}
             >
               <Icon name="mail" size={17} />
               {t("ekoonKnop")}

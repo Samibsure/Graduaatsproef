@@ -1,17 +1,35 @@
 import type { Metadata } from "next";
+import { Inter } from "next/font/google";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import "../globals.css";
 import { Wordmerk } from "@/components/Brand";
+import Feedbackknop from "@/components/Feedbackknop";
 import Nav from "@/components/Nav";
 import { SessieProvider } from "@/components/SessieProvider";
 import { SteunKnop } from "@/components/Steun";
 import { Link } from "@/i18n/navigation";
 import { INTL_LOCALE, routing } from "@/i18n/routing";
+import { VOETTEKST_KOLOMMEN } from "@/lib/navigatie";
 import { laadSessie } from "@/lib/sessie";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://autofiscaliteit.com";
+
+/**
+ * Het lettertype wordt tijdens de build opgehaald en mee uitgeleverd vanaf het
+ * eigen domein. Dat is geen detail: de CSP staat `font-src 'self'` toe en zou een
+ * verwijzing naar Google Fonts blokkeren.
+ *
+ * Deze applicatie is één lange kolom cijfers. `tabular-nums` zorgt dat elk cijfer
+ * even breed is, zodat bedragen onder elkaar uitlijnen in plaats van te dansen
+ * bij elke herberekening.
+ */
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter",
+});
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -66,43 +84,24 @@ export default async function RootLayout({
     getTranslations({ locale, namespace: "footer" }),
   ]);
 
-  const kolommen = [
-    {
-      titel: t("navigatie"),
-      links: [
-        { href: "/catalogus", label: t("catalogus") },
-        { href: "/simulator", label: t("simulator") },
-        { href: "/vergelijking", label: t("vergelijking") },
-        { href: "/vloot", label: t("vloot") },
-        { href: "/wagens", label: t("wagensBeheren") },
-      ],
-    },
-    {
-      titel: t("kennis"),
-      links: [
-        { href: "/fiscaal-kader", label: t("fiscaalKader") },
-        { href: "/parameters", label: t("parameters") },
-        { href: "/handleiding", label: t("handleiding") },
-        { href: "/over", label: t("over") },
-        { href: "/steunen", label: t("steunen") },
-      ],
-    },
-    {
-      titel: t("juridisch"),
-      links: [
-        { href: "/privacy", label: t("privacy") },
-        { href: "/voorwaarden", label: t("voorwaarden") },
-      ],
-    },
-  ];
+  // Uit src/lib/navigatie.ts, dezelfde bron als de header. Voordien stond hier
+  // een eigen lijst die stilaan van de header was afgeweken.
+  const kolommen = VOETTEKST_KOLOMMEN.map((kolom) => ({
+    titel: t(kolom.sleutel),
+    links: kolom.links.map((l) => ({ href: l.href, label: t(l.sleutel) })),
+  }));
 
   return (
-    <html lang={INTL_LOCALE[locale]}>
+    <html lang={INTL_LOCALE[locale]} className={inter.variable}>
       <body className="antialiased flex min-h-screen flex-col">
         <NextIntlClientProvider>
           <SessieProvider sessie={sessie}>
             <Nav />
             <main className="flex-1">{children}</main>
+            {/* Op elke pagina bereikbaar. Voor een rekentool is "dit cijfer
+                klopt niet" het waardevolste signaal dat er bestaat, en dat mag
+                niet afhangen van een e-mailadres in een alinea op /over. */}
+            <Feedbackknop />
           </SessieProvider>
 
           <footer className="bs-no-print mt-auto bg-ink text-white/[0.78]">
@@ -111,10 +110,10 @@ export default async function RootLayout({
                 <div className="mb-4">
                   <Wordmerk variant="dark" />
                 </div>
-                <p className="mb-3 text-sm leading-relaxed text-white/[0.62]">{t("intro")}</p>
-                <p className="mb-4 text-xs leading-relaxed text-white/[0.45]">{t("disclaimer")}</p>
+                <p className="mb-3 text-sm leading-relaxed text-white/[0.72]">{t("intro")}</p>
+                <p className="mb-4 text-xs leading-relaxed text-white/[0.62]">{t("disclaimer")}</p>
                 <SteunKnop variant="donker" />
-                <p className="mt-2.5 text-xs leading-relaxed text-white/[0.45]">
+                <p className="mt-2.5 text-xs leading-relaxed text-white/[0.62]">
                   {t("steunSub")}
                 </p>
               </div>
@@ -122,7 +121,7 @@ export default async function RootLayout({
               <div className="flex flex-wrap gap-14">
                 {kolommen.map((kolom) => (
                   <div key={kolom.titel}>
-                    <div className="mb-3.5 text-[11.5px] font-bold uppercase tracking-[0.14em] text-white/[0.45]">
+                    <div className="mb-3.5 text-[11.5px] font-bold uppercase tracking-[0.14em] text-white/[0.62]">
                       {kolom.titel}
                     </div>
                     <div className="flex flex-col gap-2.5">
@@ -142,7 +141,7 @@ export default async function RootLayout({
             </div>
 
             <div className="border-t border-white/[0.08]">
-              <div className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-3 px-6 py-[18px] text-[12.5px] text-white/[0.42]">
+              <div className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-3 px-6 py-[18px] text-[12.5px] text-white/[0.58]">
                 <span>{t("copyright")}</span>
                 <span>{t("gratis")}</span>
               </div>

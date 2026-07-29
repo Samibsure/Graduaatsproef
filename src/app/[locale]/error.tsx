@@ -2,9 +2,8 @@
 
 import { useTranslations } from "next-intl";
 import { useEffect } from "react";
-import { Container } from "@/components/ui";
-import { CONTACT } from "@/lib/contact";
-
+import { Button, Container, knopKlassen } from "@/components/ui";
+import { FEEDBACK_EMAIL } from "@/lib/feedback";
 
 export default function Foutpagina({
   error,
@@ -29,19 +28,31 @@ export default function Foutpagina({
           {t("foutTitel")}
         </h1>
         <p className="mt-3 text-[16.5px] leading-relaxed text-ink-700">
-          {t("foutTekst", { email: CONTACT })}
+          {t("foutTekst", { email: FEEDBACK_EMAIL })}
         </p>
         {error.digest && (
           <p className="mt-2 text-[13px] text-ink-500">
             {t("referentie", { digest: error.digest })}
           </p>
         )}
-        <button
-          onClick={reset}
-          className="mt-8 inline-flex h-[46px] items-center rounded-[11px] bg-ink px-6 text-[15px] font-bold text-white hover:bg-ink-600"
-        >
-          {t("opnieuw")}
-        </button>
+        <div className="mt-8 flex flex-wrap justify-center gap-3">
+          <Button onClick={reset}>{t("opnieuw")}</Button>
+          {/*
+            Het adres stond hier als platte tekst in een alinea, niet eens als
+            link. Op precies de pagina waar iemand een fout ziet, hoort melden
+            één klik te zijn. De feedbackknop zelf leeft in de layout en is hier
+            niet beschikbaar: deze pagina vervangt de inhoud, niet de schil,
+            maar een crash kan ook de knop meeslepen.
+          */}
+          <a
+            href={`mailto:${FEEDBACK_EMAIL}?subject=${encodeURIComponent(t("foutTitel"))}${
+              error.digest ? `&body=${encodeURIComponent(t("referentie", { digest: error.digest }))}` : ""
+            }`}
+            className={knopKlassen("stil", "md")}
+          >
+            {t("meldFout")}
+          </a>
+        </div>
       </div>
     </Container>
   );

@@ -1,5 +1,5 @@
 import { supabase } from "./supabase";
-import { BEDRIJF_VELDEN, type Bedrijf, type Bedrijfsrol } from "./rollen";
+import { type Bedrijfsrol } from "./rollen";
 import { bedrijfSchema, valideer } from "./validatie";
 
 /**
@@ -19,12 +19,12 @@ export type BedrijfsInvoer = {
   boekjaar_start_maand: number;
 };
 
-export async function laadBedrijf(): Promise<Bedrijf> {
-  const { data, error } = await supabase.from("companies").select(BEDRIJF_VELDEN).maybeSingle();
-  if (error) throw new Error(`Bedrijf laden mislukt: ${error.message}`);
-  if (!data) throw new Error("Bedrijf laden mislukt: geen bedrijf gevonden.");
-  return data as unknown as Bedrijf;
-}
+/*
+ * laadBedrijf() en bewaarLogoUrl() stonden hier zonder één enkele aanroeper. Het
+ * bedrijf komt uit laadSessie(), en er is nergens een scherm om een logo te
+ * uploaden. Ongebruikte functies suggereren dat een functionaliteit bestaat;
+ * beter weg dan half.
+ */
 
 /** Lege tekstvelden horen als null in de database, niet als lege string. */
 function leegAlsNull(waarde: string | null | undefined): string | null {
@@ -67,10 +67,6 @@ export async function voltooiOnboarding(invoer: Partial<BedrijfsInvoer>): Promis
     ...valideer(bedrijfSchema, normaliseerBedrijf(invoer)),
     onboarding_voltooid: true,
   });
-}
-
-export async function bewaarLogoUrl(logoUrl: string | null): Promise<void> {
-  await schrijfBedrijf({ logo_url: logoUrl });
 }
 
 /** Past de rol van een collega aan. De policy weigert de eigen rol te wijzigen. */

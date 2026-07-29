@@ -5,13 +5,15 @@ import { useEffect, useMemo, useState } from "react";
 import CarImage from "@/components/CarImage";
 import Icon from "@/components/Icon";
 import { useSessie } from "@/components/SessieProvider";
+import Besteljaartabel from "@/components/Besteljaartabel";
 import Uitfaseringstijdlijn from "@/components/Uitfaseringstijdlijn";
-import { Card, Container, PageHead, StatCard } from "@/components/ui";
+import { Card, Container, PageHead, StatCard, knopKlassen } from "@/components/ui";
 import { Link } from "@/i18n/navigation";
 import { laadCatalogus, laadFiscaleContext } from "@/lib/data";
 import { catalogPreview, geschatteAutokosten } from "@/lib/fiscaal/catalog";
 import { berekenProjectie } from "@/lib/fiscaal/engine";
 import { berekenUitfasering } from "@/lib/fiscaal/uitfasering";
+import { standaardBesteljaren, vergelijkBesteljaren } from "@/lib/fiscaal/besteljaar";
 import type { CatalogCar, FiscaleContext, Vehicle } from "@/lib/fiscaal/types";
 import { formatters } from "@/lib/format";
 
@@ -31,6 +33,7 @@ const JAREN = 4;
  */
 export default function SimulatorPagina() {
   const t = useTranslations("simulator");
+  const tJaar = useTranslations("besteljaar");
   const locale = useLocale();
   const { euro, pct } = formatters(locale);
   const sessie = useSessie();
@@ -44,6 +47,9 @@ export default function SimulatorPagina() {
   const [autokosten, setAutokosten] = useState<number | null>(null);
   const [eigenBijdrage, setEigenBijdrage] = useState(0);
   const [fout, setFout] = useState<string | null>(null);
+  // Zonder deze vlag blijft het skelet draaien wanneer het laden faalt: het
+  // resultaat komt er dan nooit, en het skelet wacht op een resultaat.
+  const [geladen, setGeladen] = useState(false);
 
   useEffect(() => {
     Promise.all([laadFiscaleContext(), laadCatalogus()])
@@ -52,7 +58,8 @@ export default function SimulatorPagina() {
         setCatalogus(k);
         setGekozenId(k[0]?.id ?? null);
       })
-      .catch((e) => setFout(e instanceof Error ? e.message : String(e)));
+      .catch((e) => setFout(e instanceof Error ? e.message : String(e)))
+      .finally(() => setGeladen(true));
   }, []);
 
   const gekozen = catalogus.find((c) => c.id === gekozenId) ?? null;
@@ -79,6 +86,13 @@ export default function SimulatorPagina() {
       projectie,
       eerste: projectie.jaren[0],
       uitfasering: berekenUitfasering(ctx, wagen, startjaar, 2031, { kmoTarief }),
+      besteljaren: vergelijkBesteljaren(
+        ctx,
+        wagen,
+        standaardBesteljaren(startjaar),
+        JAREN,
+        { kmoTarief },
+      ),
     };
   }, [ctx, wagen, startjaar, kmoTarief]);
 
@@ -118,16 +132,21 @@ export default function SimulatorPagina() {
             </label>
 
             <label className="block">
-              <span className="mb-1.5 block text-[13.5px] font-bold text-ink">{t("startjaar")}</span>
+              <span className="mb-1.5 block text-[13.5px] font-bold text-ink">
+                {tJaar("kiesBesteljaar")}
+              </span>
               <select
                 className={invoer}
                 value={startjaar}
                 onChange={(e) => setStartjaar(Number(e.target.value))}
               >
-                {[2025, 2026, 2027, 2028, 2029, 2030].map((j) => (
+                {[2024, 2025, 2026, 2027, 2028, 2029, 2030].map((j) => (
                   <option key={j} value={j}>{j}</option>
                 ))}
               </select>
+              <span className="mt-1 block text-[12.5px] text-ink-500">
+                {tJaar("kiesBesteljaarHint")}
+              </span>
             </label>
 
             <label className="block">
@@ -163,12 +182,16 @@ export default function SimulatorPagina() {
         </Card>
 
         <div>
-          {!resultaat || !gekozen ? (
+          {!geladen ? (
             <div className="grid gap-4 sm:grid-cols-2">
               {[0, 1, 2, 3].map((i) => (
                 <div key={i} className="h-[132px] animate-pulse rounded-[13px] bg-paper" />
               ))}
             </div>
+          ) : !resultaat || !gekozen ? (
+            <Card className="p-10 text-center">
+              <p className="m-0 text-[15px] text-ink-700">{t("geenModel")}</p>
+            </Card>
           ) : (
             <>
               <Card className="mb-6 overflow-hidden">
@@ -177,6 +200,7 @@ export default function SimulatorPagina() {
                     <CarImage
                       type={gekozen.voertuigtype}
                       segment={gekozen.segment}
+                        carrosserie={gekozen.carrosserie}
                       imageUrl={gekozen.image_url}
                       alt={`${gekozen.merk} ${gekozen.model}`}
                       className="h-full w-full object-cover"
@@ -187,7 +211,19 @@ export default function SimulatorPagina() {
                       {gekozen.merk} {gekozen.model}
                     </div>
                     <div className="text-[14px] text-ink-500">
+                      {gekozen.uitvoering ? `${gekozen.uitvoering} · ` : ""}
                       {gekozen.voertuigtype} · {gekozen.co2} g/km · {euro(gekozen.cataloguswaarde)}
+                    </div>
+                    {/* De twee jaartallen die door elkaar liepen, nu uit elkaar
+                        gehaald: waar de cijfers vandaan komen, en waarop
+                        gerekend wordt. */}
+                    <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] text-ink-500">
+                      {gekozen.modeljaar && (
+                        <span className="rounded-full bg-paper px-2.5 py-1 font-bold text-ink-700">
+                          {tJaar("specificaties", { modeljaar: gekozen.modeljaar })}
+                        </span>
+                      )}
+                      <span>{tJaar("gerekendOp", { jaar: startjaar })}</span>
                     </div>
                   </div>
                 </div>
@@ -218,7 +254,15 @@ export default function SimulatorPagina() {
                 <Uitfaseringstijdlijn uitfasering={resultaat.uitfasering} euro={euro} pct={pct} />
               </Card>
 
-              <Card className="border-gold-line bg-gold-soft p-6">
+              <Card className="mb-6 p-6">
+                <h2 className="m-0 mb-2 text-[18px] font-bold text-ink">{tJaar("titel")}</h2>
+                <Besteljaartabel
+                  vergelijking={resultaat.besteljaren}
+                  formatters={{ euro, pct }}
+                />
+              </Card>
+
+              <Card className="border-accent-line bg-accent-soft p-6">
                 <h2 className="m-0 mb-2 text-[18px] font-bold text-ink">
                   {sessie ? t("verderTitelAangemeld") : t("verderTitel")}
                 </h2>
@@ -228,15 +272,12 @@ export default function SimulatorPagina() {
                 <div className="flex flex-wrap gap-3">
                   <Link
                     href={sessie ? "/vergelijking" : "/registreren"}
-                    className="inline-flex h-[44px] items-center gap-2 rounded-[10px] bg-ink px-5 text-[14.5px] font-bold text-white hover:bg-ink-600"
+                    className={knopKlassen("primair", "md")}
                   >
-                    <Icon name="arrow-right" size={16} />
                     {sessie ? t("naarVergelijking") : t("registreren")}
+                    <Icon name="arrow-right" size={16} />
                   </Link>
-                  <Link
-                    href="/fiscaal-kader"
-                    className="inline-flex h-[44px] items-center gap-2 rounded-[10px] border border-line bg-white px-5 text-[14.5px] font-bold text-ink hover:border-ink-500"
-                  >
+                  <Link href="/fiscaal-kader" className={knopKlassen("stil", "md")}>
                     {t("naarKader")}
                   </Link>
                 </div>

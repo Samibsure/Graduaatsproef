@@ -38,6 +38,7 @@ import {
   TrendingDown,
   TriangleAlert,
   Upload,
+  X,
   Zap,
   type LucideIcon,
 } from "lucide-react";
@@ -84,6 +85,7 @@ const MAP: Record<string, LucideIcon> = {
   search: Search,
   "sliders-horizontal": SlidersHorizontal,
   sparkles: Sparkles,
+  x: X,
 };
 
 export default function Icon({
