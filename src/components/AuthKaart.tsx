@@ -1,7 +1,14 @@
 import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
-import { Card } from "@/components/ui";
+import { Card, invoerKlassen, knopKlassen } from "@/components/ui";
 import { Link } from "@/i18n/navigation";
+
+/**
+ * Veld en Melding wonen sinds de opschoning in ui.tsx, samen met de andere
+ * primitieven. Ze blijven hier doorgegeven zodat de authenticatiepagina's alles
+ * uit één import kunnen halen.
+ */
+export { Melding, Veld } from "@/components/ui";
 
 /** Gedeelde omkadering voor de aanmeld-, registratie- en herstelpagina's. */
 export function AuthKaart({
@@ -33,39 +40,8 @@ export function AuthKaart({
   );
 }
 
-export function Veld({
-  label,
-  hint,
-  children,
-}: {
-  label: string;
-  hint?: string;
-  children: ReactNode;
-}) {
-  return (
-    <label className="block">
-      <span className="mb-1.5 block text-[13.5px] font-bold text-ink">{label}</span>
-      {children}
-      {hint && <span className="mt-1 block text-[12.5px] text-ink-500">{hint}</span>}
-    </label>
-  );
-}
+/** Historische namen, nu doorverwezen naar de gedeelde primitieven in ui.tsx. */
+export const invoerKlasse = invoerKlassen;
 
-export function Melding({ soort, children }: { soort: "fout" | "ok"; children: ReactNode }) {
-  const stijl =
-    soort === "fout"
-      ? "border-danger/30 bg-danger/[0.06] text-danger"
-      : "border-emerald-600/30 bg-emerald-50 text-emerald-800";
-  return (
-    <p role="status" className={`rounded-[10px] border px-3.5 py-3 text-[14px] ${stijl}`}>
-      {children}
-    </p>
-  );
-}
-
-export const invoerKlasse = "bs-inp h-[44px] w-full rounded-[10px] px-3.5 text-[15px]";
-
-export const knopKlasse =
-  "inline-flex h-[46px] w-full items-center justify-center gap-2 rounded-[10px] bg-ink px-5 " +
-  "text-[15px] font-bold text-white transition-colors hover:bg-ink-600 " +
-  "disabled:cursor-not-allowed disabled:opacity-60";
+/** De verzendknop van een authenticatieformulier: primair en over de volle breedte. */
+export const knopKlasse = knopKlassen("primair", "md", "w-full");

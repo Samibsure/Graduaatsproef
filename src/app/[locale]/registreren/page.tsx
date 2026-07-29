@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import {
   AuthKaart,
@@ -14,6 +14,7 @@ import { createClient } from "@/lib/supabase/client";
 
 export default function RegistreerPagina() {
   const t = useTranslations("auth");
+  const locale = useLocale();
   const router = useRouter();
   const [naam, setNaam] = useState("");
   const [bedrijfsnaam, setBedrijfsnaam] = useState("");
@@ -42,7 +43,8 @@ export default function RegistreerPagina() {
             bedrijfsnaam: bedrijfsnaam.trim(),
             ondernemingsnummer: ondernemingsnummer.trim(),
           },
-          emailRedirectTo: `${window.location.origin}/auth/callback?verder=/wagens`,
+          emailRedirectTo:
+            `${window.location.origin}/auth/callback?verder=/wagens&taal=${locale}`,
         },
       });
       if (error) throw error;

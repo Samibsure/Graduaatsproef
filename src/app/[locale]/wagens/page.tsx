@@ -2,6 +2,7 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
+import Dialoog from "@/components/Dialoog";
 import Icon from "@/components/Icon";
 import { useSessie } from "@/components/SessieProvider";
 import { Badge, Card, Container, PageHead, TypeDot } from "@/components/ui";
@@ -75,6 +76,10 @@ export default function WagensPagina() {
   const [formulier, setFormulier] = useState<Formulier | null>(null);
   const [bezig, setBezig] = useState(false);
   const [fout, setFout] = useState<string | null>(null);
+  // Zonder deze vlag leest een gebruiker met twintig wagens bij elke paginalading
+  // eerst "nog geen wagens", want de lijst begint leeg.
+  const [geladen, setGeladen] = useState(false);
+  const [teVerwijderen, setTeVerwijderen] = useState<Vehicle | null>(null);
 
   const herlaad = () => laadWagens().then(setWagens);
 
@@ -85,7 +90,8 @@ export default function WagensPagina() {
         setWagens(w);
         setCatalogus(k);
       })
-      .catch((e) => setFout(e instanceof Error ? e.message : String(e)));
+      .catch((e) => setFout(e instanceof Error ? e.message : String(e)))
+      .finally(() => setGeladen(true));
   }, []);
 
   const zet = <K extends keyof Formulier>(veld: K, waarde: Formulier[K]) =>
@@ -119,7 +125,7 @@ export default function WagensPagina() {
   }
 
   async function verwijder(id: string) {
-    if (!confirm(t("verwijderBevestig"))) return;
+    setTeVerwijderen(null);
     setFout(null);
     try {
       await verwijderWagen(id);
@@ -386,20 +392,23 @@ export default function WagensPagina() {
         </div>
       )}
 
+      {/* min-w is hier het hele punt: zonder ondergrens knijpt een tabel met tien
+          kolommen zich op een telefoon tot onleesbaarheid samen in plaats van te
+          schuiven. */}
       <Card className="overflow-x-auto">
-        <table className="w-full text-sm">
+        <table className="w-full min-w-[900px] text-sm">
           <thead className="border-b border-line bg-paper text-left text-xs uppercase tracking-wide text-ink-500">
             <tr>
-              <th className="px-4 py-3">{t("kolomWagen")}</th>
-              <th className="px-4 py-3">{t("kolomCategorie")}</th>
-              <th className="px-4 py-3">{t("kolomBesteld")}</th>
-              <th className="px-4 py-3 text-right">CO₂</th>
-              <th className="px-4 py-3 text-right">{t("kolomCatalogus")}</th>
-              <th className="px-4 py-3 text-right">{t("kolomAftrek")}</th>
-              <th className="px-4 py-3 text-right">{t("kolomVaa")}</th>
-              <th className="px-4 py-3 text-right">{t("kolomVu")}</th>
-              <th className="px-4 py-3 text-right">{t("kolomRsz")}</th>
-              <th className="px-4 py-3" />
+              <th scope="col" className="px-4 py-3">{t("kolomWagen")}</th>
+              <th scope="col" className="px-4 py-3">{t("kolomCategorie")}</th>
+              <th scope="col" className="px-4 py-3">{t("kolomBesteld")}</th>
+              <th scope="col" className="px-4 py-3 text-right">CO₂</th>
+              <th scope="col" className="px-4 py-3 text-right">{t("kolomCatalogus")}</th>
+              <th scope="col" className="px-4 py-3 text-right">{t("kolomAftrek")}</th>
+              <th scope="col" className="px-4 py-3 text-right">{t("kolomVaa")}</th>
+              <th scope="col" className="px-4 py-3 text-right">{t("kolomVu")}</th>
+              <th scope="col" className="px-4 py-3 text-right">{t("kolomRsz")}</th>
+              <th scope="col" className="px-4 py-3" />
             </tr>
           </thead>
           <tbody className="divide-y divide-line">
@@ -432,7 +441,7 @@ export default function WagensPagina() {
                         <button onClick={() => setFormulier({ ...w })} className="mr-3 text-sm font-bold text-ink hover:text-gold">
                           {t("bewerk")}
                         </button>
-                        <button onClick={() => verwijder(w.id)} className="text-sm font-bold text-rose-600 hover:underline">
+                        <button onClick={() => setTeVerwijderen(w)} className="text-sm font-bold text-danger hover:underline">
                           {t("verwijder")}
                         </button>
                       </>
@@ -446,13 +455,24 @@ export default function WagensPagina() {
             {wagens.length === 0 && (
               <tr>
                 <td colSpan={10} className="px-4 py-10 text-center text-ink-500">
-                  {t("leeg")}
+                  {geladen ? t("leeg") : t("laden")}
                 </td>
               </tr>
             )}
           </tbody>
         </table>
       </Card>
+
+      <Dialoog
+        open={teVerwijderen !== null}
+        titel={t("verwijderTitel")}
+        tekst={t("verwijderBevestig")}
+        bevestigLabel={t("verwijder")}
+        annuleerLabel={t("annuleer")}
+        gevaarlijk
+        onBevestig={() => teVerwijderen && verwijder(teVerwijderen.id)}
+        onAnnuleer={() => setTeVerwijderen(null)}
+      />
     </Container>
   );
 }

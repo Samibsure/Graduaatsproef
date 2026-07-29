@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import {
   AuthKaart,
@@ -14,6 +14,7 @@ import { createClient } from "@/lib/supabase/client";
 
 export default function WachtwoordVergetenPagina() {
   const t = useTranslations("auth");
+  const locale = useLocale();
   const [email, setEmail] = useState("");
   const [bezig, setBezig] = useState(false);
   const [fout, setFout] = useState<string | null>(null);
@@ -26,7 +27,9 @@ export default function WachtwoordVergetenPagina() {
     try {
       const supabase = createClient();
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth/callback?verder=/wachtwoord-herstellen`,
+        redirectTo:
+          `${window.location.origin}/auth/callback` +
+          `?verder=/wachtwoord-herstellen&taal=${locale}`,
       });
       if (error) throw error;
       setVerstuurd(true);

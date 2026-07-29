@@ -187,7 +187,31 @@ export interface Vehicle {
   fiscale_pk?: number | null;
 }
 
-/** Referentiemodel uit de wagencatalogus (tabel car_catalog). */
+/** Carrosserievorm. Bepaalt mee het praktische nut en de illustratie. */
+export type Carrosserie =
+  | "hatchback"
+  | "berline"
+  | "break"
+  | "suv"
+  | "mpv"
+  | "coupe"
+  | "bestelwagen";
+
+export type Aandrijving = "voor" | "achter" | "vierwiel";
+
+/** Ruwe indeling van de onderhoudskost, van elektrisch tot zware verbranding. */
+export type Onderhoudsklasse = "laag" | "midden" | "hoog";
+
+/**
+ * Referentiemodel uit de wagencatalogus.
+ *
+ * De eerste elf velden komen overeen met de kolommen van de tabel `car_catalog`
+ * en zijn altijd gevuld. Alles daaronder is optioneel en beschrijft de wagen
+ * zelf: vermogen, verbruik, ruimte, trekgewicht. Optioneel is hier geen
+ * slordigheid maar een noodzaak: rijen die nog uit de databank komen, hebben
+ * die kolommen niet. De ingebouwde catalogus in catalogusdata.ts vult ze wel
+ * allemaal in, en het kostenmodel in kosten.ts rekent ermee.
+ */
 export interface CatalogCar {
   id: number;
   merk: string;
@@ -200,6 +224,45 @@ export interface CatalogCar {
   populariteit_rang: number | null;
   opmerking: string | null;
   image_url: string | null;
+
+  /** Stabiele sleutel, los van het volgnummer. */
+  slug?: string;
+  /** Motorisering of afwerking, bv. "Long Range AWD". */
+  uitvoering?: string | null;
+
+  /**
+   * Het modeljaar waarop deze specificaties slaan. Zonder dit veld staat er
+   * nergens uit welk bouwjaar de CO₂ en de cataloguswaarde komen, terwijl beide
+   * per modeljaar verschillen. `modeljaar_tot` is null zolang het model loopt.
+   */
+  modeljaar?: number | null;
+  modeljaar_tot?: number | null;
+  /** Waar de cijfers vandaan komen, zodat ze na te kijken zijn. */
+  bron?: string | null;
+
+  carrosserie?: Carrosserie | null;
+  aandrijving?: Aandrijving | null;
+  vermogen_kw?: number | null;
+
+  /** l/100 km bij verbranding, kWh/100 km bij een elektrische wagen (WLTP). */
+  verbruik?: number | null;
+  /** Bruikbare batterijcapaciteit in kWh. */
+  batterij_kwh?: number | null;
+  /** Elektrische actieradius in km (WLTP). Bij een PHEV: het elektrische deel. */
+  actieradius_km?: number | null;
+  /** Piekvermogen snelladen in kW. */
+  laadvermogen_dc_kw?: number | null;
+
+  zitplaatsen?: number | null;
+  koffer_liter?: number | null;
+  /** Maximaal geremd trekgewicht in kg. 0 betekent: mag niet trekken. */
+  trekgewicht_kg?: number | null;
+
+  /** Verwachte restwaarde na vier jaar, in procent van de cataloguswaarde. */
+  restwaarde_pct_4j?: number | null;
+  onderhoudsklasse?: Onderhoudsklasse | null;
+  /** Uitrusting die het praktisch nut bepaalt, bv. "trekhaak", "warmtepomp". */
+  uitrusting?: string[];
 }
 
 /** Alle referentiedata die de rekenkern nodig heeft. */

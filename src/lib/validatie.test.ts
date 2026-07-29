@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { bedrijfSchema, leesbareFout, valideer, wagenSchema } from "./validatie";
+import { bedrijfSchema, eigenModelSchema, leesbareFout, valideer, wagenSchema } from "./validatie";
 
 /**
  * Deze tests bewaken dat de grenzen hier dezelfde zijn als de CHECK-constraints
@@ -123,5 +123,62 @@ describe("bedrijfSchema", () => {
   it("weigert een boekjaarmaand buiten 1 tot 12", () => {
     expect(() => valideer(bedrijfSchema, { ...geldigBedrijf, boekjaar_start_maand: 13 })).toThrow();
     expect(() => valideer(bedrijfSchema, { ...geldigBedrijf, boekjaar_start_maand: 0 })).toThrow();
+  });
+});
+
+describe("eigenModelSchema", () => {
+  const geldig = {
+    merk: "Volkswagen",
+    model: "ID.7",
+    voertuigtype: "BEV" as const,
+    brandstof: "elektrisch" as const,
+    co2: 0,
+    cataloguswaarde: 57990,
+  };
+
+  it("aanvaardt een model met alleen de verplichte velden", () => {
+    expect(eigenModelSchema.safeParse(geldig).success).toBe(true);
+  });
+
+  it("weigert een elektrische wagen met uitstoot", () => {
+    // Dit is geen vormfout maar een inhoudelijke: zo'n tikfout glipt anders door
+    // tot in de vergelijking, waar hij een kandidaat onterecht laat verliezen.
+    const r = eigenModelSchema.safeParse({ ...geldig, co2: 120 });
+    expect(r.success).toBe(false);
+    expect(leesbareFout(r.error!)).toContain("co2");
+  });
+
+  it("weigert een verbrandingswagen zonder uitstoot", () => {
+    const r = eigenModelSchema.safeParse({
+      ...geldig,
+      voertuigtype: "fossiel",
+      brandstof: "diesel",
+      co2: 0,
+    });
+    expect(r.success).toBe(false);
+  });
+
+  it("weigert een elektrische wagen op diesel", () => {
+    const r = eigenModelSchema.safeParse({ ...geldig, brandstof: "diesel" });
+    expect(r.success).toBe(false);
+    expect(leesbareFout(r.error!)).toContain("brandstof");
+  });
+
+  it("bewaakt dezelfde grenzen als de CHECK-constraints van migratie 0010", () => {
+    expect(eigenModelSchema.safeParse({ ...geldig, cataloguswaarde: 0 }).success).toBe(false);
+    expect(eigenModelSchema.safeParse({ ...geldig, cataloguswaarde: 1_000_001 }).success).toBe(false);
+    expect(eigenModelSchema.safeParse({ ...geldig, zitplaatsen: 10 }).success).toBe(false);
+    expect(eigenModelSchema.safeParse({ ...geldig, trekgewicht_kg: 4000 }).success).toBe(false);
+    expect(eigenModelSchema.safeParse({ ...geldig, restwaarde_pct_4j: 101 }).success).toBe(false);
+    expect(eigenModelSchema.safeParse({ ...geldig, modeljaar: 1899 }).success).toBe(false);
+    expect(eigenModelSchema.safeParse({ ...geldig, modeljaar: 2026 }).success).toBe(true);
+  });
+
+  it("weigert een onbekende enumwaarde met de naam van het veld", () => {
+    // De CSV-import van de vloot castte enums blind, waarna pas de databank
+    // protesteerde met een constraintnaam. Hier komt de veldnaam mee.
+    const r = eigenModelSchema.safeParse({ ...geldig, carrosserie: "cabrio" });
+    expect(r.success).toBe(false);
+    expect(leesbareFout(r.error!)).toContain("carrosserie");
   });
 });

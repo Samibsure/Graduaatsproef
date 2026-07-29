@@ -1,10 +1,14 @@
 import { describe, expect, it } from "vitest";
 import {
   CSV_KOLOMMEN,
+  MODEL_KOLOMMEN,
   csvSjabloon,
   leesBoolean,
   leesCsv,
   leesGetal,
+  leesUitrusting,
+  modelSjabloon,
+  modellenNaarCsv,
   splitsRegel,
   wagensNaarCsv,
 } from "./csv";
@@ -135,5 +139,41 @@ describe("waarden lezen", () => {
     expect(leesGetal("")).toBeNull();
     expect(leesGetal("abc")).toBeNull();
     expect(leesGetal(undefined)).toBeNull();
+  });
+});
+
+describe("eigen modellen: CSV", () => {
+  it("schrijft de uitrusting als één cel met verticale strepen", () => {
+    const csv = modellenNaarCsv([
+      { merk: "Kia", model: "EV3", co2: 0, uitrusting: ["warmtepomp", "trekhaak"] },
+    ]);
+    const [kop, rij] = csv.split("\r\n");
+    expect(kop.split(";")).toEqual([...MODEL_KOLOMMEN]);
+    // De streep is bewust geen puntkomma: die zou de kolommen breken.
+    expect(rij.split(";")[MODEL_KOLOMMEN.indexOf("uitrusting")]).toBe("warmtepomp|trekhaak");
+  });
+
+  it("leest het eigen sjabloon terug zonder onbekende of ontbrekende kolommen", () => {
+    const gelezen = leesCsv(modelSjabloon(), MODEL_KOLOMMEN);
+    expect(gelezen.onbekendeKolommen).toEqual([]);
+    expect(gelezen.ontbrekendeKolommen).toEqual([]);
+    expect(gelezen.regels).toHaveLength(1);
+    expect(gelezen.regels[0].waarden.merk).toBe("Volkswagen");
+    expect(gelezen.regels[0].waarden.modeljaar).toBe("2026");
+  });
+
+  it("houdt de twee kolomlijsten uit elkaar", () => {
+    // Een vlootbestand door de modellezer halen hoort elke modelkolom als
+    // ontbrekend te melden, niet stilletjes half in te lezen.
+    const gelezen = leesCsv(csvSjabloon(), MODEL_KOLOMMEN);
+    expect(gelezen.ontbrekendeKolommen.length).toBeGreaterThan(0);
+    expect(gelezen.ontbrekendeKolommen).toContain("modeljaar");
+  });
+
+  it("leest uitrusting terug naar een lijst", () => {
+    expect(leesUitrusting("warmtepomp|trekhaak")).toEqual(["warmtepomp", "trekhaak"]);
+    expect(leesUitrusting(" warmtepomp | | trekhaak ")).toEqual(["warmtepomp", "trekhaak"]);
+    expect(leesUitrusting("")).toEqual([]);
+    expect(leesUitrusting(undefined)).toEqual([]);
   });
 });

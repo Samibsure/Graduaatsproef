@@ -2,8 +2,9 @@
 
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
+import Dialoog from "@/components/Dialoog";
 import { useSessie } from "@/components/SessieProvider";
-import { Card, Container, PageHead } from "@/components/ui";
+import { Button, Card, Container, Melding, PageHead } from "@/components/ui";
 import {
   bewaarAftrekRegel,
   bewaarMultiplicator,
@@ -21,20 +22,29 @@ import { PARAM_VELDEN } from "@/lib/parameterVelden";
 
 const TYPES: Voertuigtype[] = ["BEV", "PHEV", "HEV", "fossiel"];
 
-
 export default function BeheerParametersPagina() {
   const t = useTranslations("parameters");
   const sessie = useSessie();
   const [ctx, setCtx] = useState<FiscaleContext | null>(null);
+  const [geladen, setGeladen] = useState(false);
   const [jaar, setJaar] = useState(2026);
   const [melding, setMelding] = useState<string | null>(null);
   const [fout, setFout] = useState<string | null>(null);
   const [bezig, setBezig] = useState(false);
+  const [vraagHerstel, setVraagHerstel] = useState(false);
 
-  const herlaad = () => laadFiscaleContext().then(setCtx);
+  // Strikt: deze pagina schrijft terug wat ze inleest. Zou ze de terugval op de
+  // standaardwaarden krijgen zonder het te merken, dan bewaart ze die over de
+  // echte parameters heen. Zie de toelichting bij laadFiscaleContext.
+  const herlaad = () => laadFiscaleContext({ strikt: true }).then(setCtx);
 
   useEffect(() => {
-    herlaad().catch((e) => setFout(String(e)));
+    herlaad()
+      .catch((e) => {
+        setCtx(null);
+        setFout(e instanceof Error ? e.message : String(e));
+      })
+      .finally(() => setGeladen(true));
   }, []);
 
   const params = ctx?.parameters.find((p) => p.year === jaar) ?? null;
@@ -99,7 +109,7 @@ export default function BeheerParametersPagina() {
   }
 
   async function herstel() {
-    if (!confirm(t("beheerBevestig"))) return;
+    setVraagHerstel(false);
     await doe(async () => {
       await herstelStandaardwaarden();
       await herlaad();
@@ -108,7 +118,8 @@ export default function BeheerParametersPagina() {
 
   // De database weigert schrijfacties van niet-beheerders hoe dan ook; dit
   // voorkomt alleen dat iemand een formulier invult dat toch niet bewaart.
-  if (sessie && !sessie.isPlatformAdmin) {
+  // Let op de afwezige sessie: die betekent "niet aangemeld", niet "beheerder".
+  if (!sessie?.isPlatformAdmin) {
     return (
       <Container className="py-16">
         <PageHead
@@ -116,6 +127,24 @@ export default function BeheerParametersPagina() {
           title={t("geenToegangTitel")}
           sub={t("geenToegangTekst")}
         />
+      </Container>
+    );
+  }
+
+  // Zonder ingelezen context is er niets om te bewerken, en vooral: niets om te
+  // bewaren. Een formulier tonen dat op standaardwaarden staat, nodigt uit om
+  // die over de echte cijfers te schrijven.
+  if (!ctx) {
+    return (
+      <Container className="py-16">
+        <PageHead eyebrow={t("beheerEyebrow")} title={t("beheerTitel")} />
+        {geladen ? (
+          <p role="alert" className="rounded-lg bg-rose-50 px-4 py-3 text-sm text-rose-700">
+            {fout ?? t("beheerNietGeladen")}
+          </p>
+        ) : (
+          <div className="h-32 animate-pulse rounded-[13px] bg-paper" />
+        )}
       </Container>
     );
   }
@@ -128,28 +157,29 @@ export default function BeheerParametersPagina() {
         sub={t("beheerIntro")}
         action={
           <div className="flex gap-3">
-            <button
-              onClick={bewaarAlles}
-              disabled={bezig}
-              className="inline-flex h-[46px] items-center rounded-[11px] bg-gold px-5 text-[14.5px] font-bold text-white transition-colors hover:bg-gold-hover disabled:opacity-50"
-            >
+            <Button onClick={bewaarAlles} disabled={bezig}>
               {bezig ? t("beheerBezig") : t("beheerBewaar")}
-            </button>
-            <button
-              onClick={herstel}
-              disabled={bezig}
-              className="inline-flex h-[46px] items-center rounded-[11px] border-[1.5px] border-line px-5 text-[14.5px] font-bold text-ink transition-colors hover:bg-paper disabled:opacity-50"
-            >
+            </Button>
+            <Button variant="stil" onClick={() => setVraagHerstel(true)} disabled={bezig}>
               {t("beheerHerstel")}
-            </button>
+            </Button>
           </div>
         }
       />
 
-      {melding && (
-        <p className="rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{melding}</p>
-      )}
-      {fout && <p className="rounded-lg bg-rose-50 px-4 py-3 text-sm text-rose-700">{fout}</p>}
+      {melding && <Melding soort="ok">{melding}</Melding>}
+      {fout && <Melding soort="fout">{fout}</Melding>}
+
+      <Dialoog
+        open={vraagHerstel}
+        titel={t("beheerHerstel")}
+        tekst={t("beheerBevestig")}
+        bevestigLabel={t("beheerHerstel")}
+        annuleerLabel={t("beheerAnnuleer")}
+        gevaarlijk
+        onBevestig={herstel}
+        onAnnuleer={() => setVraagHerstel(false)}
+      />
 
       <Card className="p-5">
         <div className="flex items-center justify-between">
@@ -215,9 +245,9 @@ export default function BeheerParametersPagina() {
                 <table className="w-full text-sm">
                   <thead className="border-y border-line bg-paper text-left text-xs uppercase tracking-wide text-slate-500">
                     <tr>
-                      <th className="px-3 py-2">{t("kolomBestelperiode")}</th>
-                      <th className="px-3 py-2">{t("kolomGebruiksjaar")}</th>
-                      <th className="px-3 py-2 text-right">{t("kolomAftrek")}</th>
+                      <th scope="col" className="px-3 py-2">{t("kolomBestelperiode")}</th>
+                      <th scope="col" className="px-3 py-2">{t("kolomGebruiksjaar")}</th>
+                      <th scope="col" className="px-3 py-2 text-right">{t("kolomAftrek")}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">

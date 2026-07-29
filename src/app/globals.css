@@ -20,7 +20,11 @@
   --paper: #f7f8fa;
   --line: #e6e9ed;
   --danger: #a23b34;
+  --danger-soft: #fbeceb;
   --success: #2e7d5b;
+  --success-soft: #e9f4ef;
+  --warning: #8a5a12;
+  --warning-soft: #fdf3e3;
   --grey-200: #e4e4e4;
   --focus-ring: rgba(11, 31, 51, 0.3);
   --accent-hover: #16314c;
@@ -38,6 +42,28 @@
   --color-paper: var(--paper);
   --color-line: var(--line);
   --color-danger: var(--danger);
+
+  /*
+   * De accent-namen wijzen naar dezelfde waarden als de gold-namen hierboven.
+   * Die laatste zijn historisch en misleidend: --gold is teal. Nieuwe code
+   * gebruikt accent; de bestaande gold-klassen blijven werken, zodat er geen
+   * herschrijving van honderd klassennamen nodig is om hier vanaf te raken.
+   */
+  --color-accent: var(--gold);
+  --color-accent-hover: var(--gold-hover);
+  --color-accent-soft: var(--gold-soft);
+  --color-accent-line: var(--gold-line);
+
+  --color-danger-soft: var(--danger-soft);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+
+  /* Drie schaduwniveaus in plaats van drie losse arbitraire waarden. */
+  --shadow-zacht: 0 1px 2px rgba(11, 31, 51, 0.04), 0 4px 14px rgba(11, 31, 51, 0.05);
+  --shadow-diep: 0 14px 36px rgba(11, 31, 51, 0.09);
+  --shadow-zwevend: 0 18px 48px rgba(11, 31, 51, 0.12);
 }
 
 html,
@@ -47,8 +73,18 @@ body {
 
 body {
   background: #ffffff;
-  color: #1a1a1a;
-  font-family: "Trebuchet MS", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--ink-700);
+  font-family: var(--font-inter), "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+
+/*
+ * Bedragen en percentages horen onder elkaar uit te lijnen. Met proportionele
+ * cijfers verspringt een kolom euro's bij elke herberekening, wat het aflezen
+ * van een vergelijkingstabel onnodig moeilijk maakt.
+ */
+table,
+[data-cijfers] {
+  font-variant-numeric: tabular-nums;
 }
 
 /* ---- Animaties ---- */
@@ -75,6 +111,44 @@ body {
 }
 .bs-fade {
   animation: bsFade 0.4s ease both;
+}
+
+/*
+ * Wie beweging heeft uitgezet, krijgt ze niet. Dat is geen smaakkwestie: voor
+ * mensen met vestibulaire klachten veroorzaakt verschuivende inhoud echte
+ * misselijkheid. De inhoud blijft volledig zichtbaar, alleen de aanloop valt weg.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .bs-rise,
+  .bs-fade {
+    animation: none;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ---- Focus ----
+ * Alleen .bs-inp had een zichtbare focusstijl; elke knop en link viel terug op
+ * de browserstandaard, die op de donkere en accentkleurige vlakken van deze site
+ * vaak onzichtbaar is. De ring staat buiten het element, zodat ze de vorm niet
+ * vervormt.
+ */
+:where(a, button, select, summary, [role="button"], [tabindex]):focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Op de donkere voettekst en donkere hero's is een inktkleurige ring onzichtbaar. */
+footer :where(a, button, select, [role="button"]):focus-visible,
+.bg-ink-gradient :where(a, button, select, [role="button"]):focus-visible {
+  outline-color: #ffffff;
 }
 
 /* ---- Navigatie ---- */
@@ -157,17 +231,20 @@ body {
 .bs-cmp-bar:hover {
   opacity: 0.82;
 }
-@media (max-width: 760px) {
-  .bs-cmp-scroll {
-    overflow-x: auto;
-  }
-  .bs-cmp-table .bs-sticky-col {
-    position: sticky;
-    left: 0;
-    z-index: 2;
-    background: #fff;
-    box-shadow: 1px 0 0 var(--line);
-  }
+/*
+ * Onvoorwaardelijk scrollbaar. Stond dit alleen onder 760px, dan liep de tabel
+ * (ongeveer 700px breed plus marges) op een tablet of klein scherm over de rand
+ * zonder schuifbalk: onbereikbare kolommen, geen enkele aanwijzing.
+ */
+.bs-cmp-scroll {
+  overflow-x: auto;
+}
+.bs-cmp-table .bs-sticky-col {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background: #fff;
+  box-shadow: 1px 0 0 var(--line);
 }
 
 /* ---- Metric-switch ---- */

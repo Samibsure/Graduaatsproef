@@ -1,4 +1,5 @@
-import type { Voertuigtype } from "@/lib/fiscaal/types";
+import { useId } from "react";
+import type { Carrosserie, Voertuigtype } from "@/lib/fiscaal/types";
 
 /**
  * Visuele weergave van een wagen. Toont een echte foto wanneer `imageUrl` is
@@ -16,17 +17,24 @@ const accent: Record<Voertuigtype, string> = {
   fossiel: "#ef4444",
 };
 
-const label: Record<Voertuigtype, string> = {
-  BEV: "100% elektrisch",
-  PHEV: "Plug-in hybride",
-  HEV: "Hybride",
-  fossiel: "Brandstof",
-};
-
-function bodyStyle(segment: string | null): BodyStyle {
+/**
+ * De carrosserievorm van de illustratie.
+ *
+ * Hier stond een substring-zoektocht in de Nederlandstalige segmenttekst naar
+ * "suv" en "berline". Elk nieuw segmentwoord werd daardoor zwijgend een
+ * hatchback, en in het Frans of het Engels sowieso. Nu telt het expliciete veld
+ * `carrosserie` van het model; de tekstherkenning blijft alleen als terugval
+ * voor rijen die dat veld niet hebben.
+ */
+function bodyStyle(segment: string | null, carrosserie?: Carrosserie | null): BodyStyle {
+  if (carrosserie) {
+    if (carrosserie === "suv" || carrosserie === "mpv" || carrosserie === "bestelwagen") return "suv";
+    if (carrosserie === "berline" || carrosserie === "break" || carrosserie === "coupe") return "sedan";
+    return "hatchback";
+  }
   const s = (segment ?? "").toLowerCase();
   if (s.includes("suv")) return "suv";
-  if (s.includes("berline")) return "sedan";
+  if (s.includes("berline") || s.includes("saloon")) return "sedan";
   return "hatchback";
 }
 
@@ -69,22 +77,41 @@ function geometrie(style: BodyStyle): CabinGeo {
 export default function CarImage({
   type,
   segment,
+  carrosserie,
   imageUrl,
   alt,
   className = "",
 }: {
   type: Voertuigtype;
   segment: string | null;
+  carrosserie?: Carrosserie | null;
   imageUrl?: string | null;
   alt?: string;
   className?: string;
 }) {
+  // Eén id-voorvoegsel per instantie. De verlopen hadden een id dat alleen van
+  // het type en de vorm afhing, dus stonden er op een catalogusraster tientallen
+  // elementen met hetzelfde id: ongeldige HTML, en de browser mag dan zelf kiezen
+  // welk verloop hij toepast.
+  const uniek = useId().replace(/:/g, "");
+
   if (imageUrl) {
-    // eslint-disable-next-line @next/next/no-img-element
-    return <img src={imageUrl} alt={alt ?? "Wagen"} className={`h-full w-full object-cover ${className}`} />;
+    return (
+      // Bewust geen next/image: de foto's staan lokaal in public/cars en de CSP
+      // laat toch geen externe bron toe, dus de optimalisatielaag levert hier
+      // niets op.
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={imageUrl}
+        // Zonder alt is dit een gat voor een schermlezer; de aanroeper geeft de
+        // wagennaam mee. De vorige terugval was hardgecodeerd Nederlands.
+        alt={alt ?? ""}
+        className={`h-full w-full object-cover ${className}`}
+      />
+    );
   }
 
-  const style = bodyStyle(segment);
+  const style = bodyStyle(segment, carrosserie);
   const g = geometrie(style);
   const kleur = accent[type];
 
@@ -93,21 +120,21 @@ export default function CarImage({
       viewBox="0 0 260 150"
       className={className}
       role="img"
-      aria-label={alt ?? `${type} illustratie`}
+      aria-label={alt ?? type}
       preserveAspectRatio="xMidYMid meet"
     >
       <defs>
-        <linearGradient id={`bg-${type}-${style}`} x1="0" y1="0" x2="0" y2="1">
+        <linearGradient id={`bg-${uniek}`} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor="#ffffff" />
           <stop offset="100%" stopColor="#eef1f5" />
         </linearGradient>
-        <linearGradient id={`body-${type}-${style}`} x1="0" y1="0" x2="0" y2="1">
+        <linearGradient id={`body-${uniek}`} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor="#1d3e5c" />
           <stop offset="100%" stopColor="#0b1f33" />
         </linearGradient>
       </defs>
 
-      <rect x="0" y="0" width="260" height="150" rx="16" fill={`url(#bg-${type}-${style})`} />
+      <rect x="0" y="0" width="260" height="150" rx="16" fill={`url(#bg-${uniek})`} />
 
       {/* grondschaduw */}
       <ellipse cx="130" cy="122" rx="104" ry="9" fill="#0b1f33" opacity="0.08" />
@@ -123,7 +150,7 @@ export default function CarImage({
         width={g.bodyW}
         height={118 - g.bodyTop}
         rx="18"
-        fill={`url(#body-${type}-${style})`}
+        fill={`url(#body-${uniek})`}
       />
       {/* accentlijn per aandrijving */}
       <rect x={g.bodyX + 10} y="104" width={g.bodyW - 20} height="5" rx="2.5" fill={kleur} opacity="0.9" />
@@ -145,8 +172,12 @@ export default function CarImage({
         <Glyph type={type} />
       </g>
 
-      <text x="20" y="142" fontSize="11" fontWeight="600" fill="#0b1f33" opacity="0.7">
-        {label[type]}
+      {/* Het voertuigtype als code (BEV, PHEV, HEV) in plaats van als zin.
+          Hier stond hardgecodeerde Nederlandse tekst ("100% elektrisch",
+          "Plug-in hybride"), die zo op elke kaart verscheen, ook voor
+          Franstalige en Engelstalige bezoekers. */}
+      <text x="20" y="142" fontSize="11" fontWeight="700" fill="#0b1f33" opacity="0.7">
+        {type}
       </text>
     </svg>
   );

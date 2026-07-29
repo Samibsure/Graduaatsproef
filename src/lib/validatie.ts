@@ -68,6 +68,71 @@ export const wagenSchema = z.object({
     },
   );
 
+const CARROSSERIEEN = [
+  "hatchback",
+  "berline",
+  "break",
+  "suv",
+  "mpv",
+  "coupe",
+  "bestelwagen",
+] as const;
+const AANDRIJVINGEN = ["voor", "achter", "vierwiel"] as const;
+const ONDERHOUDSKLASSEN = ["laag", "midden", "hoog"] as const;
+
+/**
+ * Een eigen wagenmodel van een bedrijf.
+ *
+ * Spiegelt de CHECK-constraints van `eigen_modellen` in migratie 0010, om
+ * dezelfde reden als hierboven: de database weigert het toch wel, maar dan met
+ * een constraintnaam in plaats van met de naam van het veld.
+ *
+ * De laatste twee regels zijn geen vormcontrole maar een inhoudelijke: een
+ * elektrische wagen met uitstoot, of een verbrandingswagen zonder, is een
+ * tikfout. Die glipt anders door tot in de vergelijking, waar hij een kandidaat
+ * onterecht laat winnen.
+ */
+export const eigenModelSchema = z
+  .object({
+    merk: z.string().trim().min(1).max(60),
+    model: z.string().trim().min(1).max(80),
+    uitvoering: z.string().trim().max(80).nullable().optional(),
+    voertuigtype: z.enum(VOERTUIGTYPES),
+    brandstof: z.enum(BRANDSTOFFEN),
+    carrosserie: z.enum(CARROSSERIEEN).nullable().optional(),
+    segment: z.string().trim().max(80).nullable().optional(),
+    modeljaar: z.number().int().min(1990).max(2100).nullable().optional(),
+    bron: z.string().trim().max(200).nullable().optional(),
+    co2: z.number().min(0).max(1000),
+    cataloguswaarde: z.number().gt(0).max(1_000_000),
+    vermogen_kw: z.number().gt(0).max(2000).nullable().optional(),
+    aandrijving: z.enum(AANDRIJVINGEN).nullable().optional(),
+    verbruik: z.number().min(0).max(100).nullable().optional(),
+    batterij_kwh: z.number().min(0).max(500).nullable().optional(),
+    actieradius_km: z.number().min(0).max(2000).nullable().optional(),
+    laadvermogen_dc_kw: z.number().min(0).max(1000).nullable().optional(),
+    zitplaatsen: z.number().int().min(1).max(9).nullable().optional(),
+    koffer_liter: z.number().min(0).max(10_000).nullable().optional(),
+    trekgewicht_kg: z.number().min(0).max(3500).nullable().optional(),
+    restwaarde_pct_4j: z.number().min(0).max(100).nullable().optional(),
+    onderhoudsklasse: z.enum(ONDERHOUDSKLASSEN).nullable().optional(),
+    uitrusting: z.array(z.string().trim().max(60)).max(30).optional(),
+    image_url: z.string().trim().max(500).nullable().optional(),
+    opmerking: z.string().trim().max(500).nullable().optional(),
+  })
+  .refine(
+    (m) => m.voertuigtype !== "BEV" || m.co2 === 0,
+    { message: "een volledig elektrische wagen stoot 0 g CO₂/km uit", path: ["co2"] },
+  )
+  .refine(
+    (m) => m.voertuigtype === "BEV" || m.co2 > 0,
+    { message: "een wagen die brandstof verbrandt, stoot meer dan 0 g CO₂/km uit", path: ["co2"] },
+  )
+  .refine(
+    (m) => m.voertuigtype !== "BEV" || m.brandstof === "elektrisch",
+    { message: "een volledig elektrische wagen rijdt op elektriciteit", path: ["brandstof"] },
+  );
+
 export const bedrijfSchema = z.object({
   naam: z.string().trim().min(2).max(120),
   ondernemingsnummer: z.string().trim().max(32).nullable(),

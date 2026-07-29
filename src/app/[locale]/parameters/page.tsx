@@ -99,9 +99,9 @@ export default function ParametersPagina() {
                 <table className="w-full text-sm">
                   <thead className="border-y border-line bg-paper text-left text-xs uppercase tracking-wide text-ink-500">
                     <tr>
-                      <th className="px-3 py-2">{t("kolomBestelperiode")}</th>
-                      <th className="px-3 py-2">{t("kolomGebruiksjaar")}</th>
-                      <th className="px-3 py-2 text-right">{t("kolomAftrek")}</th>
+                      <th scope="col" className="px-3 py-2">{t("kolomBestelperiode")}</th>
+                      <th scope="col" className="px-3 py-2">{t("kolomGebruiksjaar")}</th>
+                      <th scope="col" className="px-3 py-2 text-right">{t("kolomAftrek")}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
