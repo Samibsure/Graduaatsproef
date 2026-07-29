@@ -10,6 +10,7 @@ import { CONTACT } from "@/lib/contact";
 import {
   HEEFT_STEUNKANAAL,
   STEUN_BEGUNSTIGDE,
+  STEUN_BIC,
   STEUN_IBAN,
   STEUN_MEDEDELING,
   STEUN_URL,
@@ -134,6 +135,14 @@ function SteunenInhoud() {
                       <dd className="m-0 mt-0.5 text-[15px] text-ink">{STEUN_BEGUNSTIGDE}</dd>
                     </div>
                   )}
+                  {STEUN_BIC && (
+                    <div>
+                      <dt className="text-[12px] font-bold uppercase tracking-[0.1em] text-ink-500">
+                        {t("bicLabel")}
+                      </dt>
+                      <dd className="m-0 mt-0.5 text-[15px] text-ink">{STEUN_BIC}</dd>
+                    </div>
+                  )}
                   <div>
                     <dt className="text-[12px] font-bold uppercase tracking-[0.1em] text-ink-500">
                       {t("mededelingLabel")}
@@ -141,6 +150,9 @@ function SteunenInhoud() {
                     <dd className="m-0 mt-0.5 text-[15px] text-ink">{STEUN_MEDEDELING}</dd>
                   </div>
                 </dl>
+                <p className="m-0 mt-3 text-[13px] leading-relaxed text-ink-500">
+                  {t("rekeningVoetnoot")}
+                </p>
               </Card>
             )}
           </div>

@@ -10,14 +10,19 @@
  * - een gewone overschrijving, waarbij het rekeningnummer alleen getoond
  *   wordt en er dus niets te verwerken valt.
  *
- * De waarden staan in de omgeving en niet in de broncode: zo blijft een
- * rekeningnummer buiten de repository en kan het wijzigen zonder deployment
- * van nieuwe code. Staat er niets ingevuld, dan blijft de pagina bestaan maar
- * toont ze enkel de manieren om gratis te helpen.
+ * Elke waarde is te overschrijven via de omgeving, zodat een rekeningnummer
+ * kan wijzigen zonder deployment van nieuwe code. De standaardwaarden staan er
+ * wel, om dezelfde reden als bij de Supabase-configuratie: een pagina die om
+ * een bijdrage vraagt en vervolgens niet zegt waarheen, is erger dan geen
+ * pagina. Het rekeningnummer is sowieso publiek, het staat op de site zelf.
+ *
+ * Blijft een waarde leeg, dan verdwijnt het bijbehorende kanaal van de pagina
+ * en blijven alleen de manieren over om gratis te helpen.
  */
 export const STEUN_URL = process.env.NEXT_PUBLIC_DONATIE_URL ?? "";
-export const STEUN_IBAN = process.env.NEXT_PUBLIC_DONATIE_IBAN ?? "";
-export const STEUN_BEGUNSTIGDE = process.env.NEXT_PUBLIC_DONATIE_BEGUNSTIGDE ?? "";
+export const STEUN_IBAN = process.env.NEXT_PUBLIC_DONATIE_IBAN ?? "BE28734065253020";
+export const STEUN_BIC = process.env.NEXT_PUBLIC_DONATIE_BIC ?? "KREDBEBB";
+export const STEUN_BEGUNSTIGDE = process.env.NEXT_PUBLIC_DONATIE_BEGUNSTIGDE ?? "Sami Elhamdaoui";
 export const STEUN_MEDEDELING = process.env.NEXT_PUBLIC_DONATIE_MEDEDELING ?? "Autofiscaliteit";
 
 /** Is er überhaupt een manier om bij te dragen? Zo niet, geen knoppen tonen. */

@@ -107,10 +107,12 @@ raakt elk bestand en de tests, zonder winst voor de gebruiker.
 De applicatie blijft gratis; `/steunen` legt uit wat het draaien kost en biedt twee kanalen aan: een
 externe pagina (Buy Me a Coffee of gelijkaardig) en een gewone overschrijving. Er zit **geen**
 betaalintegratie in de applicatie: er wordt geen enkel betaalgegeven verwerkt of bewaard, het
-rekeningnummer wordt alleen getoond. De waarden staan in de omgeving (`src/lib/steun.ts`), niet in de
-broncode, zodat een rekeningnummer buiten de repository blijft en kan wijzigen zonder deployment.
-Staat er niets ingevuld, dan blijft de pagina bestaan en toont ze enkel de manieren om gratis te
-helpen.
+rekeningnummer wordt alleen getoond. De waarden staan in `src/lib/steun.ts` en zijn elk te
+overschrijven via de omgeving, zodat een rekeningnummer kan wijzigen zonder deployment van nieuwe
+code. Het staat er wel als standaardwaarde: een pagina die om een bijdrage vraagt en vervolgens niet
+zegt waarheen, is erger dan geen pagina, en het nummer is sowieso publiek want het staat op de site
+zelf. Blijft een waarde leeg, dan verdwijnt dat kanaal en blijven alleen de manieren over om gratis
+te helpen.
 
 De vraag komt op vier plaatsen terug en nergens als pop-up of banner: een knop in de voettekst, een
 kaart onderaan `/over`, een regel onderaan `/handleiding` en één regel op `/vergelijking`, pas nadat
@@ -147,6 +149,7 @@ deployment niet afhangt van instellingen in het dashboard.
 | `NEXT_PUBLIC_SITE_URL` | nee | Basis-URL voor metadata, standaard `https://autofiscaliteit.com` |
 | `NEXT_PUBLIC_DONATIE_URL` | nee | Externe donatiepagina (Buy Me a Coffee); leeg laten verbergt die kaart |
 | `NEXT_PUBLIC_DONATIE_IBAN` | nee | Rekeningnummer voor een overschrijving; leeg laten verbergt die kaart |
+| `NEXT_PUBLIC_DONATIE_BIC` | nee | BIC bij het rekeningnummer, voor buitenlandse overschrijvingen |
 | `NEXT_PUBLIC_DONATIE_BEGUNSTIGDE` | nee | Naam van de begunstigde bij het rekeningnummer |
 | `NEXT_PUBLIC_DONATIE_MEDEDELING` | nee | Voorgestelde mededeling, standaard `Autofiscaliteit` |
 
