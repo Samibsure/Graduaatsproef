@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { DEFAULT_CATALOGUS, catalogusPerSlug } from "./catalogusdata";
 import { catalogusMarkdown } from "./catalogusdoc";
 import { wagenSchema } from "../validatie";
-import { catalogNaarWagen } from "./catalog";
+import { catalogNaarWagen, zoekCatalogusmodel } from "./catalog";
 
 /**
  * De catalogus is data, geen code, en juist daarom heeft ze tests nodig: een
@@ -105,5 +105,75 @@ describe("gegenereerde catalogusdocumentatie", () => {
     // zonder het document te vernieuwen, dan faalt deze test. Vernieuwen doe je
     // met `npm test -- -u`.
     await expect(catalogusMarkdown()).toMatchFileSnapshot("../../../docs/catalogus.md");
+  });
+});
+
+describe("zoekCatalogusmodel", () => {
+  const wagen = (merk: string | null, model: string | null, catalog_id: number | null = null) => ({
+    merk,
+    model,
+    catalog_id,
+  });
+
+  it("vindt een model op merk en modelnaam", () => {
+    expect(zoekCatalogusmodel(DEFAULT_CATALOGUS, wagen("Tesla", "Model Y"))?.slug).toBe(
+      "tesla-model-y",
+    );
+  });
+
+  it("vindt een wagen die de uitvoering in het modelveld draagt", () => {
+    // Zo staan de bestaande wagens in de databank: "Golf 1.5 eTSI", terwijl de
+    // catalogus "Golf" heet met uitvoering "1.5 eTSI".
+    expect(zoekCatalogusmodel(DEFAULT_CATALOGUS, wagen("Volkswagen", "Golf 1.5 eTSI"))?.slug).toBe(
+      "vw-golf",
+    );
+  });
+
+  it("kiest de langste treffer, zodat een kortere naam niet voorgaat", () => {
+    const model = zoekCatalogusmodel(DEFAULT_CATALOGUS, wagen("Volkswagen", "ID.7 Tourer Pro S"));
+    expect(model?.slug).toBe("vw-id7-tourer");
+  });
+
+  it("negeert een oud volgnummer dat naar een ander merk wijst", () => {
+    // Het volgnummer verwees naar de tabel car_catalog met vijfentwintig rijen;
+    // in de ingebouwde catalogus staat op datzelfde nummer een andere wagen.
+    // Een foto van een vreemd merk is erger dan geen foto.
+    const model = zoekCatalogusmodel(DEFAULT_CATALOGUS, wagen("Volkswagen", "Bestaat niet", 25));
+    expect(model).toBeNull();
+  });
+
+  it("aanvaardt het volgnummer wel wanneer het merk klopt", () => {
+    const eerste = DEFAULT_CATALOGUS[0];
+    const model = zoekCatalogusmodel(
+      DEFAULT_CATALOGUS,
+      wagen(eerste.merk, "Onbekende uitvoering", eerste.id),
+    );
+    expect(model?.slug).toBe(eerste.slug);
+  });
+
+  it("geeft null voor een wagen zonder merk of model", () => {
+    expect(zoekCatalogusmodel(DEFAULT_CATALOGUS, wagen(null, null))).toBeNull();
+  });
+});
+
+describe("zoekCatalogusmodel bij meerdere uitvoeringen van dezelfde naam", () => {
+  const wagen = (merk: string, model: string) => ({ merk, model, catalog_id: null });
+
+  it("kiest de uitvoering die in de naam van de wagen staat", () => {
+    // De Golf staat twee keer in de catalogus. Het verschil tussen deze twee is
+    // een benzinewagen en een plug-in hybride: een andere CO2, een ander VAA en
+    // een ander aftrekregime.
+    expect(zoekCatalogusmodel(DEFAULT_CATALOGUS, wagen("Volkswagen", "Golf 1.5 eTSI"))?.slug).toBe(
+      "vw-golf",
+    );
+    expect(zoekCatalogusmodel(DEFAULT_CATALOGUS, wagen("Volkswagen", "Golf eHybrid"))?.slug).toBe(
+      "vw-golf-ehybrid",
+    );
+  });
+
+  it("valt terug op de langste modelnaam wanneer geen uitvoering past", () => {
+    expect(zoekCatalogusmodel(DEFAULT_CATALOGUS, wagen("Volkswagen", "ID.7 Tourer 2026"))?.slug).toBe(
+      "vw-id7-tourer",
+    );
   });
 });

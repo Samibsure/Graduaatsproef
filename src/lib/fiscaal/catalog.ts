@@ -161,10 +161,41 @@ export function zoekCatalogusmodel(
   const model = wagen.model?.trim().toLowerCase();
 
   if (merk && model) {
-    const opNaam = catalogus.find(
-      (c) => c.merk.toLowerCase() === merk && c.model.toLowerCase() === model,
-    );
+    const zelfdeMerk = catalogus.filter((c) => c.merk.toLowerCase() === merk);
+
+    const opNaam = zelfdeMerk.find((c) => c.model.toLowerCase() === model);
     if (opNaam) return opNaam;
+
+    /*
+     * Bestaande wagens dragen de uitvoering vaak in het modelveld: "Golf 1.5
+     * eTSI" waar de catalogus "Golf" heet met uitvoering "1.5 eTSI". Een exacte
+     * vergelijking mist die, en dan verdwijnt de foto zonder reden.
+     *
+     * Twee dingen bepalen welke treffer wint, want één modelnaam kan meerdere
+     * uitvoeringen hebben. De Golf staat er twee keer in, als 1.5 eTSI en als
+     * eHybrid; zonder de tweede regel is het toeval welke van de twee je krijgt,
+     * en dat is het verschil tussen een benzinewagen en een plug-in hybride.
+     */
+    const kandidaten = zelfdeMerk
+      .filter((c) => model.startsWith(`${c.model.toLowerCase()} `))
+      .map((c) => {
+        const rest = model.slice(c.model.length).trim();
+        const uitvoering = (c.uitvoering ?? "").toLowerCase();
+        return {
+          model: c,
+          // 1. De uitvoering die in de rest van de naam staat, wint altijd.
+          uitvoeringKlopt: uitvoering !== "" && rest === uitvoering,
+          // 2. Anders de langste modelnaam, zodat "ID.7 Tourer" niet blijft
+          //    hangen op "ID.7".
+          lengte: c.model.length,
+        };
+      })
+      .sort(
+        (a, b) =>
+          Number(b.uitvoeringKlopt) - Number(a.uitvoeringKlopt) || b.lengte - a.lengte,
+      );
+
+    if (kandidaten.length > 0) return kandidaten[0].model;
   }
 
   if (wagen.catalog_id !== null) {

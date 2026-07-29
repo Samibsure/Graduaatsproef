@@ -14,6 +14,7 @@ Het volledige schema van Autofiscaliteit staat in `migrations/`, in volgorde uit
 | `0008_hulpfuncties_afschermen.sql` | `EXECUTE` op de vier RLS-hulpfuncties weg bij `PUBLIC` en `anon` |
 | `0009_profielrechten_afdwingen.sql` | Kolomrechten en een trigger op `profiles`: geen zelfpromotie meer tot beheerder of platformbeheerder |
 | `0010_feedback_en_eigen_modellen.sql` | Tabel `feedback` (iedereen mag melden, alleen een platformbeheerder leest), tabel `eigen_modellen` per bedrijf, en de vreemde sleutel `vehicles.catalog_id` losgekoppeld |
+| `0011_overbodige_tabelrechten_intrekken.sql` | `TRUNCATE`, `TRIGGER` en `REFERENCES` weg bij `anon` en `authenticated`, op elke tabel en voor toekomstige tabellen |
 
 `0005` en `0006` horen bij elkaar maar staan bewust apart: PostgreSQL weigert een nieuwe
 enumwaarde te gebruiken in dezelfde transactie waarin ze is aangemaakt.
@@ -103,22 +104,38 @@ bestaande database kunnen draaien.
    Voor **anon** zijn die meldingen weg sinds `0008`. `handle_new_user()` is en blijft
    afgeschermd: die hoort alleen door de trigger aangeroepen te worden.
 
-## Migratie 0010
+### Status na `0011`
 
-Deze migratie is **niet vereist om de applicatie te laten draaien**. Zolang ze niet is uitgevoerd:
+De migraties `0010` en `0011` zijn uitgevoerd op het project `fkmulfdpuphedfakmmsd`.
+Gecontroleerd met testgebruikers in een teruggedraaide transactie:
 
-- valt het feedbackformulier terug op een vooringevulde e-mail, zonder dat de gebruiker het merkt;
-- blijft de eigen modellenbibliotheek verborgen achter een uitleg in plaats van een foutmelding.
+| Poging | Uitkomst |
+| --- | --- |
+| Bedrijf B leest de eigen modellen van bedrijf A | 0 rijen |
+| Rol `lezer` voegt een eigen model toe | geweigerd |
+| Bezoeker zonder account meldt een fout | werkt |
+| Bezoeker zonder account leest de meldingen | 0 rijen |
+| Elektrische wagen met uitstoot als eigen model | geweigerd door de CHECK |
+| Verbrandingswagen zonder uitstoot als eigen model | geweigerd door de CHECK |
+| Wagen toevoegen zonder `catalog_id`, en daarna bewerken | werkt |
 
-Na het uitvoeren zijn drie dingen het nakijken waard, volgens hetzelfde patroon als bij `0009`:
+Verder: elke tabel in `public` heeft RLS aan, en de enige policy die `anon` laat schrijven is
+`feedback_insert`. Dat is bedoeld: de simulator en de catalogus zijn publiek, dus de fouten die
+daar opvallen komen van bezoekers zonder account. De Security Advisor merkt die policy terecht op
+als `WITH CHECK (true)`; de grens zit in de CHECK-constraint die de lengte van elke melding
+begrenst, niet in de policy. Er is geen snelheidsbegrenzing: wie de publieke sleutel heeft, kan de
+tabel volschrijven. Dat is de prijs van een meldknop zonder drempel.
 
-```sql
--- een lezer mag geen eigen model toevoegen
--- bedrijf B ziet geen enkel model van bedrijf A
--- een gewone update op een wagen slaagt nog (de kolomrechten van 0009)
-select tablename, rowsecurity from pg_tables where schemaname = 'public';
-select tablename, policyname, roles, cmd from pg_policies where schemaname = 'public';
-```
+### Waarom `0011`
+
+`anon` en `authenticated` hadden op élke tabel ook `TRUNCATE`, `TRIGGER` en `REFERENCES` staan.
+Dat zijn de standaardrechten van een nieuw Supabase-project.
+
+`TRUNCATE` is de vervelende: **RLS geldt niet voor TRUNCATE**. Een policy die zegt "alleen rijen
+van je eigen bedrijf" doet daar niets. Uitbuiten kon niet, want PostgREST kent geen TRUNCATE, geen
+enkele functie voert er een uit, en `anon` noch `authenticated` mag iets aanmaken in `public`. Maar
+een recht dat niemand nodig heeft, hoort niet uitgedeeld te zijn, en de dag dat er een
+RPC-functie bijkomt is dit het verschil tussen een fout en een ramp.
 
 ## Wagencatalogus
 
