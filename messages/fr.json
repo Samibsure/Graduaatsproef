@@ -119,7 +119,7 @@
     "verwijderen": "Supprimer",
     "collegaVerwijderd": "Collègue retiré de l'entreprise.",
     "uitnodigen": "Inviter un collègue",
-    "uitnodigenHint": "Il ou elle s'inscrit avec cette adresse e-mail et rejoint automatiquement votre entreprise.",
+    "uitnodigenHint": "Aucun e-mail n'est envoyé : prévenez vous-même votre collègue. S'il s'inscrit avec cette adresse, il rejoint automatiquement votre entreprise.",
     "uitnodigenPlaceholder": "collegue@entreprise.be",
     "uitnodigenKnop": "Inviter",
     "uitnodigingGenoteerd": "Invitation enregistrée.",

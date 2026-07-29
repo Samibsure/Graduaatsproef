@@ -119,7 +119,7 @@
     "verwijderen": "Remove",
     "collegaVerwijderd": "Colleague removed from the company.",
     "uitnodigen": "Invite a colleague",
-    "uitnodigenHint": "They register with this email address and automatically join your company.",
+    "uitnodigenHint": "No email is sent: let your colleague know yourself. If they register with this address, they automatically join your company.",
     "uitnodigenPlaceholder": "colleague@company.be",
     "uitnodigenKnop": "Invite",
     "uitnodigingGenoteerd": "Invitation recorded.",
