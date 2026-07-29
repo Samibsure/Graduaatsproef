@@ -18,6 +18,7 @@ import {
   laadWagens,
   type Evaluatie,
 } from "@/lib/data";
+import { zoekCatalogusmodel } from "@/lib/fiscaal/catalog";
 import { berekenProjectie } from "@/lib/fiscaal/engine";
 import { berekenUitfasering, type Uitfasering } from "@/lib/fiscaal/uitfasering";
 import { CRITERIA, scoreVergelijking } from "@/lib/fiscaal/scoring";
@@ -112,7 +113,7 @@ export default function VergelijkingPagina() {
   const cmp = projecties.map((p) => {
     const j0 = p.jaren[0];
     const score = scores.find((s) => s.vehicleId === p.vehicle.id);
-    const cat = catalogus.find((c) => c.id === p.vehicle.catalog_id) ?? null;
+    const cat = zoekCatalogusmodel(catalogus, p.vehicle);
     return {
       id: p.vehicle.id,
       name: p.vehicle.omschrijving,

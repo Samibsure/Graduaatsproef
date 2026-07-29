@@ -18,13 +18,19 @@ export function geschatteAutokosten(cataloguswaarde: number, voertuigtype: strin
  */
 export function catalogNaarWagen(car: CatalogCar, jaar = 2026): Omit<Vehicle, "id"> {
   return {
-    omschrijving: `${car.merk} ${car.model}`,
+    omschrijving: car.uitvoering
+      ? `${car.merk} ${car.model} ${car.uitvoering}`
+      : `${car.merk} ${car.model}`,
     werknemer: null,
     kenteken: null,
     categorie: "kandidaat",
     merk: car.merk,
     model: car.model,
-    catalog_id: car.id,
+    // Bewust null voor een model uit de ingebouwde catalogus. De kolom
+    // vehicles.catalog_id verwijst naar de tabel car_catalog, die nog maar
+    // vijfentwintig rijen telt; een volgnummer uit de broncode wegschrijven
+    // zou die vreemde sleutel schenden. Terugvinden gebeurt op merk en model.
+    catalog_id: car.slug ? null : car.id,
     voertuigtype: car.voertuigtype,
     brandstof: car.brandstof,
     besteldatum: `${jaar}-01-15`,
@@ -44,5 +50,38 @@ export function catalogNaarWagen(car: CatalogCar, jaar = 2026): Omit<Vehicle, "i
 
 /** Volledig Vehicle-object met tijdelijk id, handig voor preview-berekeningen. */
 export function catalogPreview(car: CatalogCar, jaar = 2026): Vehicle {
-  return { id: `catalog-${car.id}`, ...catalogNaarWagen(car, jaar) };
+  return { id: `catalog-${car.slug ?? car.id}`, ...catalogNaarWagen(car, jaar) };
+}
+
+/**
+ * Zoekt het catalogusmodel dat bij een bewaarde wagen hoort, voor de foto en de
+ * specificaties.
+ *
+ * Merk en model gaan voor op `catalog_id`. Dat volgnummer verwees naar de tabel
+ * car_catalog, die maar vijfentwintig rijen telde; wagens die daarvoor bewaard
+ * zijn, dragen een nummer dat nu naar een ander model zou wijzen. Merk en model
+ * staan wél in de wagen zelf en blijven kloppen.
+ */
+export function zoekCatalogusmodel(
+  catalogus: CatalogCar[],
+  wagen: Pick<Vehicle, "merk" | "model" | "catalog_id">,
+): CatalogCar | null {
+  const merk = wagen.merk?.trim().toLowerCase();
+  const model = wagen.model?.trim().toLowerCase();
+
+  if (merk && model) {
+    const opNaam = catalogus.find(
+      (c) => c.merk.toLowerCase() === merk && c.model.toLowerCase() === model,
+    );
+    if (opNaam) return opNaam;
+  }
+
+  if (wagen.catalog_id !== null) {
+    // Alleen aanvaarden wanneer ook het merk klopt: een oud volgnummer dat
+    // toevallig bestaat, mag geen foto van een vreemde wagen opleveren.
+    const opId = catalogus.find((c) => c.id === wagen.catalog_id);
+    if (opId && (!merk || opId.merk.toLowerCase() === merk)) return opId;
+  }
+
+  return null;
 }

@@ -1,6 +1,7 @@
 import { supabase } from "./supabase";
 import type { CatalogCar, FiscaleContext, Vehicle } from "./fiscaal/types";
 import type { Bestelperiode, DeductionRule, TaxParameters } from "./fiscaal/types";
+import { DEFAULT_CATALOGUS } from "./fiscaal/catalogusdata";
 import { DEFAULT_CONTEXT } from "./fiscaal/defaults";
 import type { ScoreResultaat } from "./fiscaal/scoring";
 import { valideer, wagenSchema } from "./validatie";
@@ -77,14 +78,21 @@ export async function laadWagens(): Promise<Vehicle[]> {
   return data as Vehicle[];
 }
 
-/** Laadt de catalogus met de bekendste bedrijfswagens, gesorteerd op populariteit. */
+/**
+ * De wagencatalogus.
+ *
+ * Komt uit de broncode (`catalogusdata.ts`) en niet meer uit de tabel
+ * `car_catalog`. Die tabel bestond alleen in het productieproject: niet in deze
+ * repository, niet in een migratie. Uitbreiden ging alleen met de hand, een
+ * fout was niet terug te draaien, en viel de databank weg dan viel de catalogus
+ * mee weg: deze functie gooide een fout, waardoor startpagina, catalogus én
+ * simulator tegelijk stukgingen.
+ *
+ * Blijft async, zodat de aanroepers niet hoeven te wijzigen en een latere
+ * databankbron nog altijd kan.
+ */
 export async function laadCatalogus(): Promise<CatalogCar[]> {
-  const { data, error } = await supabase
-    .from("car_catalog")
-    .select("*")
-    .order("populariteit_rang", { ascending: true, nullsFirst: false });
-  if (error) throw new Error(`Catalogus laden mislukt: ${error.message}`);
-  return data as CatalogCar[];
+  return DEFAULT_CATALOGUS;
 }
 
 export async function bewaarWagen(wagen: Omit<Vehicle, "id"> & { id?: string }): Promise<void> {
