@@ -1,3 +1,4 @@
+import { isOntbrekendeTabel } from "./postgrest";
 import { supabase } from "./supabase";
 
 /**
@@ -41,18 +42,6 @@ export interface Feedback {
 
 export type Verzendresultaat = "bewaard" | "geen-tabel";
 
-/**
- * PostgREST meldt een ontbrekende tabel of kolom met een eigen foutcode. Dat is
- * het signaal dat migratie 0010 nog niet is uitgevoerd, en dus het enige geval
- * waarin de e-mailterugval hoort te gelden. Elke andere fout is een echte fout
- * en moet de gebruiker bereiken.
- */
-function isOntbrekendeTabel(code: string | undefined, bericht: string): boolean {
-  // 42P01 = undefined_table, PGRST205 = onbekende tabel in het schemacachegeheugen.
-  if (code === "42P01" || code === "PGRST205" || code === "PGRST204") return true;
-  return /schema cache|does not exist|bestaat niet/i.test(bericht);
-}
-
 export async function verstuurFeedback(melding: Feedback): Promise<Verzendresultaat> {
   const omschrijving = melding.omschrijving.trim();
   if (omschrijving.length < 5) {
@@ -70,7 +59,8 @@ export async function verstuurFeedback(melding: Feedback): Promise<Verzendresult
   });
 
   if (!error) return "bewaard";
-  if (isOntbrekendeTabel(error.code, error.message)) return "geen-tabel";
+  // Migratie 0010 nog niet uitgevoerd: dan gaat de melding per e-mail.
+  if (isOntbrekendeTabel(error)) return "geen-tabel";
   throw new Error(`Melding versturen mislukt: ${error.message}`);
 }
 

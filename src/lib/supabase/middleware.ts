@@ -8,10 +8,11 @@ import { supabaseConfig } from "./env";
  * Routes die aanmelden vereisen, zonder taalvoorvoegsel. Alles wat hier niet in
  * staat, is publiek.
  */
-const AFGESCHERMD = [
+export const AFGESCHERMD = [
   "/wagens",
   "/vergelijking",
   "/vloot",
+  "/modellen",
   "/instellingen",
   "/beheer",
   "/welkom",

@@ -17,6 +17,7 @@ import {
 } from "@/components/ui";
 import { Link, useRouter } from "@/i18n/navigation";
 import { bewaarWagen, laadCatalogus, laadFiscaleContext } from "@/lib/data";
+import { laadEigenModellen } from "@/lib/eigenModellen";
 import { standaardBesteljaren, vergelijkBesteljaren } from "@/lib/fiscaal/besteljaar";
 import { catalogNaarWagen, catalogPreview } from "@/lib/fiscaal/catalog";
 import { berekenJaar } from "@/lib/fiscaal/engine";
@@ -47,6 +48,8 @@ export default function CatalogusPagina() {
 
   const [ctx, setCtx] = useState<FiscaleContext | null>(null);
   const [catalogus, setCatalogus] = useState<CatalogCar[] | null>(null);
+  const [eigen, setEigen] = useState<CatalogCar[]>([]);
+  const [bron, setBron] = useState<"alle" | "eigen">("alle");
   const [besteljaar, setBesteljaar] = useState(2026);
   const [filter, setFilter] = useState<Voertuigtype | "alle">("alle");
   const [merkFilter, setMerkFilter] = useState("alle");
@@ -69,9 +72,19 @@ export default function CatalogusPagina() {
         setCatalogus([]);
         setFout(e instanceof Error ? e.message : String(e));
       });
+
+    // De eigen modellen apart en zonder de pagina op te houden: wie niet
+    // aangemeld is of migratie 0010 nog niet uitvoerde, hoort daar niets van te
+    // merken. De catalogus werkt gewoon.
+    laadEigenModellen()
+      .then((r) => setEigen(r.modellen))
+      .catch(() => setEigen([]));
   }, []);
 
-  const alles = useMemo(() => catalogus ?? [], [catalogus]);
+  const alles = useMemo(
+    () => (bron === "eigen" ? eigen : [...eigen, ...(catalogus ?? [])]),
+    [bron, eigen, catalogus],
+  );
 
   const merken = useMemo(
     () => [...new Set(alles.map((c) => c.merk))].sort((a, b) => a.localeCompare(b)),
@@ -130,7 +143,7 @@ export default function CatalogusPagina() {
   }, [alles, filter, merkFilter, carrosserieFilter, query, sortering, preview]);
 
   // Bij elke wijziging opnieuw vanaf het begin tonen.
-  useEffect(() => setZichtbaar(PER_PAGINA), [filter, merkFilter, carrosserieFilter, query, sortering]);
+  useEffect(() => setZichtbaar(PER_PAGINA), [filter, merkFilter, carrosserieFilter, query, sortering, bron]);
 
   async function voegToe(car: CatalogCar) {
     // De catalogus is bewust publiek: pas bij het toevoegen is een account
@@ -211,6 +224,25 @@ export default function CatalogusPagina() {
           {tJaar("kiesBesteljaarHint")}
         </p>
       </div>
+
+      {eigen.length > 0 && (
+        <div className="mb-5 flex flex-wrap items-center gap-2.5">
+          {(["alle", "eigen"] as const).map((keuze) => (
+            <button
+              key={keuze}
+              onClick={() => setBron(keuze)}
+              data-active={bron === keuze}
+              aria-pressed={bron === keuze}
+              className="bs-chip inline-flex cursor-pointer items-center gap-[7px] rounded-full px-4 py-[9px] text-[14px] font-bold transition-all"
+            >
+              {keuze === "alle" ? t("bronAlle") : t("bronEigen")}
+              <span className="font-bold opacity-55">
+                {keuze === "alle" ? eigen.length + (catalogus?.length ?? 0) : eigen.length}
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
 
       <div className="mb-[26px] flex flex-wrap items-center justify-between gap-[18px] border-b border-line pb-[22px]">
         <div className="flex flex-wrap gap-2.5">

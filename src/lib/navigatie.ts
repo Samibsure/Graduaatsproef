@@ -59,6 +59,7 @@ export const UITLEG_GROEP: NavGroep = {
 export const MEER_GROEP: NavGroep = {
   sleutel: "meer",
   links: [
+    { href: "/modellen", sleutel: "modellen" },
     { href: "/simulator", sleutel: "simulator" },
     { href: "/handleiding", sleutel: "handleiding" },
     { href: "/fiscaal-kader", sleutel: "fiscaalKader" },
@@ -88,6 +89,7 @@ export const VOETTEKST_KOLOMMEN: readonly { sleutel: string; links: readonly Nav
       { href: "/vergelijking", sleutel: "vergelijking" },
       { href: "/vloot", sleutel: "vloot" },
       { href: "/wagens", sleutel: "wagensBeheren" },
+      { href: "/modellen", sleutel: "modellen" },
     ],
   },
   {
