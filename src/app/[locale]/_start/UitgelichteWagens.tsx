@@ -48,6 +48,7 @@ export default function UitgelichteWagens() {
               <CarImage
                 type={car.voertuigtype}
                 segment={car.segment}
+                        carrosserie={car.carrosserie}
                 imageUrl={car.image_url}
                 alt={`${car.merk} ${car.model}`}
                 className="h-full w-full object-cover"

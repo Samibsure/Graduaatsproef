@@ -200,6 +200,7 @@ export default function SimulatorPagina() {
                     <CarImage
                       type={gekozen.voertuigtype}
                       segment={gekozen.segment}
+                        carrosserie={gekozen.carrosserie}
                       imageUrl={gekozen.image_url}
                       alt={`${gekozen.merk} ${gekozen.model}`}
                       className="h-full w-full object-cover"

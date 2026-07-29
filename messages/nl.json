@@ -147,7 +147,22 @@
     "rolUitlegLezer": "Kan alles bekijken, maar niets bewaren of verwijderen.",
     "rolUitlegLid": "Kan wagens en beslissingen beheren.",
     "rolUitlegFiscalist": "Zoals lid, en bedoeld als aanspreekpunt voor de fiscale beoordeling.",
-    "rolUitlegBeheerder": "Kan bovendien het team en de bedrijfsgegevens beheren."
+    "rolUitlegBeheerder": "Kan bovendien het team en de bedrijfsgegevens beheren.",
+    "maand1": "Januari",
+    "maand2": "Februari",
+    "maand3": "Maart",
+    "maand4": "April",
+    "maand5": "Mei",
+    "maand6": "Juni",
+    "maand7": "Juli",
+    "maand8": "Augustus",
+    "maand9": "September",
+    "maand10": "Oktober",
+    "maand11": "November",
+    "maand12": "December",
+    "annuleer": "Annuleren",
+    "collegaVerwijderTitel": "Collega verwijderen",
+    "collegaVerwijderTekst": "{naam} verliest de toegang tot de wagens en de beslissingen van dit bedrijf. Het account zelf blijft bestaan."
   },
   "fouten": {
     "nietGevondenTitel": "Deze pagina bestaat niet",

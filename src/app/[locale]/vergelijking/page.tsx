@@ -589,6 +589,7 @@ export default function VergelijkingPagina() {
                   value: metricDefs[metric].get(c),
                 }))}
                 fmt={metricDefs[metric].fmt}
+                euro={euro}
                 best={metricDefs[metric].best}
                 isPct={metric === "aftrek"}
               />
@@ -658,12 +659,15 @@ export default function VergelijkingPagina() {
 function BarChart({
   items,
   fmt,
+  euro,
   best,
   isPct,
   label,
 }: {
   items: Array<{ short: string; type: string; value: number }>;
   fmt: (v: number) => string;
+  /** De euro-opmaak van de actieve taal, voor de aslabels. */
+  euro: (v: number) => string;
   best: "min" | "max";
   isPct: boolean;
   label: string;
@@ -686,7 +690,9 @@ function BarChart({
   const barW = Math.min(96, slot * 0.46);
   const grid = [0, 1, 2, 3, 4].map((i) => ({
     y: baseY - (i / 4) * plotH,
-    label: isPct ? `${Math.round((maxV * i) / 4)}%` : euroAxis((maxV * i) / 4),
+    // Via de formatters van de actieve taal: hier stond een vaste nl-BE-opmaak,
+    // zodat de as van de grafiek als enige onderdeel niet meevertaalde.
+    label: isPct ? `${Math.round((maxV * i) / 4)}%` : euro(Math.round((maxV * i) / 4)),
   }));
 
   return (
@@ -725,6 +731,4 @@ function BarChart({
   );
 }
 
-function euroAxis(v: number) {
-  return "€ " + Math.round(v).toLocaleString("nl-BE");
-}
+

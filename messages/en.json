@@ -147,7 +147,22 @@
     "rolUitlegLezer": "Can view everything, but cannot save or delete.",
     "rolUitlegLid": "Can manage vehicles and decisions.",
     "rolUitlegFiscalist": "Like member, and intended as the contact for the tax assessment.",
-    "rolUitlegBeheerder": "Can additionally manage the team and company details."
+    "rolUitlegBeheerder": "Can additionally manage the team and company details.",
+    "maand1": "January",
+    "maand2": "February",
+    "maand3": "March",
+    "maand4": "April",
+    "maand5": "May",
+    "maand6": "June",
+    "maand7": "July",
+    "maand8": "August",
+    "maand9": "September",
+    "maand10": "October",
+    "maand11": "November",
+    "maand12": "December",
+    "annuleer": "Cancel",
+    "collegaVerwijderTitel": "Remove colleague",
+    "collegaVerwijderTekst": "{naam} loses access to this company's vehicles and decisions. The account itself stays active."
   },
   "fouten": {
     "nietGevondenTitel": "This page does not exist",

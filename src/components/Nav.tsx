@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useId, useRef, useState } from "react";
 import { Wordmerk } from "@/components/Brand";
 import Icon from "@/components/Icon";
@@ -16,10 +16,17 @@ import {
   type NavLink,
 } from "@/lib/navigatie";
 
-/** Afmelden gebeurt via POST, zodat een prefetch niemand ongewenst uitlogt. */
+/**
+ * Afmelden gebeurt via POST, zodat een prefetch niemand ongewenst uitlogt.
+ *
+ * De taal gaat als parameter mee: /afmelden zit niet onder [locale] en kan ze
+ * dus niet uit het pad afleiden. Zonder deze parameter kwam een Franstalige
+ * gebruiker na het afmelden op de Nederlandstalige startpagina terecht.
+ */
 function AfmeldKnop({ className, label }: { className: string; label: string }) {
+  const taal = useLocale();
   return (
-    <form action="/afmelden" method="post">
+    <form action={`/afmelden?taal=${taal}`} method="post">
       <button type="submit" className={className}>
         {label}
       </button>

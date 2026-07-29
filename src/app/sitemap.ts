@@ -1,11 +1,15 @@
 import type { MetadataRoute } from "next";
 import { routing } from "@/i18n/routing";
+import { voorvoegsel } from "@/lib/taalpad";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://autofiscaliteit.com";
 
 /** Alleen de publieke pagina's; alles achter de aanmelding hoort hier niet. */
 const PUBLIEK = [
   { pad: "", prioriteit: 1 },
+  // De simulator ontbrak hier, terwijl ze publiek is en sinds "Start hier" de
+  // eerste bestemming van elke bezoeker.
+  { pad: "/simulator", prioriteit: 0.95 },
   { pad: "/catalogus", prioriteit: 0.9 },
   { pad: "/fiscaal-kader", prioriteit: 0.8 },
   { pad: "/parameters", prioriteit: 0.7 },
@@ -14,9 +18,6 @@ const PUBLIEK = [
   { pad: "/privacy", prioriteit: 0.3 },
   { pad: "/voorwaarden", prioriteit: 0.3 },
 ];
-
-/** De standaardtaal staat zonder voorvoegsel in de URL. */
-const voorvoegsel = (locale: string) => (locale === routing.defaultLocale ? "" : `/${locale}`);
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return PUBLIEK.flatMap(({ pad, prioriteit }) =>

@@ -147,7 +147,22 @@
     "rolUitlegLezer": "Peut tout consulter, mais rien enregistrer ni supprimer.",
     "rolUitlegLid": "Peut gérer les véhicules et les décisions.",
     "rolUitlegFiscalist": "Comme membre, et prévu comme interlocuteur pour l'évaluation fiscale.",
-    "rolUitlegBeheerder": "Peut en outre gérer l'équipe et les données de l'entreprise."
+    "rolUitlegBeheerder": "Peut en outre gérer l'équipe et les données de l'entreprise.",
+    "maand1": "Janvier",
+    "maand2": "Février",
+    "maand3": "Mars",
+    "maand4": "Avril",
+    "maand5": "Mai",
+    "maand6": "Juin",
+    "maand7": "Juillet",
+    "maand8": "Août",
+    "maand9": "Septembre",
+    "maand10": "Octobre",
+    "maand11": "Novembre",
+    "maand12": "Décembre",
+    "annuleer": "Annuler",
+    "collegaVerwijderTitel": "Retirer le collègue",
+    "collegaVerwijderTekst": "{naam} perd l'accès aux véhicules et aux décisions de cette entreprise. Le compte lui-même reste actif."
   },
   "fouten": {
     "nietGevondenTitel": "Cette page n'existe pas",

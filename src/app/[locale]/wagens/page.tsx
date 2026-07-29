@@ -392,20 +392,23 @@ export default function WagensPagina() {
         </div>
       )}
 
+      {/* min-w is hier het hele punt: zonder ondergrens knijpt een tabel met tien
+          kolommen zich op een telefoon tot onleesbaarheid samen in plaats van te
+          schuiven. */}
       <Card className="overflow-x-auto">
-        <table className="w-full text-sm">
+        <table className="w-full min-w-[900px] text-sm">
           <thead className="border-b border-line bg-paper text-left text-xs uppercase tracking-wide text-ink-500">
             <tr>
-              <th className="px-4 py-3">{t("kolomWagen")}</th>
-              <th className="px-4 py-3">{t("kolomCategorie")}</th>
-              <th className="px-4 py-3">{t("kolomBesteld")}</th>
-              <th className="px-4 py-3 text-right">CO₂</th>
-              <th className="px-4 py-3 text-right">{t("kolomCatalogus")}</th>
-              <th className="px-4 py-3 text-right">{t("kolomAftrek")}</th>
-              <th className="px-4 py-3 text-right">{t("kolomVaa")}</th>
-              <th className="px-4 py-3 text-right">{t("kolomVu")}</th>
-              <th className="px-4 py-3 text-right">{t("kolomRsz")}</th>
-              <th className="px-4 py-3" />
+              <th scope="col" className="px-4 py-3">{t("kolomWagen")}</th>
+              <th scope="col" className="px-4 py-3">{t("kolomCategorie")}</th>
+              <th scope="col" className="px-4 py-3">{t("kolomBesteld")}</th>
+              <th scope="col" className="px-4 py-3 text-right">CO₂</th>
+              <th scope="col" className="px-4 py-3 text-right">{t("kolomCatalogus")}</th>
+              <th scope="col" className="px-4 py-3 text-right">{t("kolomAftrek")}</th>
+              <th scope="col" className="px-4 py-3 text-right">{t("kolomVaa")}</th>
+              <th scope="col" className="px-4 py-3 text-right">{t("kolomVu")}</th>
+              <th scope="col" className="px-4 py-3 text-right">{t("kolomRsz")}</th>
+              <th scope="col" className="px-4 py-3" />
             </tr>
           </thead>
           <tbody className="divide-y divide-line">

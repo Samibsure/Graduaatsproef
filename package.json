@@ -21,7 +21,6 @@
     "next-intl": "^4.13.4",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "recharts": "^3.8.1",
     "zod": "^4.4.3"
   },
   "devDependencies": {

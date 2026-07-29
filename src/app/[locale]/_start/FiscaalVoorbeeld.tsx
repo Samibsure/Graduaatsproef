@@ -65,6 +65,7 @@ export default function FiscaalVoorbeeld() {
               <CarImage
                 type={wagen.voertuigtype}
                 segment={wagen.segment}
+                        carrosserie={wagen.carrosserie}
                 imageUrl={wagen.image_url}
                 alt={`${wagen.merk} ${wagen.model}`}
                 className="h-full w-full object-cover"
