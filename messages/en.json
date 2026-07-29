@@ -156,7 +156,8 @@
     "foutTitel": "Something went wrong",
     "foutTekst": "The page could not be loaded. Try again; if it keeps failing, let us know at {email}.",
     "referentie": "Reference: {digest}",
-    "opnieuw": "Try again"
+    "opnieuw": "Try again",
+    "meldFout": "Report this error"
   },
   "over": {
     "titel": "About",
@@ -794,5 +795,29 @@
     "gerekendOp": "tax calculated on an order placed in {jaar}",
     "kiesBesteljaar": "Order year",
     "kiesBesteljaarHint": "Determines deductibility. Nothing about the car itself changes."
+  },
+  "feedback": {
+    "knop": "Report",
+    "titel": "Spotted something wrong?",
+    "intro": "An error in a calculation, an idea, or simply a question: let us know. Every report gets read.",
+    "soort": "What is it about?",
+    "soort_bug": "Error",
+    "soort_idee": "Idea",
+    "soort_vraag": "Question",
+    "omschrijving": "What is going on?",
+    "omschrijvingHint": "The more concrete, the faster it gets fixed. Which car, which year, which figure was wrong?",
+    "omschrijvingPlaceholder": "For a BMW 330e ordered in 2025, the simulator shows…",
+    "email": "Your email address",
+    "emailHint": "Optional. Only needed if you want a reply.",
+    "privacy": "Sent along: the page you were on, your language, your screen width and your browser. Never data from your fleet or your company profile.",
+    "verstuur": "Send report",
+    "bezig": "Working…",
+    "dank": "Thank you. Your report has arrived.",
+    "perMail": "Reports currently arrive by email. Everything is filled in already; you only have to send.",
+    "openMail": "Open in email",
+    "sluit": "Close",
+    "onderwerpBug": "Autofiscaliteit: error reported",
+    "onderwerpIdee": "Autofiscaliteit: improvement suggested",
+    "onderwerpVraag": "Autofiscaliteit: question"
   }
 }

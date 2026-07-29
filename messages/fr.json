@@ -156,7 +156,8 @@
     "foutTitel": "Quelque chose s'est mal passé",
     "foutTekst": "La page n'a pas pu être chargée. Réessayez ; si le problème persiste, faites-le nous savoir via {email}.",
     "referentie": "Référence : {digest}",
-    "opnieuw": "Réessayer"
+    "opnieuw": "Réessayer",
+    "meldFout": "Signaler cette erreur"
   },
   "over": {
     "titel": "À propos",
@@ -794,5 +795,29 @@
     "gerekendOp": "calcul fiscal basé sur une commande en {jaar}",
     "kiesBesteljaar": "Année de commande",
     "kiesBesteljaarHint": "Détermine la déductibilité. Le véhicule lui-même ne change en rien."
+  },
+  "feedback": {
+    "knop": "Signaler",
+    "titel": "Vous avez vu quelque chose d'incorrect ?",
+    "intro": "Une erreur de calcul, une idée ou simplement une question : faites-le savoir. Chaque signalement est lu.",
+    "soort": "De quoi s'agit-il ?",
+    "soort_bug": "Erreur",
+    "soort_idee": "Idée",
+    "soort_vraag": "Question",
+    "omschrijving": "Que se passe-t-il ?",
+    "omschrijvingHint": "Plus c'est concret, plus vite ce sera résolu. Quel véhicule, quelle année, quel chiffre était faux ?",
+    "omschrijvingPlaceholder": "Pour une BMW 330e commandée en 2025, le simulateur affiche…",
+    "email": "Votre adresse e-mail",
+    "emailHint": "Facultatif. Nécessaire uniquement si vous souhaitez une réponse.",
+    "privacy": "Sont transmis : la page consultée, votre langue, la largeur de votre écran et votre navigateur. Jamais de données de votre flotte ni de votre profil d'entreprise.",
+    "verstuur": "Envoyer le signalement",
+    "bezig": "En cours…",
+    "dank": "Merci. Votre signalement est bien arrivé.",
+    "perMail": "Les signalements arrivent actuellement par e-mail. Tout est déjà rempli ; il ne reste qu'à envoyer.",
+    "openMail": "Ouvrir dans l'e-mail",
+    "sluit": "Fermer",
+    "onderwerpBug": "Autofiscaliteit : erreur signalée",
+    "onderwerpIdee": "Autofiscaliteit : amélioration proposée",
+    "onderwerpVraag": "Autofiscaliteit : question"
   }
 }

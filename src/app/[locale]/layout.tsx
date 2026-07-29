@@ -5,6 +5,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import "../globals.css";
 import { Wordmerk } from "@/components/Brand";
+import Feedbackknop from "@/components/Feedbackknop";
 import Nav from "@/components/Nav";
 import { SessieProvider } from "@/components/SessieProvider";
 import { Link } from "@/i18n/navigation";
@@ -103,6 +104,10 @@ export default async function RootLayout({
           <SessieProvider sessie={sessie}>
             <Nav />
             <main className="flex-1">{children}</main>
+            {/* Op elke pagina bereikbaar. Voor een rekentool is "dit cijfer
+                klopt niet" het waardevolste signaal dat er bestaat, en dat mag
+                niet afhangen van een e-mailadres in een alinea op /over. */}
+            <Feedbackknop />
           </SessieProvider>
 
           <footer className="bs-no-print mt-auto bg-ink text-white/[0.78]">

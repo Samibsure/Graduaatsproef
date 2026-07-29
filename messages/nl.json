@@ -156,7 +156,8 @@
     "foutTitel": "Er liep iets mis",
     "foutTekst": "De pagina kon niet geladen worden. Probeer het opnieuw; blijft het misgaan, laat het ons dan weten via {email}.",
     "referentie": "Referentie: {digest}",
-    "opnieuw": "Opnieuw proberen"
+    "opnieuw": "Opnieuw proberen",
+    "meldFout": "Deze fout melden"
   },
   "over": {
     "titel": "Over",
@@ -794,5 +795,29 @@
     "gerekendOp": "fiscaal gerekend op een bestelling in {jaar}",
     "kiesBesteljaar": "Besteljaar",
     "kiesBesteljaarHint": "Bepaalt de aftrekbaarheid. Aan de wagen zelf verandert er niets."
+  },
+  "feedback": {
+    "knop": "Melden",
+    "titel": "Iets gezien dat niet klopt?",
+    "intro": "Een fout in een berekening, een idee, of gewoon een vraag: laat het weten. Elke melding wordt gelezen.",
+    "soort": "Waarover gaat het?",
+    "soort_bug": "Fout",
+    "soort_idee": "Idee",
+    "soort_vraag": "Vraag",
+    "omschrijving": "Wat is er aan de hand?",
+    "omschrijvingHint": "Hoe concreter, hoe sneller het opgelost raakt. Welke wagen, welk jaar, welk cijfer klopte niet?",
+    "omschrijvingPlaceholder": "Bij een BMW 330e besteld in 2025 toont de simulator …",
+    "email": "Je e-mailadres",
+    "emailHint": "Optioneel. Alleen nodig als je een antwoord wil.",
+    "privacy": "Meegestuurd: de pagina waarop je stond, je taal, je schermbreedte en je browser. Nooit gegevens uit je vloot of je bedrijfsprofiel.",
+    "verstuur": "Melding versturen",
+    "bezig": "Bezig…",
+    "dank": "Bedankt. Je melding is aangekomen.",
+    "perMail": "De meldingen komen op dit moment per e-mail binnen. Alles staat al ingevuld; je hoeft alleen te versturen.",
+    "openMail": "Openen in e-mail",
+    "sluit": "Sluiten",
+    "onderwerpBug": "Autofiscaliteit: fout gemeld",
+    "onderwerpIdee": "Autofiscaliteit: verbetering voorgesteld",
+    "onderwerpVraag": "Autofiscaliteit: vraag"
   }
 }
