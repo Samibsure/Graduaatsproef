@@ -1,6 +1,43 @@
 export type Voertuigtype = "BEV" | "PHEV" | "HEV" | "fossiel";
 export type Brandstof = "elektrisch" | "diesel" | "benzine" | "lpg" | "cng";
 
+/** De drie gewesten. Bepalen de BIV, de verkeersbelasting en het CREG-laadtarief. */
+export type Gewest = "vlaanderen" | "wallonie" | "brussel";
+
+/**
+ * Euronorm van het voertuig. Bepaalt de luchtcomponent in de BIV, de toegang
+ * tot de lage-emissiezones en de drempel voor een valse hybride.
+ */
+export type Euronorm =
+  | "euro0"
+  | "euro1"
+  | "euro2"
+  | "euro3"
+  | "euro4"
+  | "euro5"
+  | "euro6"
+  | "euro6d"
+  | "euro6e"
+  | "euro6e-bis"
+  | "euro6e-ter"
+  | "euro7";
+
+/** Euronormen van oud naar nieuw. De index is de enige zinvolle ordening. */
+export const EURONORMEN: Euronorm[] = [
+  "euro0",
+  "euro1",
+  "euro2",
+  "euro3",
+  "euro4",
+  "euro5",
+  "euro6",
+  "euro6d",
+  "euro6e",
+  "euro6e-bis",
+  "euro6e-ter",
+  "euro7",
+];
+
 /**
  * Methode voor de BTW-aftrek op autokosten (circulaire E.T. 119.650).
  * `geen` betekent dat er geen BTW teruggevorderd wordt; dat is de standaard,
@@ -113,6 +150,41 @@ export interface Vehicle {
 
   /** Einde van het lease- of financieringscontract, voor de vervangplanner. */
   einde_contract?: string | null;
+
+  /**
+   * Verkeersboetes over het jaar. Een verworpen uitgave (art. 53 WIB92): niet
+   * aftrekbaar, ongeacht het aftrekpercentage van de wagen.
+   */
+  kosten_boetes?: number | null;
+
+  /**
+   * Brandstofkosten binnen de jaarlijkse autokosten. Enkel van belang bij een
+   * plug-inhybride: dat deel kent een eigen plafond van 50%, en vanaf 2028 nul.
+   */
+  kosten_brandstof?: number | null;
+
+  /**
+   * De CO2-uitstoot staat niet op het gelijkvormigheidsattest. De gramformule
+   * valt dan terug op 40% en de RSZ-bijdrage op de forfaitaire waarde.
+   */
+  co2_onbekend?: boolean | null;
+
+  /** Energiecapaciteit van de batterij in kWh. Nodig voor de valse-hybridetoets. */
+  batterij_kwh?: number | null;
+  /** Wagengewicht in kg. Nodig voor de valse-hybridetoets (kWh per 100 kg). */
+  wagengewicht?: number | null;
+  /** Euronorm, voor de CO2-drempel bij PHEV's, de BIV en de lage-emissiezones. */
+  euronorm?: Euronorm | null;
+  /**
+   * CO2 van het overeenstemmende niet-plug-in model. Wordt gebruikt wanneer de
+   * wagen een valse hybride is; ontbreekt die waarde, dan geldt CO2 × 2,5.
+   */
+  co2_equivalent?: number | null;
+
+  /** Gewest van de titularis. Bepaalt BIV, verkeersbelasting en laadtarief. */
+  gewest?: Gewest | null;
+  /** Fiscale pk, voor de verkeersbelasting en de Brusselse BIV. */
+  fiscale_pk?: number | null;
 }
 
 /** Referentiemodel uit de wagencatalogus (tabel car_catalog). */
@@ -135,6 +207,29 @@ export interface FiscaleContext {
   parameters: TaxParameters[];
   periodes: Bestelperiode[];
   regels: DeductionRule[];
+}
+
+/**
+ * De jaarlijkse kosten opgesplitst naar het aftrekregime dat erop van toepassing
+ * is. Zie `kostenBasis` in engine.ts voor de regels per post.
+ */
+export interface Kostenverdeling {
+  /** Teruggevorderde BTW op de autokosten. Geen kost meer, dus vooraf afgetrokken. */
+  btwTeruggevorderd: number;
+  /** Kosten die het aftrekpercentage van de wagen zelf volgen. */
+  kostenWagen: number;
+  /** Laadstroom. Volgt het afbouwpad van de elektrische wagens. */
+  kostenElektriciteit: number;
+  /** Brandstofdeel van een plug-inhybride. Eigen plafond van 50%, nul vanaf 2028. */
+  kostenBrandstofPhev: number;
+  /** Intrest en laadpaal: buiten de aftrekbeperking, dus volledig aftrekbaar. */
+  kostenVolledigAftrekbaar: number;
+  /** Verkeersboetes: nooit aftrekbaar. */
+  kostenNietAftrekbaar: number;
+  /** Alles waarop een aftrekbeperking speelt: wagen + laadstroom + PHEV-brandstof. */
+  kostenOnderworpen: number;
+  /** Alle kosten samen, na BTW-teruggave. */
+  kostenTotaal: number;
 }
 
 /** Resultaat van de fiscale berekening voor één gebruiksjaar. */
@@ -164,6 +259,12 @@ export interface JaarResultaat {
   kostenOnderworpen: number;
   /** Kosten die daarbuiten vallen en dus volledig aftrekbaar zijn. */
   kostenVolledigAftrekbaar: number;
+  /** De volledige opsplitsing per kostensoort, voor de detailweergave. */
+  kostenverdeling: Kostenverdeling;
+  /** Aftrekpercentage op de laadstroom. Wijkt af bij een plug-inhybride. */
+  aftrekPctElektriciteit: number;
+  /** Aftrekpercentage op het brandstofdeel van een plug-inhybride. */
+  aftrekPctBrandstof: number;
 }
 
 export interface Projectie {

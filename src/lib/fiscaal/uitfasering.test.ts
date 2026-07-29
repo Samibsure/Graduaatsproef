@@ -48,10 +48,12 @@ const diesel: Vehicle = {
 describe("uitfaseringstijdlijn", () => {
   it("wijst het jaar aan waarin de aftrek van de diesel daalt", () => {
     const u = berekenUitfasering(ctx, diesel, 2025, 2029);
-    expect(u.jaren.map((j) => j.aftrekPct)).toEqual([75, 50, 25, 0, 0]);
+    // 135 g diesel geeft 52,5% via de gramformule. Die blijft gelden zolang ze
+    // onder het plafond van het jaar zit; vanaf 2026 knijpt het plafond dicht.
+    expect(u.jaren.map((j) => j.aftrekPct)).toEqual([52.5, 50, 25, 0, 0]);
     expect(u.eersteDaling).toBe(2026);
     expect(u.eersteNulJaar).toBe(2028);
-    expect(u.aftrekStart).toBe(75);
+    expect(u.aftrekStart).toBe(52.5);
     expect(u.aftrekEinde).toBe(0);
   });
 
@@ -63,9 +65,9 @@ describe("uitfaseringstijdlijn", () => {
   it("toont de toename van de fiscale meerkost, het bedrag van de waarschuwing", () => {
     const u = berekenUitfasering(ctx, diesel, 2025, 2029);
     expect(u.meerkostToename).toBeGreaterThan(0);
-    // Van 75% naar 0% aftrek op € 9.200 kosten is 0,75 × 9.200 extra verworpen
-    // uitgaven, tegen 25% VenB. De RSZ-multiplicator stijgt bovendien mee.
-    expect(u.meerkostToename).toBeGreaterThan(0.25 * 0.75 * 9200);
+    // Van 52,5% naar 0% aftrek op € 9.200 kosten is 0,525 × 9.200 extra
+    // verworpen uitgaven, tegen 25% VenB. De RSZ-multiplicator stijgt mee.
+    expect(u.meerkostToename).toBeGreaterThan(0.25 * 0.525 * 9200);
   });
 
   it("laat een BEV besteld vóór 2027 vlak lopen, zonder waarschuwing", () => {
