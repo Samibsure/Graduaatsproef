@@ -21,20 +21,28 @@ import { PARAM_VELDEN } from "@/lib/parameterVelden";
 
 const TYPES: Voertuigtype[] = ["BEV", "PHEV", "HEV", "fossiel"];
 
-
 export default function BeheerParametersPagina() {
   const t = useTranslations("parameters");
   const sessie = useSessie();
   const [ctx, setCtx] = useState<FiscaleContext | null>(null);
+  const [geladen, setGeladen] = useState(false);
   const [jaar, setJaar] = useState(2026);
   const [melding, setMelding] = useState<string | null>(null);
   const [fout, setFout] = useState<string | null>(null);
   const [bezig, setBezig] = useState(false);
 
-  const herlaad = () => laadFiscaleContext().then(setCtx);
+  // Strikt: deze pagina schrijft terug wat ze inleest. Zou ze de terugval op de
+  // standaardwaarden krijgen zonder het te merken, dan bewaart ze die over de
+  // echte parameters heen. Zie de toelichting bij laadFiscaleContext.
+  const herlaad = () => laadFiscaleContext({ strikt: true }).then(setCtx);
 
   useEffect(() => {
-    herlaad().catch((e) => setFout(String(e)));
+    herlaad()
+      .catch((e) => {
+        setCtx(null);
+        setFout(e instanceof Error ? e.message : String(e));
+      })
+      .finally(() => setGeladen(true));
   }, []);
 
   const params = ctx?.parameters.find((p) => p.year === jaar) ?? null;
@@ -108,7 +116,8 @@ export default function BeheerParametersPagina() {
 
   // De database weigert schrijfacties van niet-beheerders hoe dan ook; dit
   // voorkomt alleen dat iemand een formulier invult dat toch niet bewaart.
-  if (sessie && !sessie.isPlatformAdmin) {
+  // Let op de afwezige sessie: die betekent "niet aangemeld", niet "beheerder".
+  if (!sessie?.isPlatformAdmin) {
     return (
       <Container className="py-16">
         <PageHead
@@ -116,6 +125,24 @@ export default function BeheerParametersPagina() {
           title={t("geenToegangTitel")}
           sub={t("geenToegangTekst")}
         />
+      </Container>
+    );
+  }
+
+  // Zonder ingelezen context is er niets om te bewerken, en vooral: niets om te
+  // bewaren. Een formulier tonen dat op standaardwaarden staat, nodigt uit om
+  // die over de echte cijfers te schrijven.
+  if (!ctx) {
+    return (
+      <Container className="py-16">
+        <PageHead eyebrow={t("beheerEyebrow")} title={t("beheerTitel")} />
+        {geladen ? (
+          <p role="alert" className="rounded-lg bg-rose-50 px-4 py-3 text-sm text-rose-700">
+            {fout ?? t("beheerNietGeladen")}
+          </p>
+        ) : (
+          <div className="h-32 animate-pulse rounded-[13px] bg-paper" />
+        )}
       </Container>
     );
   }

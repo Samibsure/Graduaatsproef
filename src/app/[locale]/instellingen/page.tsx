@@ -76,8 +76,27 @@ export default function InstellingenPagina() {
   );
 
   useEffect(() => {
-    herlaad().catch((e) => setFout(String(e)));
+    herlaad().catch((e) => setFout(e instanceof Error ? e.message : String(e)));
   }, [herlaad]);
+
+  /**
+   * Het bedrijf verwijderen kan niet door voerUit(): die herlaadt achteraf het
+   * team, en window.location.href blokkeert niet. De herlading zou dus tegen een
+   * net verwijderd bedrijf draaien en een verwarrende fout tonen bovenop een
+   * geslaagde verwijdering.
+   */
+  async function verwijderBedrijf() {
+    setFout(null);
+    setMelding(null);
+    setBezig(true);
+    try {
+      await verwijderMijnBedrijf();
+      window.location.href = "/";
+    } catch (e) {
+      setFout(e instanceof Error ? e.message : String(e));
+      setBezig(false);
+    }
+  }
 
   async function voerUit(actie: () => Promise<void>, bericht: string) {
     setFout(null);
@@ -371,12 +390,7 @@ export default function InstellingenPagina() {
 
           <button
             disabled={bezig || bevestigVerwijderen !== sessie.bedrijf.naam}
-            onClick={() =>
-              voerUit(async () => {
-                await verwijderMijnBedrijf();
-                window.location.href = "/";
-              }, "")
-            }
+            onClick={verwijderBedrijf}
             className="mt-4 inline-flex h-[44px] items-center rounded-[10px] bg-danger px-5 text-[14.5px] font-bold text-white disabled:cursor-not-allowed disabled:opacity-50"
           >
             {t("verwijderKnop")}

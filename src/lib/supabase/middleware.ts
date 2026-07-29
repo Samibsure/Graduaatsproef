@@ -82,15 +82,20 @@ export async function updateSession(request: NextRequest) {
   // Wie zich net registreerde heeft een bedrijf zonder gegevens en zonder
   // wagens. Die sturen we eerst door de wizard, anders is de eerste indruk een
   // lege tabel. Eén extra opzoeking, en alleen op de afgeschermde routes.
+  //
+  // Alleen een beheerder wordt doorgestuurd. De wizard eindigt op een update van
+  // companies, en die policy laat niemand anders schrijven. Een uitgenodigd lid
+  // van een bedrijf waarvan de beheerder de wizard nooit afmaakte, zou hier
+  // anders permanent vastzitten op een formulier dat altijd weigert.
   if (user && moetAangemeld && pad !== ONBOARDING_PAD) {
     const { data: profiel } = await supabase
       .from("profiles")
-      .select("companies (onboarding_voltooid)")
+      .select("rol, companies (onboarding_voltooid)")
       .eq("id", user.id)
       .maybeSingle();
 
     const bedrijf = profiel?.companies as unknown as { onboarding_voltooid: boolean } | null;
-    if (bedrijf && !bedrijf.onboarding_voltooid) {
+    if (bedrijf && !bedrijf.onboarding_voltooid && profiel?.rol === "beheerder") {
       const welkom = request.nextUrl.clone();
       welkom.pathname = `${voorvoegsel}${ONBOARDING_PAD}`;
       welkom.search = "";

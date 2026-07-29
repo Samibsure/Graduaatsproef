@@ -441,6 +441,7 @@
     "beheerBezig": "Bezig…",
     "beheerBewaard": "Parameters bewaard.",
     "beheerHersteld": "Standaardwaarden hersteld.",
+    "beheerNietGeladen": "De fiscale parameters konden niet uit de databank geladen worden. Het formulier blijft gesloten: bewaren zou de gepubliceerde cijfers overschrijven met de standaardwaarden uit de broncode. Probeer opnieuw zodra de verbinding hersteld is.",
     "beheerBevestig": "Alle parameters en de aftrekkalender terugzetten naar de gepubliceerde waarden?",
     "geenToegangTitel": "Geen toegang",
     "geenToegangTekst": "Deze pagina is voorbehouden aan het beheer van Autofiscaliteit. De fiscale parameters gelden voor heel België en kunnen niet per bedrijf worden aangepast."
@@ -509,6 +510,7 @@
     "verwijder": "Verwijder",
     "verwijderBevestig": "Deze wagen verwijderen?",
     "leeg": "Nog geen wagens. Voeg er toe vanuit de catalogus of via “Nieuwe wagen”.",
+    "laden": "Wagens laden…",
     "badgeVloot": "vloot",
     "badgeKandidaat": "kandidaat",
     "alleenLezen": "Alleen lezen",
@@ -648,6 +650,9 @@
     "startVoorbeeldUitleg": "Drie wagens klaargezet: een elektrische, een plug-in hybride en een diesel. Zo zie je de fiscale kloof meteen.",
     "startLeeg": "Met een lege vloot",
     "startLeegUitleg": "Je voegt zelf je eerste wagen toe, uit de catalogus of met eigen cijfers.",
+    "geenBeheerderTitel": "Klaar om te starten",
+    "geenBeheerderTekst": "De bedrijfsgegevens van {bedrijf} worden door een beheerder ingevuld. Jij hoeft daar niet op te wachten: je kan meteen wagens bekijken, doorrekenen en vergelijken.",
+    "geenBeheerderKnop": "Naar mijn wagens",
     "vorige": "Vorige",
     "volgende": "Volgende"
   },
@@ -713,6 +718,7 @@
     "eigenBijdrage": "Eigen bijdrage werknemer per maand",
     "tankkaart": "Tank- of laadkaart",
     "kmoTarief": "Verlaagd KMO-tarief",
+    "geenModel": "Er is nu geen wagenmodel om door te rekenen. Ververs de pagina, of probeer het straks opnieuw.",
     "kpiAftrek": "Fiscale aftrek",
     "kpiAftrekDetail": "in {jaar}",
     "kpiVaa": "Voordeel alle aard",

@@ -1,6 +1,8 @@
 "use client";
 
-import Link from "next/link";
+// Uit @/i18n/navigation, niet uit next/link: de gewone Link laat het
+// taalvoorvoegsel vallen en zet een Franstalige bezoeker terug in het Nederlands.
+import { Link } from "@/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useMemo, useState } from "react";
 import CarImage from "@/components/CarImage";
@@ -54,6 +56,9 @@ export default function VergelijkingPagina() {
   const [bezig, setBezig] = useState(false);
   const [bewaard, setBewaard] = useState(false);
   const [fout, setFout] = useState<string | null>(null);
+  // Zonder deze vlag leest wie wagens heeft eerst "voeg er eerst een toe",
+  // want de lijst begint leeg en de fetch is nog onderweg.
+  const [geladen, setGeladen] = useState(false);
 
   useEffect(() => {
     Promise.all([laadFiscaleContext(), laadWagens(), laadEvaluaties(), laadCatalogus()])
@@ -64,7 +69,8 @@ export default function VergelijkingPagina() {
         setCatalogus(k);
         setGeselecteerd(w.slice(0, MAX_KANDIDATEN).map((v) => v.id));
       })
-      .catch((e) => setFout(e instanceof Error ? e.message : String(e)));
+      .catch((e) => setFout(e instanceof Error ? e.message : String(e)))
+      .finally(() => setGeladen(true));
   }, []);
 
   const kandidaten = wagens.filter((w) => geselecteerd.includes(w.id));
@@ -255,17 +261,20 @@ export default function VergelijkingPagina() {
                   {w.omschrijving}
                 </button>
               ))}
-              {wagens.length === 0 && (
-                <p className="m-0 text-sm text-ink-500">
-                  {t.rich("voegEerstToe", {
-                    catalogus: (chunks) => (
-                      <Link href="/catalogus" className="font-bold text-ink underline">
-                        {chunks}
-                      </Link>
-                    ),
-                  })}
-                </p>
-              )}
+              {wagens.length === 0 &&
+                (geladen ? (
+                  <p className="m-0 text-sm text-ink-500">
+                    {t.rich("voegEerstToe", {
+                      catalogus: (chunks) => (
+                        <Link href="/catalogus" className="font-bold text-ink underline">
+                          {chunks}
+                        </Link>
+                      ),
+                    })}
+                  </p>
+                ) : (
+                  <span className="inline-block h-[30px] w-[160px] animate-pulse rounded-full bg-paper" />
+                ))}
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-5 text-[14px]">

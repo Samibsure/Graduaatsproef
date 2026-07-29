@@ -23,14 +23,32 @@ export interface Evaluatie {
  * en kan er ook geen verzinnen.
  */
 
-/** Laadt parameters, bestelperiodes en aftrekkalender uit Supabase. */
-export async function laadFiscaleContext(): Promise<FiscaleContext> {
+/**
+ * Laadt parameters, bestelperiodes en aftrekkalender uit Supabase.
+ *
+ * Standaard valt deze functie terug op `DEFAULT_CONTEXT` wanneer de databank
+ * niet antwoordt: een bezoeker ziet dan liever de gepubliceerde cijfers dan een
+ * lege pagina. Met `strikt` gooit ze in plaats daarvan een fout.
+ *
+ * Die schakelaar is niet cosmetisch. De beheerderspagina vult haar formulier
+ * met wat deze functie teruggeeft en schrijft dat op "Bewaren" terug naar de
+ * databank. Zou ze de terugval krijgen zonder het te weten, dan overschrijft ze
+ * de echte fiscale parameters van heel België met de waarden uit de broncode.
+ * Wie schrijft, moet dus strikt lezen.
+ */
+export async function laadFiscaleContext(
+  opties?: { strikt?: boolean },
+): Promise<FiscaleContext> {
   const [parameters, periodes, regels] = await Promise.all([
     supabase.from("tax_parameters").select("*").order("year"),
     supabase.from("bestelperiodes").select("*").order("volgorde"),
     supabase.from("deduction_rules").select("*").order("id"),
   ]);
-  if (parameters.error || periodes.error || regels.error) {
+  const fout = parameters.error ?? periodes.error ?? regels.error;
+  if (fout) {
+    if (opties?.strikt) {
+      throw new Error(`Fiscale parameters laden mislukt: ${fout.message}`);
+    }
     console.error("Kon fiscale context niet laden, val terug op standaardwaarden", {
       parameters: parameters.error,
       periodes: periodes.error,
@@ -38,6 +56,14 @@ export async function laadFiscaleContext(): Promise<FiscaleContext> {
     });
     return DEFAULT_CONTEXT;
   }
+
+  // Een geslaagde query die niets teruggeeft is voor een lezer onschuldig, maar
+  // voor de beheerderspagina even gevaarlijk als een fout: een leeg formulier
+  // bewaren wist de kalender.
+  if (opties?.strikt && !parameters.data?.length) {
+    throw new Error("Fiscale parameters laden mislukt: de databank gaf geen enkele rij terug.");
+  }
+
   return {
     parameters: parameters.data as TaxParameters[],
     periodes: periodes.data as Bestelperiode[],

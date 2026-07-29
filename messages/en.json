@@ -441,6 +441,7 @@
     "beheerBezig": "Working…",
     "beheerBewaard": "Parameters saved.",
     "beheerHersteld": "Defaults restored.",
+    "beheerNietGeladen": "The tax parameters could not be loaded from the database. The form stays closed: saving would overwrite the published figures with the source-code defaults. Try again once the connection is back.",
     "beheerBevestig": "Reset all parameters and the deduction calendar to the published values?",
     "geenToegangTitel": "No access",
     "geenToegangTekst": "This page is reserved for the administration of Autofiscaliteit. The tax parameters apply across Belgium and cannot be adjusted per company."
@@ -509,6 +510,7 @@
     "verwijder": "Delete",
     "verwijderBevestig": "Delete this vehicle?",
     "leeg": "No vehicles yet. Add some from the catalogue or via “New vehicle”.",
+    "laden": "Loading vehicles…",
     "badgeVloot": "fleet",
     "badgeKandidaat": "candidate",
     "alleenLezen": "Read only",
@@ -648,6 +650,9 @@
     "startVoorbeeldUitleg": "Three vehicles ready: an electric, a plug-in hybrid and a diesel. The tax gap is visible at once.",
     "startLeeg": "With an empty fleet",
     "startLeegUitleg": "You add your first vehicle yourself, from the catalogue or with your own figures.",
+    "geenBeheerderTitel": "Ready to start",
+    "geenBeheerderTekst": "The company details for {bedrijf} are filled in by an administrator. You do not have to wait for that: you can already browse vehicles, calculate them and compare them.",
+    "geenBeheerderKnop": "Go to my vehicles",
     "vorige": "Previous",
     "volgende": "Next"
   },
@@ -713,6 +718,7 @@
     "eigenBijdrage": "Employee contribution per month",
     "tankkaart": "Fuel or charge card",
     "kmoTarief": "Reduced SME rate",
+    "geenModel": "There is no vehicle model available to calculate right now. Refresh the page, or try again later.",
     "kpiAftrek": "Tax deduction",
     "kpiAftrekDetail": "in {jaar}",
     "kpiVaa": "Benefit in kind",

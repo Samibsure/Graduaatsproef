@@ -1,13 +1,14 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useRouter } from "@/i18n/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
 import { useEffect, useState } from "react";
 import { Melding, Veld, invoerKlasse, knopKlasse } from "@/components/AuthKaart";
 import Icon from "@/components/Icon";
 import { useSessie } from "@/components/SessieProvider";
 import { Card, Container, Eyebrow } from "@/components/ui";
 import { voltooiOnboarding, type BedrijfsInvoer } from "@/lib/bedrijf";
+import { magBeheren } from "@/lib/rollen";
 import { maakVoorbeeldvloot } from "@/lib/voorbeeldvloot";
 
 const STAPPEN = 3;
@@ -75,6 +76,27 @@ export default function WelkomPagina() {
   }
 
   if (!sessie) return null;
+
+  // De wizard eindigt op een update van companies, en die policy laat alleen een
+  // beheerder schrijven. Wie hier toch belandt (rechtstreekse link, of een
+  // bedrijf waarvan de beheerder de wizard nooit afmaakte) krijgt een uitleg en
+  // een weg naar binnen, geen formulier dat gegarandeerd weigert.
+  if (!magBeheren(sessie)) {
+    return (
+      <Container className="max-w-[560px] py-16">
+        <Eyebrow dash>{t("eyebrow")}</Eyebrow>
+        <h1 className="m-0 text-[clamp(24px,3.4vw,32px)] font-bold tracking-[-0.02em] text-ink">
+          {t("geenBeheerderTitel")}
+        </h1>
+        <p className="mt-3 text-[16px] text-ink-700">
+          {t("geenBeheerderTekst", { bedrijf: sessie.bedrijf.naam })}
+        </p>
+        <Link href="/wagens" className={`${knopKlasse} mt-7 w-auto`}>
+          {t("geenBeheerderKnop")}
+        </Link>
+      </Container>
+    );
+  }
 
   return (
     <Container className="max-w-[720px] py-14">

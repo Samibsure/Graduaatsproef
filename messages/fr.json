@@ -441,6 +441,7 @@
     "beheerBezig": "En cours…",
     "beheerBewaard": "Paramètres enregistrés.",
     "beheerHersteld": "Valeurs par défaut rétablies.",
+    "beheerNietGeladen": "Les paramètres fiscaux n'ont pas pu être chargés depuis la base de données. Le formulaire reste fermé : l'enregistrement écraserait les chiffres publiés par les valeurs par défaut du code source. Réessayez dès que la connexion est rétablie.",
     "beheerBevestig": "Rétablir tous les paramètres et le calendrier de déduction aux valeurs publiées ?",
     "geenToegangTitel": "Accès refusé",
     "geenToegangTekst": "Cette page est réservée à l'administration d'Autofiscaliteit. Les paramètres fiscaux valent pour toute la Belgique et ne peuvent pas être adaptés par entreprise."
@@ -509,6 +510,7 @@
     "verwijder": "Supprimer",
     "verwijderBevestig": "Supprimer ce véhicule ?",
     "leeg": "Pas encore de véhicule. Ajoutez-en depuis le catalogue ou via « Nouveau véhicule ».",
+    "laden": "Chargement des véhicules…",
     "badgeVloot": "flotte",
     "badgeKandidaat": "candidat",
     "alleenLezen": "Lecture seule",
@@ -648,6 +650,9 @@
     "startVoorbeeldUitleg": "Trois véhicules prêts : un électrique, un hybride rechargeable et un diesel. L'écart fiscal saute aux yeux.",
     "startLeeg": "Avec une flotte vide",
     "startLeegUitleg": "Vous ajoutez vous-même votre premier véhicule, depuis le catalogue ou avec vos propres chiffres.",
+    "geenBeheerderTitel": "Prêt à commencer",
+    "geenBeheerderTekst": "Les données d'entreprise de {bedrijf} sont complétées par un administrateur. Vous n'avez pas à l'attendre : vous pouvez déjà consulter des véhicules, les calculer et les comparer.",
+    "geenBeheerderKnop": "Vers mes véhicules",
     "vorige": "Précédent",
     "volgende": "Suivant"
   },
@@ -713,6 +718,7 @@
     "eigenBijdrage": "Contribution personnelle du travailleur par mois",
     "tankkaart": "Carte carburant ou de recharge",
     "kmoTarief": "Taux réduit PME",
+    "geenModel": "Aucun modèle de véhicule n'est disponible pour le calcul. Actualisez la page ou réessayez plus tard.",
     "kpiAftrek": "Déduction fiscale",
     "kpiAftrekDetail": "en {jaar}",
     "kpiVaa": "Avantage de toute nature",

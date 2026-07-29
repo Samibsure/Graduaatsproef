@@ -44,6 +44,9 @@ export default function SimulatorPagina() {
   const [autokosten, setAutokosten] = useState<number | null>(null);
   const [eigenBijdrage, setEigenBijdrage] = useState(0);
   const [fout, setFout] = useState<string | null>(null);
+  // Zonder deze vlag blijft het skelet draaien wanneer het laden faalt: het
+  // resultaat komt er dan nooit, en het skelet wacht op een resultaat.
+  const [geladen, setGeladen] = useState(false);
 
   useEffect(() => {
     Promise.all([laadFiscaleContext(), laadCatalogus()])
@@ -52,7 +55,8 @@ export default function SimulatorPagina() {
         setCatalogus(k);
         setGekozenId(k[0]?.id ?? null);
       })
-      .catch((e) => setFout(e instanceof Error ? e.message : String(e)));
+      .catch((e) => setFout(e instanceof Error ? e.message : String(e)))
+      .finally(() => setGeladen(true));
   }, []);
 
   const gekozen = catalogus.find((c) => c.id === gekozenId) ?? null;
@@ -163,12 +167,16 @@ export default function SimulatorPagina() {
         </Card>
 
         <div>
-          {!resultaat || !gekozen ? (
+          {!geladen ? (
             <div className="grid gap-4 sm:grid-cols-2">
               {[0, 1, 2, 3].map((i) => (
                 <div key={i} className="h-[132px] animate-pulse rounded-[13px] bg-paper" />
               ))}
             </div>
+          ) : !resultaat || !gekozen ? (
+            <Card className="p-10 text-center">
+              <p className="m-0 text-[15px] text-ink-700">{t("geenModel")}</p>
+            </Card>
           ) : (
             <>
               <Card className="mb-6 overflow-hidden">

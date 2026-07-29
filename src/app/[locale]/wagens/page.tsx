@@ -75,6 +75,9 @@ export default function WagensPagina() {
   const [formulier, setFormulier] = useState<Formulier | null>(null);
   const [bezig, setBezig] = useState(false);
   const [fout, setFout] = useState<string | null>(null);
+  // Zonder deze vlag leest een gebruiker met twintig wagens bij elke paginalading
+  // eerst "nog geen wagens", want de lijst begint leeg.
+  const [geladen, setGeladen] = useState(false);
 
   const herlaad = () => laadWagens().then(setWagens);
 
@@ -85,7 +88,8 @@ export default function WagensPagina() {
         setWagens(w);
         setCatalogus(k);
       })
-      .catch((e) => setFout(e instanceof Error ? e.message : String(e)));
+      .catch((e) => setFout(e instanceof Error ? e.message : String(e)))
+      .finally(() => setGeladen(true));
   }, []);
 
   const zet = <K extends keyof Formulier>(veld: K, waarde: Formulier[K]) =>
@@ -446,7 +450,7 @@ export default function WagensPagina() {
             {wagens.length === 0 && (
               <tr>
                 <td colSpan={10} className="px-4 py-10 text-center text-ink-500">
-                  {t("leeg")}
+                  {geladen ? t("leeg") : t("laden")}
                 </td>
               </tr>
             )}
