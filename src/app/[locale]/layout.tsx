@@ -9,6 +9,7 @@ import Nav from "@/components/Nav";
 import { SessieProvider } from "@/components/SessieProvider";
 import { Link } from "@/i18n/navigation";
 import { INTL_LOCALE, routing } from "@/i18n/routing";
+import { VOETTEKST_KOLOMMEN } from "@/lib/navigatie";
 import { laadSessie } from "@/lib/sessie";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://autofiscaliteit.com";
@@ -88,34 +89,12 @@ export default async function RootLayout({
     getTranslations({ locale, namespace: "footer" }),
   ]);
 
-  const kolommen = [
-    {
-      titel: t("navigatie"),
-      links: [
-        { href: "/catalogus", label: t("catalogus") },
-        { href: "/simulator", label: t("simulator") },
-        { href: "/vergelijking", label: t("vergelijking") },
-        { href: "/vloot", label: t("vloot") },
-        { href: "/wagens", label: t("wagensBeheren") },
-      ],
-    },
-    {
-      titel: t("kennis"),
-      links: [
-        { href: "/fiscaal-kader", label: t("fiscaalKader") },
-        { href: "/parameters", label: t("parameters") },
-        { href: "/handleiding", label: t("handleiding") },
-        { href: "/over", label: t("over") },
-      ],
-    },
-    {
-      titel: t("juridisch"),
-      links: [
-        { href: "/privacy", label: t("privacy") },
-        { href: "/voorwaarden", label: t("voorwaarden") },
-      ],
-    },
-  ];
+  // Uit src/lib/navigatie.ts, dezelfde bron als de header. Voordien stond hier
+  // een eigen lijst die stilaan van de header was afgeweken.
+  const kolommen = VOETTEKST_KOLOMMEN.map((kolom) => ({
+    titel: t(kolom.sleutel),
+    links: kolom.links.map((l) => ({ href: l.href, label: t(l.sleutel) })),
+  }));
 
   return (
     <html lang={INTL_LOCALE[locale]} className={inter.variable}>

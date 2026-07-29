@@ -1,9 +1,10 @@
 import { useTranslations } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Logomerk } from "@/components/Brand";
-import { Badge, Card } from "@/components/ui";
+import { Badge, Card, knopKlassen } from "@/components/ui";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
+import { START_HIER_HREF } from "@/lib/navigatie";
 
 const CONTACT = "contact@autofiscaliteit.com";
 
@@ -85,10 +86,7 @@ function OverInhoud() {
               </li>
             ))}
           </ul>
-          <Link
-            href="/registreren"
-            className="mt-5 inline-block rounded-xl bg-gold px-4 py-2 text-sm font-semibold text-white hover:bg-gold-hover"
-          >
+          <Link href={START_HIER_HREF} className={knopKlassen("primair", "md", "mt-5")}>
             {t("startKnop")}
           </Link>
         </Card>

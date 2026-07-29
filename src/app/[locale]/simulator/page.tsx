@@ -6,7 +6,7 @@ import CarImage from "@/components/CarImage";
 import Icon from "@/components/Icon";
 import { useSessie } from "@/components/SessieProvider";
 import Uitfaseringstijdlijn from "@/components/Uitfaseringstijdlijn";
-import { Card, Container, PageHead, StatCard } from "@/components/ui";
+import { Card, Container, PageHead, StatCard, knopKlassen } from "@/components/ui";
 import { Link } from "@/i18n/navigation";
 import { laadCatalogus, laadFiscaleContext } from "@/lib/data";
 import { catalogPreview, geschatteAutokosten } from "@/lib/fiscaal/catalog";
@@ -226,7 +226,7 @@ export default function SimulatorPagina() {
                 <Uitfaseringstijdlijn uitfasering={resultaat.uitfasering} euro={euro} pct={pct} />
               </Card>
 
-              <Card className="border-gold-line bg-gold-soft p-6">
+              <Card className="border-accent-line bg-accent-soft p-6">
                 <h2 className="m-0 mb-2 text-[18px] font-bold text-ink">
                   {sessie ? t("verderTitelAangemeld") : t("verderTitel")}
                 </h2>
@@ -236,15 +236,12 @@ export default function SimulatorPagina() {
                 <div className="flex flex-wrap gap-3">
                   <Link
                     href={sessie ? "/vergelijking" : "/registreren"}
-                    className="inline-flex h-[44px] items-center gap-2 rounded-[10px] bg-ink px-5 text-[14.5px] font-bold text-white hover:bg-ink-600"
+                    className={knopKlassen("primair", "md")}
                   >
-                    <Icon name="arrow-right" size={16} />
                     {sessie ? t("naarVergelijking") : t("registreren")}
+                    <Icon name="arrow-right" size={16} />
                   </Link>
-                  <Link
-                    href="/fiscaal-kader"
-                    className="inline-flex h-[44px] items-center gap-2 rounded-[10px] border border-line bg-white px-5 text-[14.5px] font-bold text-ink hover:border-ink-500"
-                  >
+                  <Link href="/fiscaal-kader" className={knopKlassen("stil", "md")}>
                     {t("naarKader")}
                   </Link>
                 </div>

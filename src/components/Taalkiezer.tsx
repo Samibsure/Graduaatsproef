@@ -11,7 +11,11 @@ import { TAALNAAM, routing, type Locale } from "@/i18n/routing";
  * naar Engels overschakelt, komt op /en/catalogus terecht en niet op de
  * startpagina.
  */
-export default function Taalkiezer({ variant = "licht" }: { variant?: "licht" | "compact" }) {
+export default function Taalkiezer({
+  variant = "licht",
+}: {
+  variant?: "licht" | "compact" | "minimaal";
+}) {
   const locale = useLocale() as Locale;
   const pathname = usePathname();
   const params = useParams();
@@ -30,16 +34,24 @@ export default function Taalkiezer({ variant = "licht" }: { variant?: "licht" | 
     });
   }
 
-  if (variant === "compact") {
+  if (variant === "compact" || variant === "minimaal") {
     return (
-      <div className="flex gap-1.5">
+      <div className={variant === "minimaal" ? "flex gap-0.5" : "flex gap-1.5"}>
         {routing.locales.map((l) => (
           <button
             key={l}
             onClick={() => kies(l)}
             disabled={bezig}
-            aria-current={l === locale}
-            className="rounded-md px-2.5 py-1.5 text-[13px] font-bold uppercase text-ink-500 aria-[current=true]:bg-gold-soft aria-[current=true]:text-ink"
+            aria-current={l === locale ? "true" : undefined}
+            // lang op de knop zelf: anders spreekt een schermlezer "FR" uit
+            // volgens de uitspraakregels van de pagina eromheen.
+            lang={l}
+            title={TAALNAAM[l]}
+            className={
+              variant === "minimaal"
+                ? "rounded-md px-1.5 py-1 text-[12.5px] font-bold uppercase text-ink-500 hover:text-ink aria-[current=true]:text-ink aria-[current=true]:underline aria-[current=true]:underline-offset-4"
+                : "rounded-md px-2.5 py-1.5 text-[13px] font-bold uppercase text-ink-500 aria-[current=true]:bg-accent-soft aria-[current=true]:text-ink"
+            }
           >
             {l}
           </button>
@@ -55,10 +67,10 @@ export default function Taalkiezer({ variant = "licht" }: { variant?: "licht" | 
         value={locale}
         disabled={bezig}
         onChange={(e) => kies(e.target.value as Locale)}
-        className="h-[42px] cursor-pointer appearance-none rounded-[10px] border border-line bg-white pl-3.5 pr-8 text-[14px] font-bold uppercase text-ink hover:bg-paper"
+        className="h-11 cursor-pointer appearance-none rounded-[10px] border border-line bg-white pl-3.5 pr-8 text-[14px] font-bold uppercase text-ink hover:bg-paper"
       >
         {routing.locales.map((l) => (
-          <option key={l} value={l}>
+          <option key={l} value={l} lang={l}>
             {l.toUpperCase()}
           </option>
         ))}
