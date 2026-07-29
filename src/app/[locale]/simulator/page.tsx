@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import CarImage from "@/components/CarImage";
 import Icon from "@/components/Icon";
 import { useSessie } from "@/components/SessieProvider";
+import Besteljaartabel from "@/components/Besteljaartabel";
 import Uitfaseringstijdlijn from "@/components/Uitfaseringstijdlijn";
 import { Card, Container, PageHead, StatCard, knopKlassen } from "@/components/ui";
 import { Link } from "@/i18n/navigation";
@@ -12,6 +13,7 @@ import { laadCatalogus, laadFiscaleContext } from "@/lib/data";
 import { catalogPreview, geschatteAutokosten } from "@/lib/fiscaal/catalog";
 import { berekenProjectie } from "@/lib/fiscaal/engine";
 import { berekenUitfasering } from "@/lib/fiscaal/uitfasering";
+import { standaardBesteljaren, vergelijkBesteljaren } from "@/lib/fiscaal/besteljaar";
 import type { CatalogCar, FiscaleContext, Vehicle } from "@/lib/fiscaal/types";
 import { formatters } from "@/lib/format";
 
@@ -31,6 +33,7 @@ const JAREN = 4;
  */
 export default function SimulatorPagina() {
   const t = useTranslations("simulator");
+  const tJaar = useTranslations("besteljaar");
   const locale = useLocale();
   const { euro, pct } = formatters(locale);
   const sessie = useSessie();
@@ -83,6 +86,13 @@ export default function SimulatorPagina() {
       projectie,
       eerste: projectie.jaren[0],
       uitfasering: berekenUitfasering(ctx, wagen, startjaar, 2031, { kmoTarief }),
+      besteljaren: vergelijkBesteljaren(
+        ctx,
+        wagen,
+        standaardBesteljaren(startjaar),
+        JAREN,
+        { kmoTarief },
+      ),
     };
   }, [ctx, wagen, startjaar, kmoTarief]);
 
@@ -122,16 +132,21 @@ export default function SimulatorPagina() {
             </label>
 
             <label className="block">
-              <span className="mb-1.5 block text-[13.5px] font-bold text-ink">{t("startjaar")}</span>
+              <span className="mb-1.5 block text-[13.5px] font-bold text-ink">
+                {tJaar("kiesBesteljaar")}
+              </span>
               <select
                 className={invoer}
                 value={startjaar}
                 onChange={(e) => setStartjaar(Number(e.target.value))}
               >
-                {[2025, 2026, 2027, 2028, 2029, 2030].map((j) => (
+                {[2024, 2025, 2026, 2027, 2028, 2029, 2030].map((j) => (
                   <option key={j} value={j}>{j}</option>
                 ))}
               </select>
+              <span className="mt-1 block text-[12.5px] text-ink-500">
+                {tJaar("kiesBesteljaarHint")}
+              </span>
             </label>
 
             <label className="block">
@@ -195,7 +210,19 @@ export default function SimulatorPagina() {
                       {gekozen.merk} {gekozen.model}
                     </div>
                     <div className="text-[14px] text-ink-500">
+                      {gekozen.uitvoering ? `${gekozen.uitvoering} · ` : ""}
                       {gekozen.voertuigtype} · {gekozen.co2} g/km · {euro(gekozen.cataloguswaarde)}
+                    </div>
+                    {/* De twee jaartallen die door elkaar liepen, nu uit elkaar
+                        gehaald: waar de cijfers vandaan komen, en waarop
+                        gerekend wordt. */}
+                    <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] text-ink-500">
+                      {gekozen.modeljaar && (
+                        <span className="rounded-full bg-paper px-2.5 py-1 font-bold text-ink-700">
+                          {tJaar("specificaties", { modeljaar: gekozen.modeljaar })}
+                        </span>
+                      )}
+                      <span>{tJaar("gerekendOp", { jaar: startjaar })}</span>
                     </div>
                   </div>
                 </div>
@@ -224,6 +251,14 @@ export default function SimulatorPagina() {
                 <h2 className="m-0 mb-1.5 text-[18px] font-bold text-ink">{t("tijdlijnTitel")}</h2>
                 <p className="mb-4 text-[14px] text-ink-700">{t("tijdlijnIntro")}</p>
                 <Uitfaseringstijdlijn uitfasering={resultaat.uitfasering} euro={euro} pct={pct} />
+              </Card>
+
+              <Card className="mb-6 p-6">
+                <h2 className="m-0 mb-2 text-[18px] font-bold text-ink">{tJaar("titel")}</h2>
+                <Besteljaartabel
+                  vergelijking={resultaat.besteljaren}
+                  formatters={{ euro, pct }}
+                />
               </Card>
 
               <Card className="border-accent-line bg-accent-soft p-6">
