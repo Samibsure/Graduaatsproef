@@ -11,6 +11,7 @@ const PUBLIEK = [
   { pad: "/parameters", prioriteit: 0.7 },
   { pad: "/handleiding", prioriteit: 0.6 },
   { pad: "/over", prioriteit: 0.5 },
+  { pad: "/steunen", prioriteit: 0.4 },
   { pad: "/privacy", prioriteit: 0.3 },
   { pad: "/voorwaarden", prioriteit: 0.3 },
 ];

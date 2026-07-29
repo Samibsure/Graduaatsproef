@@ -1,8 +1,10 @@
 import { useTranslations } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import Icon from "@/components/Icon";
+import { SteunKnop } from "@/components/Steun";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
+import { CONTACT } from "@/lib/contact";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: Locale }> }) {
   const { locale } = await params;
@@ -120,6 +122,28 @@ function HandleidingInhoud() {
             ),
           })}
         </p>
+      </div>
+
+      {/* Wie hier geraakt is, heeft de tool gebruikt: de juiste plek voor de
+          vraag om te helpen, en meteen ook voor het adres waar een fout in de
+          berekening gemeld kan worden. */}
+      <div className="mt-8 flex flex-wrap items-center justify-between gap-5 rounded-[14px] border border-line bg-paper p-6">
+        <div className="max-w-[42em]">
+          <h2 className="m-0 text-[18px] font-bold text-ink">{t("hulpTitel")}</h2>
+          <p className="m-0 mt-1.5 text-[14.5px] leading-relaxed text-ink-700">
+            {t.rich("hulpTekst", {
+              mail: () => (
+                <a
+                  href={`mailto:${CONTACT}`}
+                  className="font-bold text-ink underline underline-offset-2 hover:text-gold"
+                >
+                  {CONTACT}
+                </a>
+              ),
+            })}
+          </p>
+        </div>
+        <SteunKnop />
       </div>
     </div>
   );

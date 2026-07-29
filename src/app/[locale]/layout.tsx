@@ -6,18 +6,12 @@ import "../globals.css";
 import { Wordmerk } from "@/components/Brand";
 import Nav from "@/components/Nav";
 import { SessieProvider } from "@/components/SessieProvider";
+import { SteunKnop } from "@/components/Steun";
 import { Link } from "@/i18n/navigation";
 import { INTL_LOCALE, routing } from "@/i18n/routing";
 import { laadSessie } from "@/lib/sessie";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://autofiscaliteit.com";
-
-/**
- * Vrijwillige donatie: één link naar een externe pagina, bewust geen
- * betaalintegratie in de applicatie zelf. Blijft de variabele leeg, dan
- * verdwijnt de knop gewoon.
- */
-const DONATIE_URL = process.env.NEXT_PUBLIC_DONATIE_URL ?? "";
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -90,6 +84,7 @@ export default async function RootLayout({
         { href: "/parameters", label: t("parameters") },
         { href: "/handleiding", label: t("handleiding") },
         { href: "/over", label: t("over") },
+        { href: "/steunen", label: t("steunen") },
       ],
     },
     {
@@ -118,16 +113,10 @@ export default async function RootLayout({
                 </div>
                 <p className="mb-3 text-sm leading-relaxed text-white/[0.62]">{t("intro")}</p>
                 <p className="mb-4 text-xs leading-relaxed text-white/[0.45]">{t("disclaimer")}</p>
-                {DONATIE_URL && (
-                  <a
-                    href={DONATIE_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 rounded-[9px] border border-white/[0.16] px-3.5 py-2 text-xs font-bold text-white/[0.78] transition-colors hover:border-white/[0.32] hover:text-white"
-                  >
-                    {t("steun")}
-                  </a>
-                )}
+                <SteunKnop variant="donker" />
+                <p className="mt-2.5 text-xs leading-relaxed text-white/[0.45]">
+                  {t("steunSub")}
+                </p>
               </div>
 
               <div className="flex flex-wrap gap-14">

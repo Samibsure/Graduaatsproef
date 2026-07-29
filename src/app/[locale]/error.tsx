@@ -3,8 +3,8 @@
 import { useTranslations } from "next-intl";
 import { useEffect } from "react";
 import { Container } from "@/components/ui";
+import { CONTACT } from "@/lib/contact";
 
-const CONTACT = "contact@autofiscaliteit.com";
 
 export default function Foutpagina({
   error,

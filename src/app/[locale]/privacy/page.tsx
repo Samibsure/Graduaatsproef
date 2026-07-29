@@ -9,8 +9,8 @@ import {
   opmaak,
 } from "@/components/Juridisch";
 import type { Locale } from "@/i18n/routing";
+import { CONTACT } from "@/lib/contact";
 
-const CONTACT = "contact@autofiscaliteit.com";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: Locale }> }) {
   const { locale } = await params;
