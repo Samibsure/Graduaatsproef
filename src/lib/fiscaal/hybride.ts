@@ -52,9 +52,22 @@ export function co2Drempel(vehicle: Pick<Vehicle, "euronorm" | "besteldatum">): 
   return verhoogd ? CO2_DREMPEL_EURO6E_BIS : CO2_DREMPEL;
 }
 
+/**
+ * Waarom een wagen wel of niet als valse hybride geldt. Een code en geen zin:
+ * de interface is drietalig en vertaalt zelf, met de getallen uit het oordeel
+ * als variabelen.
+ */
+export type ValseHybrideReden =
+  | "geenPhev"
+  | "bovenDrempel"
+  | "teKleineBatterij"
+  | "geenBatterijgegevens"
+  | "echteHybride";
+
 export interface ValseHybrideOordeel {
   isValseHybride: boolean;
-  /** Reden waarom, of waarom niet. Wordt in de detailweergave getoond. */
+  redenCode: ValseHybrideReden;
+  /** Dezelfde reden als Nederlandse zin, voor logboeken en het PDF-dossier. */
   reden: string;
   /** De drempel die op deze wagen van toepassing is. */
   drempel: number;
@@ -80,6 +93,7 @@ export function beoordeelValseHybride(vehicle: Vehicle): ValseHybrideOordeel {
   if (vehicle.voertuigtype !== "PHEV") {
     return {
       isValseHybride: false,
+      redenCode: "geenPhev",
       reden: "Geen plug-inhybride, de regel is niet van toepassing.",
       drempel,
       kwhPer100kg: null,
@@ -93,6 +107,7 @@ export function beoordeelValseHybride(vehicle: Vehicle): ValseHybrideOordeel {
   if (vehicle.co2 > drempel) {
     return {
       isValseHybride: true,
+      redenCode: "bovenDrempel",
       reden: `Uitstoot ${vehicle.co2} g/km ligt boven de drempel van ${drempel} g/km.`,
       drempel,
       kwhPer100kg,
@@ -102,6 +117,7 @@ export function beoordeelValseHybride(vehicle: Vehicle): ValseHybrideOordeel {
   if (kwhPer100kg !== null && kwhPer100kg < MIN_KWH_PER_100KG) {
     return {
       isValseHybride: true,
+      redenCode: "teKleineBatterij",
       reden: `Batterij levert ${kwhPer100kg.toFixed(2)} kWh per 100 kg, minder dan de vereiste ${MIN_KWH_PER_100KG}.`,
       drempel,
       kwhPer100kg,
@@ -111,6 +127,7 @@ export function beoordeelValseHybride(vehicle: Vehicle): ValseHybrideOordeel {
   if (kwhPer100kg === null) {
     return {
       isValseHybride: false,
+      redenCode: "geenBatterijgegevens",
       reden: `Uitstoot blijft onder ${drempel} g/km. De batterijtoets is niet uitgevoerd: batterijcapaciteit of gewicht ontbreekt.`,
       drempel,
       kwhPer100kg,
@@ -119,6 +136,7 @@ export function beoordeelValseHybride(vehicle: Vehicle): ValseHybrideOordeel {
 
   return {
     isValseHybride: false,
+    redenCode: "echteHybride",
     reden: `Echte plug-inhybride: onder ${drempel} g/km en minstens ${MIN_KWH_PER_100KG} kWh per 100 kg.`,
     drempel,
     kwhPer100kg,

@@ -452,20 +452,29 @@ export function berekenVerkeersbelasting(invoer: VerkeersbelastingInvoer): Gemar
 /**
  * De aangekondigde Vlaamse hervorming belast nieuwe wagens op gewicht en CO2 in
  * plaats van op fiscale pk. Ze is nog niet in werking en heeft Europees fiat
- * nodig; ze staat hier alleen als aankondiging, niet als rekenregel.
+ * nodig; ze staat hier alleen als aankondiging, niet als rekenregel. Er is dus
+ * bewust geen formule: zolang de tekst niet definitief is, zou elke uitkomst
+ * een precisie voorwenden die er niet is.
+ *
+ * Wat aangekondigd is:
+ * - de grondslag wordt maximaal toegelaten totaalgewicht plus CO2 in plaats van
+ *   fiscale pk;
+ * - een verhogende factor voor motoren vanaf 2.400 cc en diesels onder Euro 6;
+ * - bestaande voertuigen kiezen tussen oud en nieuw, het nieuwe enkel wanneer
+ *   het gunstiger uitvalt;
+ * - leasingwagens blijven op fiscale pk;
+ * - de verhoging is afgetopt op € 125 per jaar.
+ *
+ * Die opsomming staat voor de gebruiker in de taalbestanden, onder
+ * `parameters.hervormingPunt1` tot `5`.
  */
 export const VLAAMSE_HERVORMING_2027 = {
   vanaf: "2027-05-01",
   zekerheid: "voorlopig" as const,
-  kenmerken: [
-    "Grondslag wordt maximaal toegelaten totaalgewicht plus CO2 in plaats van fiscale pk.",
-    "Verhogende factor voor motoren vanaf 2.400 cc en voor diesels onder Euro 6.",
-    "Bestaande voertuigen kiezen tussen het oude en het nieuwe systeem, het nieuwe enkel als het gunstiger uitvalt.",
-    "Leasingwagens blijven op fiscale pk.",
-    "De verhoging is afgetopt op € 125 per jaar.",
-  ],
+  /** Aantal punten in de opsomming; de teksten staan in de taalbestanden. */
+  aantalKenmerken: 5,
   bron: {
-    wet: "Vlaamse regering, aangekondigde hervoming verkeersbelasting (Europees fiat nog nodig)",
+    wet: "Vlaamse regering, aangekondigde hervorming verkeersbelasting (Europees fiat nog nodig)",
     zekerheid: "voorlopig" as const,
   } satisfies Bron,
 };

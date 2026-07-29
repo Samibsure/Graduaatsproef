@@ -22,7 +22,8 @@ verworpen uitgaven, en is sindsdien uitgebouwd tot een publiek product.
 4. **Mijn wagens**: eigen vloot en kandidaten, met de volledige berekening per gebruiksjaar.
 5. **Vergelijking**: scoringsmatrix met zeven gewogen criteria, een grafiek en een advies
    *aanvaarden / overwegen / afwijzen*, met beslissingshistoriek.
-6. **Fiscaal kader en parameters**: de regels en cijfers achter de berekening, publiek raadpleegbaar.
+6. **Fiscaal kader en parameters**: de regels en cijfers achter de berekening, publiek raadpleegbaar,
+   met per cijfer een statusbadge en de rechtsbron erbij.
 7. **Onboarding en instellingen**: een wizard van drie stappen bij de eerste aanmelding, en daarna
    het bedrijfsprofiel, het fiscaal profiel en het team op `/instellingen`.
 8. **Melden**: een knop op elke pagina om een fout in een berekening te melden of een verbetering
@@ -99,11 +100,25 @@ besteljaar vasthoudt en het gebruiksjaar laat lopen.
 
 ### Rekenkern
 
-- **Aftrekbaarheid VenB**: opzoeking in de aftrekkalender per voertuigtype × bestelperiode ×
-  gebruiksjaar; gramformule (`120% − 0,5% × coëfficiënt × CO₂`) voor bestellingen vóór 1 juli 2023.
+- **Aftrekbaarheid VenB**: drie regimes, allemaal opgehangen aan de aanschaffingsdatum, dat wil
+  zeggen de datum van de bestelbon of van het leasecontract. Vóór 1 juli 2023 geldt de gramformule
+  (`120% − 0,5% × coëfficiënt × CO₂`) levenslang. Tussen 1 juli 2023 en 31 december 2025 blijft die
+  formule gelden, maar afgetopt op een plafond dat per aanslagjaar zakt van 75% naar 0%; de
+  minimumaftrek van 50% verdwijnt daar vanaf aanslagjaar 2026. Vanaf 1 januari 2026 vallen
+  verbrandingswagens op 0% en houden elektrische wagens levenslang het percentage van hun
+  besteljaar. Bij een uitstoot vanaf 200 g/km of een onbekende uitstoot geldt 40%.
 - **VAA**: `cataloguswaarde × 6/7 × leeftijdscorrectie × CO₂-percentage`, met wettelijk minimum.
 - **RSZ CO₂-bijdrage**: `((CO₂ × 9 − 600) / 12) × indexcoëfficiënt × multiplicator`, met minimum.
+  Zonder CO₂-waarde legt de RSZ een forfait op van 182 g/km (benzine) of 165 g/km (diesel).
 - **Verworpen uitgaven**: `(1 − aftrek%) × autokosten + (17% zonder / 40% met tank- of laadkaart) × VAA`.
+- **Kostensoorten**: niet elke autokost volgt hetzelfde percentage. Intrest en laadpaal vallen
+  buiten de aftrekbeperking, laadstroom volgt het afbouwpad van de elektrische wagens (ook voor het
+  elektrische deel van een plug-inhybride), het brandstofdeel van een PHEV kent een eigen plafond
+  van 50% dat vanaf 2028 nul wordt, en verkeersboetes zijn nooit aftrekbaar.
+- **Valse hybrides** (`hybride.ts`): een plug-inhybride met minder dan 0,5 kWh batterij per 100 kg
+  of met te veel uitstoot rekent met de CO₂ van het overeenstemmende niet-plug-in model, en bij
+  gebrek daaraan met de officiële waarde maal 2,5. De drempel ligt op 50 g/km, of 75 g/km vanaf
+  Euro 6e-bis voor bestellingen vanaf 2025.
 - **Scoringsmatrix**: de zes criteria van het rapport (TCO 4 jaar 40%, aftrekbaarheid VenB 20%,
   verworpen uitgaven 15%, operationele flexibiliteit 10%, CO₂/ESG 10%, restwaarde 5%) blijven de
   referentie en worden door de tests bewaakt. De applicatie gebruikt `CRITERIA_UITGEBREID`, met
@@ -116,6 +131,29 @@ besteljaar vasthoudt en het gebruiksjaar laat lopen.
 
 De rekenkern is bewust vrij van UI en database, zodat de formules los te testen zijn. De unit tests
 valideren de uitkomsten tegen een uitgewerkt referentiedossier.
+
+### Wat naast de federale kern staat
+
+De federale parameters staan tot op de cent in het Staatsblad. Daarbuiten is dat niet zo, en de
+rekenkern doet daar niet alsof. Elk cijfer buiten de federale kern draagt zijn eigen zekerheid en
+rechtsbron mee (`bronnen.ts`, met **bevestigd**, **te verifiëren** en **voorlopig**), en de
+referentiepagina toont die als badge naast het bedrag.
+
+| Module | Wat | Bijzonderheid |
+| --- | --- | --- |
+| `gewesten.ts` | BIV en jaarlijkse verkeersbelasting per gewest | Geeft **geen bedrag** wanneer het barema ontbreekt, in plaats van te raden |
+| `laadinfra.ts` | Verhoogde kostenaftrek, investeringsaftrek, CREG-tarieven thuisladen | Weigert de cumul van verhoogde kostenaftrek en investeringsaftrek |
+| `vergoedingen.ts` | Kilometervergoeding, fietsvergoeding, verzekeringstaks, accijns professionele diesel | Waarschuwt boven 24.000 beroepskilometers |
+| `lez.ts` | Toegang tot de lage-emissiezones per stad en euronorm | Doet geen uitspraak zonder euronorm |
+| `wegenvignet.ts` | Wegenvignet vanaf 1 mei 2027 | Alles voorlopig: tarieven uitgelekt, aftrekbaarheid voor personenwagens onbevestigd |
+
+Dat onderscheid is geen voorzichtigheid om de voorzichtigheid: een gewestelijk barema dat niet
+gepubliceerd is, mag geen bedrag opleveren dat een boekhouder overneemt. Voor een bindend bedrag
+verwijst de applicatie door naar de simulator van het gewest zelf.
+
+`kosten.ts` blijft daarnaast een *raming* van de verkeersbelasting geven, omdat een TCO altijd een
+getal nodig heeft. Die twee benaderingen vullen elkaar aan en horen niet door elkaar gebruikt te
+worden.
 
 ### Afscherming
 
@@ -136,7 +174,8 @@ Zie `supabase/README.md` voor het schema en de controlestappen.
 ### Validatie
 
 De grenzen op een wagen (CO₂, cataloguswaarde, beroepsgebruik, scores, datums) staan als
-CHECK-constraints in migratie `0006`. Dat is de regel die niet te omzeilen valt, want de browser
+CHECK-constraints in migratie `0006`, aangevuld door `0007` en `0012`. Dat is de regel die niet te
+omzeilen valt, want de browser
 praat rechtstreeks met PostgREST. `src/lib/validatie.ts` herhaalt dezelfde grenzen met Zod, puur om
 vóór het netwerkverzoek te kunnen zeggen wélk veld er misgaat in plaats van een constraintnaam te
 tonen. Wijzigt een grens, wijzig ze dan op beide plaatsen; `src/lib/validatie.test.ts` bewaakt dat.
@@ -198,6 +237,17 @@ mailserver is te beperkt en levert slecht af), met de redirect-URL's op het prod
 
 Deze pagina is alleen toegankelijk voor platformbeheerders: de parameters gelden voor heel België
 en zijn niet per bedrijf aanpasbaar.
+
+Niet alles loopt op jaarritme. Deze bewegen vaker en staan als tabel in de rekenkern, zodat een
+nieuw tarief één regel data is:
+
+| Wat | Wanneer | Waar |
+| --- | --- | --- |
+| RSZ-indexcoëfficiënt | november | `defaults.ts` |
+| Referentie-CO₂ en minimum VAA | december, bij KB | `defaults.ts` |
+| CREG-tarief thuisladen | per kwartaal, per gewest | `laadinfra.ts` |
+| Kilometervergoeding | per kwartaal, in 2026 tijdelijk per maand | `vergoedingen.ts` |
+| Gewestelijke barema's | bij indexatie, verschillend per gewest | `gewesten.ts` |
 
 ## Licentie
 
