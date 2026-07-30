@@ -3,6 +3,7 @@ import Icon from "@/components/Icon";
 import { Badge } from "@/components/ui";
 import type { Regimeband, VerbrandingRegime } from "@/lib/fiscaal/regimes";
 import type { Formatters } from "@/lib/format";
+import { periodenaam } from "@/lib/periodenaam";
 
 /**
  * De aftrekbaarheid per bestelperiode, voor elektrisch en voor verbranding.
@@ -24,20 +25,6 @@ import type { Formatters } from "@/lib/format";
  * kalender identieke rijen. Waar een plug-inhybride wél afwijkt, in zijn
  * brandstofdeel en zijn laadstroom, staat op /fiscaal-kader.
  */
-
-/** De periodekop uit de grensdatums, niet uit het Nederlandse label in de databank. */
-function periodeKop(
-  band: Pick<Regimeband, "van" | "tot">,
-  t: (sleutel: string, waarden?: Record<string, string>) => string,
-  datum: (iso: string) => string,
-): string {
-  if (band.van === null && band.tot !== null) return t("periodeTot", { tot: datum(band.tot) });
-  if (band.tot === null && band.van !== null) return t("periodeVanaf", { van: datum(band.van) });
-  if (band.van !== null && band.tot !== null) {
-    return t("periodeTussen", { van: datum(band.van), tot: datum(band.tot) });
-  }
-  return t("periodeAltijd");
-}
 
 /**
  * Wat er in de verbrandingscel staat. De drie soorten zijn geen opmaakkeuze: ze
@@ -104,7 +91,7 @@ function Bandinhoud({
   return (
     <>
       <div className="flex flex-wrap items-baseline gap-2">
-        <span className="font-bold text-ink">{periodeKop(band, t, formatters.datum)}</span>
+        <span className="font-bold text-ink">{periodenaam(band, t, formatters.datum)}</span>
         {band.isVandaag && <Badge tint="green">{t("vandaag")}</Badge>}
       </div>
       <dl className="m-0 mt-3 grid gap-3 sm:grid-cols-2">

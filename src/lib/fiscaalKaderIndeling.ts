@@ -42,6 +42,9 @@ export const SECTIES: readonly Sectie[] = [
 /** De drie assen uit de eerste sectie: `${sleutel}Titel` en `Tekst`. */
 export const ASSEN: readonly string[] = ["asBesteldatum", "asAandrijving", "asGebruiksjaar"];
 
+/** De drie factoren van het voordeel alle aard: `${sleutel}Titel` en `Tekst`. */
+export const VAA_FACTOREN: readonly string[] = ["vaaCatalogus", "vaaCo2", "vaaLeeftijd"];
+
 /** De brandstoffen waarvoor de gramformule haar drempels toont. */
 export const GRAMBRANDSTOFFEN = ["diesel", "benzine", "cng"] as const;
 
@@ -121,6 +124,7 @@ export function samengesteldeSleutels(): string[] {
   return [
     ...SECTIES.flatMap((s) => [`${s.sleutel}Titel`, `${s.sleutel}Tekst`]),
     ...ASSEN.flatMap((a) => [`${a}Titel`, `${a}Tekst`]),
+    ...VAA_FACTOREN.flatMap((v) => [`${v}Titel`, `${v}Tekst`]),
     ...KOSTENSOORTEN.flatMap((k) => [`${k}Titel`, `${k}Tekst`]),
     ...BUITEN.flatMap((b) => [`${b}Titel`, `${b}Tekst`]),
     ...ZEKERHEDEN.flatMap((z) => [`${z}Titel`, `${z}Tekst`]),

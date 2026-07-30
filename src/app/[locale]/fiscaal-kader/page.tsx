@@ -38,6 +38,7 @@ import {
   MATRIXJAREN,
   MATRIXWAGENS,
   SECTIES,
+  VAA_FACTOREN,
   ZEKERHEDEN,
 } from "@/lib/fiscaalKaderIndeling";
 import { formatters } from "@/lib/format";
@@ -494,7 +495,7 @@ function FiscaalKaderInhoud({ locale }: { locale: Locale }) {
         <Sectie id={SECTIES[5].id} titel={t("vaaTitel")} tekst={t("vaaTekst")}>
           <Formule label={t("formuleLabel")} formule={t("vaaFormule")} />
           <Puntenlijst
-            items={["vaaCatalogus", "vaaCo2", "vaaLeeftijd"].map((k) => ({
+            items={VAA_FACTOREN.map((k) => ({
               sleutel: k,
               titel: t(`${k}Titel`),
               tekst: t(`${k}Tekst`),
