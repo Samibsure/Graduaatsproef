@@ -27,8 +27,14 @@ const BTW_FORFAIT = 35;
  * uit de RSZ-instructies.
  */
 
-/** Coëfficiënt in de gramformule per brandstoftype (FOD Financiën, 2025). */
-const GRAMFORMULE_COEFF: Record<Brandstof, number> = {
+/**
+ * Coëfficiënt in de gramformule per brandstoftype (FOD Financiën, 2025).
+ *
+ * Geëxporteerd zodat /fiscaal-kader hem kan tonen. De coëfficiënt uit de formule
+ * terugrekenen leek eerst eleganter, maar dat werkt op hele grammen en gaf voor
+ * CNG 0,91 in plaats van 0,9.
+ */
+export const GRAMFORMULE_COEFF: Record<Brandstof, number> = {
   diesel: 1,
   benzine: 0.95,
   lpg: 0.95,

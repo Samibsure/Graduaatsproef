@@ -159,6 +159,21 @@ describe("aftrekMatrix naast de rekenkern", () => {
     expect(oud?.cellen.map((c) => c.aftrek)).toEqual([52.5, 52.5, 52.5, 52.5]);
   });
 
+  it("toont bij een valse hybride de gecorrigeerde uitstoot in de formulekolom", () => {
+    // Een plug-inhybride van 120 g/km zit ver boven de drempel van 50 g, dus de
+    // rekenkern rekent met 120 x 2,5 = 300 g. Toonde de formulekolom de ruwe
+    // waarde, dan stond er 63% naast een aftrek van 0% en verklaarde de tabel
+    // precies het tegenovergestelde van wat er gebeurt.
+    const [rij] = aftrekMatrix(
+      ctx,
+      [{ sleutel: "vals", aandrijving: "PHEV", co2: 120, besteldatum: "2024-03-01" }],
+      [2025],
+    );
+    expect(rij.cellen[0].aftrek).toBe(0);
+    expect(rij.cellen[0].formule).toBe(0);
+    expect(rij.cellen[0].bindend).toBe("formule");
+  });
+
   it("valt bij onbekende uitstoot op het forfait van 40% terug", () => {
     const onbekend = rijen.find((r) => r.sleutel === "onbekend");
     expect(onbekend?.cellen[0].aftrek).toBe(40);

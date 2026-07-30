@@ -18,6 +18,7 @@ function maakFormatters(locale: Locale) {
     maximumFractionDigits: 2,
   });
   const getalFmt = new Intl.NumberFormat(intl, { maximumFractionDigits: 2 });
+  const coefficientFmt = new Intl.NumberFormat(intl, { maximumFractionDigits: 4 });
   const datumFmt = new Intl.DateTimeFormat(intl, {
     day: "numeric",
     month: "long",
@@ -30,6 +31,12 @@ function maakFormatters(locale: Locale) {
     euroCent: (n: number) => euroCentFmt.format(n),
     getal: (n: number) => getalFmt.format(n),
     pct: (n: number) => `${getalFmt.format(n)}%`,
+    /**
+     * Coëfficiënten met vier decimalen. De gewone opmaak op twee cijfers maakt
+     * van de RSZ-indexcoëfficiënt 1,6291 het getal 1,63, en dat is precies het
+     * cijfer waarmee elke bijdrage vermenigvuldigd wordt.
+     */
+    coefficient: (n: number) => coefficientFmt.format(n),
     /**
      * Een ISO-datum uit de databank als "1 juli 2023".
      *

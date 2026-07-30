@@ -10,6 +10,7 @@ import {
   isOvergangsregime,
   plafondUitKalender,
 } from "./engine";
+import { fiscaleCo2 } from "./hybride";
 import type { Bestelperiode, Brandstof, FiscaleContext, Vehicle, Voertuigtype } from "./types";
 
 /**
@@ -253,7 +254,11 @@ export function aftrekMatrix(
         return { gebruiksjaar, aftrek, formule: null, plafond: null, bindend: "kalender" };
       }
 
-      const formule = gramformule(vehicle.brandstof, wagen.co2, {
+      // Met de fiscale uitstoot en niet met de waarde uit het dossier. Bij een
+      // valse hybride rekent `aftrekPct` met de gecorrigeerde uitstoot, en een
+      // formulekolom die de ruwe waarde toont, zou naast de aftrek staan die ze
+      // hoort te verklaren.
+      const formule = gramformule(vehicle.brandstof, fiscaleCo2(vehicle).co2, {
         metMinimum: oudsteRegime || gebruiksjaar <= LAATSTE_JAAR_MET_MINIMUMAFTREK,
       });
 
