@@ -11,29 +11,16 @@
 # over om het te merken: kijken. Wat hieronder staat is dus met het oog
 # afgekeurd, met de reden erbij, en na een geslaagde herkansing weer geschrapt.
 
-# interieur, zonder dat titel of categorie het zegt
-hyundai-inster
-leapmotor-c10
+# interieur, zonder dat titel of categorie het zegt; tweede poging
 renault-symbioz-etech
 skoda-superb-iv
 volvo-es90
 
-# vorige generatie: dit is nog de X5 E53 uit 1999
+# nog altijd de X5 E53 uit 1999; de nieuwe regel op BMW-chassiscodes moet dat nu
+# afvangen
 bmw-x5-50e
 
-# niet de wagen zelf: een rij geparkeerde auto's, een straatbeeld met bromfietsen
+# de wagen staat er wel op, maar donker en van achteren op een rijbaan
 mercedes-c220d
 mercedes-e220d
-opel-corsa-electric
 skoda-kamiq
-
-# te dicht op de wagen, of te donker om iets te zien
-porsche-taycan
-smart-3
-opel-grandland-electric
-
-# rallywagen met reclamelivery
-toyota-yaris
-
-# de wagen staat te ver weg om er iets aan te zien
-mercedes-glc220d

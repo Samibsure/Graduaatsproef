@@ -78,6 +78,13 @@ GEVALLEN = [
     ("vorige generatie, herkend aan de categorie",
      pagina("File:BMW X5 E53 facelift Sanming 02 2024-01-13.jpg", ("BMW E53 (1999)",)),
      model("BMW", "X5"), False),
+    ("BMW E-chassiscode zonder bouwjaar",
+     pagina("File:BMW X5 E53 Sanming 02.jpg"), model("BMW", "X5"), False),
+    ("BMW G-chassiscode mag wel",
+     pagina("File:BMW X5 G05 2024.jpg"), model("BMW", "X5"), True),
+    ("een e-code van een ander merk is geen chassiscode",
+     pagina("File:Peugeot e-208 GT 2024.jpg"), model("Peugeot", "e-208"), True),
+
     ("vorige generatie in de titel",
      pagina("File:Toyota Prius XW20 2004.jpg"), model("Toyota", "Prius"), False),
 

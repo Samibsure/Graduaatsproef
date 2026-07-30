@@ -390,6 +390,13 @@ def beoordeel(pagina: dict, model: Model) -> Kandidaat | None:
     # BMW X5 stond in de bestandsnaam de opnamedatum 2024 en in de categorie het
     # bouwjaar 1999, en zo raakte een X5 E53 op de plaats van de X5 50e. Het
     # jongste jaartal zei daar niets, het oudste alles.
+    # BMW noemt zijn generaties bij chassiscode, en die code staat vaak in de
+    # bestandsnaam terwijl er geen bouwjaar bij staat. Elke E-code is van voor
+    # 2010: zo bleef 'BMW X5 E53' opduiken voor de X5 50e van 2026, ook nadat de
+    # jaartaltoets er was. De F- en G-codes blijven toegelaten.
+    if normaliseer(model.merk) == "bmw" and re.search(r"\be\d{2}\b", alles):
+        return None
+
     jaren = jaartallen(alles, negeer=set(normaliseer(model.model).split()))
     if jaren:
         if min(jaren) < model.modeljaar - 8:
