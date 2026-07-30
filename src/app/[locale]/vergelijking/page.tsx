@@ -8,6 +8,7 @@ import { useEffect, useMemo, useState } from "react";
 import CarImage from "@/components/CarImage";
 import Icon from "@/components/Icon";
 import { useSessie } from "@/components/SessieProvider";
+import { SteunNoot } from "@/components/Steun";
 import Uitfaseringstijdlijn from "@/components/Uitfaseringstijdlijn";
 import { Container, Eyebrow, TypeDot } from "@/components/ui";
 import {
@@ -627,6 +628,8 @@ export default function VergelijkingPagina() {
               </button>
               {bewaard && <span className="text-sm font-medium text-emerald-700">{t("bewaard")}</span>}
             </div>
+            {/* Pas nadat de tool iets opgeleverd heeft, en dan één regel. */}
+            {bewaard && <SteunNoot className="mt-4 border-t border-line pt-4" />}
           </div>
 
           {/* HISTORIEK */}

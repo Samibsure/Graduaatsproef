@@ -27,6 +27,8 @@ verworpen uitgaven, en is sindsdien uitgebouwd tot een publiek product.
    het bedrijfsprofiel, het fiscaal profiel en het team op `/instellingen`.
 8. **Melden**: een knop op elke pagina om een fout in een berekening te melden of een verbetering
    te vragen.
+9. **Over en steunen**: het verhaal achter de tool, de toelichting bij Ekoon ICT, en de pagina voor
+   de vrijwillige bijdrage.
 
 ### Onboarding
 
@@ -200,6 +202,26 @@ in alle drie de bestanden: een ontbrekende sleutel valt zichtbaar door de mand.
 Interne functie- en veldnamen blijven Nederlands (`laadWagens`, `verworpenUitgaven`). Die hernoemen
 raakt elk bestand en de tests, zonder winst voor de gebruiker.
 
+### Vrijwillige bijdrage
+
+De applicatie blijft gratis; `/steunen` legt uit wat het draaien kost en biedt twee kanalen aan: een
+externe pagina (Buy Me a Coffee of gelijkaardig) en een gewone overschrijving. Er zit **geen**
+betaalintegratie in de applicatie: er wordt geen enkel betaalgegeven verwerkt of bewaard, het
+rekeningnummer wordt alleen getoond. De waarden staan in `src/lib/steun.ts` en zijn elk te
+overschrijven via de omgeving, zodat een rekeningnummer kan wijzigen zonder deployment van nieuwe
+code. Het staat er wel als standaardwaarde: een pagina die om een bijdrage vraagt en vervolgens niet
+zegt waarheen, is erger dan geen pagina, en het nummer is sowieso publiek want het staat op de site
+zelf. Blijft een waarde leeg, dan verdwijnt dat kanaal en blijven alleen de manieren over om gratis
+te helpen.
+
+De vraag komt op vier plaatsen terug en nergens als pop-up of banner: een knop in de voettekst, een
+kaart onderaan `/over`, een regel onderaan `/handleiding` en één regel op `/vergelijking`, pas nadat
+een beslissing bewaard is. Dat laatste is bewust het enige moment in de applicatie zelf: daar heeft
+de tool net iets opgeleverd.
+
+Vragen, foutmeldingen en suggesties gaan naar het adres in `src/lib/contact.ts`. Dat staat op één
+plaats, want het komt terug op de Over-pagina, de handleiding, de privacyverklaring en de foutpagina.
+
 ## Lokaal draaien
 
 ```bash
@@ -225,7 +247,11 @@ deployment niet afhangt van instellingen in het dashboard.
 | `NEXT_PUBLIC_SUPABASE_URL` | nee | URL van het Supabase-project; standaard het publieke project |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | nee | Publishable key (publiek; RLS doet de afscherming) |
 | `NEXT_PUBLIC_SITE_URL` | nee | Basis-URL voor metadata, standaard `https://autofiscaliteit.com` |
-| `NEXT_PUBLIC_DONATIE_URL` | nee | Externe donatiepagina; leeg laten verbergt de knop |
+| `NEXT_PUBLIC_DONATIE_URL` | nee | Externe donatiepagina (Buy Me a Coffee); leeg laten verbergt die kaart |
+| `NEXT_PUBLIC_DONATIE_IBAN` | nee | Rekeningnummer voor een overschrijving; leeg laten verbergt die kaart |
+| `NEXT_PUBLIC_DONATIE_BIC` | nee | BIC bij het rekeningnummer, voor buitenlandse overschrijvingen |
+| `NEXT_PUBLIC_DONATIE_BEGUNSTIGDE` | nee | Naam van de begunstigde bij het rekeningnummer |
+| `NEXT_PUBLIC_DONATIE_MEDEDELING` | nee | Voorgestelde mededeling, standaard `Autofiscaliteit` |
 
 De Supabase-waarden mogen ook onder de namen staan die de Vercel-marketplace-integratie zet:
 `SUPABASE_URL` en `SUPABASE_ANON_KEY` of `SUPABASE_PUBLISHABLE_KEY`. `next.config.ts` neemt de
