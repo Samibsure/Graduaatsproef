@@ -6,11 +6,36 @@
 # Leeg bestand = volledige verversing.
 #
 # Waarom dit bestand bestaat: de keuzeregels vinden een interieurfoto alleen als
-# Commons het bestand ook zo heeft ingedeeld of beschreven. Doet de fotograaf dat
-# niet, dan is er aan de metadata niets te zien en blijft er maar één manier over
-# om het te merken: kijken. Wat hieronder staat is dus met het oog afgekeurd, met
-# de reden erbij, en na een geslaagde herkansing weer geschrapt.
+# Commons het bestand ook zo heeft ingedeeld of beschreven. Bij een beursreeks
+# als 'Auto Zuerich 2024 DSC 6644.jpg' staat er in titel, categorie noch
+# beschrijving iets over wat er op de foto staat, en blijft er maar één manier
+# over om het te merken: kijken. Wat hieronder staat is met het oog afgekeurd,
+# met de reden erbij, en na een geslaagde herkansing weer geschrapt.
 
-# Leeg: de volgende push ververst de hele catalogus. De wegingsregel op
-# wiki-gebruik herrangschikt alle kandidaten, dus die hoort over alle 163
-# modellen te gaan en niet alleen over de afgekeurde.
+# interieur, zonder enig spoor daarvan in de metadata
+citroen-ec3
+fiat-600e
+leapmotor-c10
+renault-clio-etech
+renault-megane-etech
+renault-scenic-etech
+renault-symbioz-etech
+skoda-superb-iv
+volvo-es90
+
+# vorige generatie: Tucson JM (2004), Sportage KM (2004), Prius XW30 (2009)
+hyundai-tucson-hev
+kia-sportage-phev
+toyota-prius-phev
+
+# closeup van een achterklep met typeplaatje
+kia-ev3
+
+# rallywagen met reclamelivery
+hyundai-ioniq5
+
+# camouflagewikkel op een testwagen
+vw-tiguan-ehybrid
+
+# een Golf Country uit 1990; de nieuwe variantnaamregel vangt die nu af
+vw-golf-ehybrid

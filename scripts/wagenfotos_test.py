@@ -98,6 +98,9 @@ GEVALLEN = [
      pagina("File:PIMS 2024 - BMW i5 M60 Touring (front).jpg"),
      model("BMW", "i5 Touring"), True),
 
+    ("de Golf Country uit 1990 is geen Golf eHybrid",
+     pagina("File:Volkswagen Golf Country 1X7A0284.jpg"), model("Volkswagen", "Golf"), False),
+
     # Cijfers onderscheiden de modellen, dus ze moeten als heel woord kloppen.
     ("de ID.4 mag niet doorgaan voor de ID.7",
      pagina("File:Volkswagen ID.4 2021.jpg"), model("Volkswagen", "ID.7"), False),

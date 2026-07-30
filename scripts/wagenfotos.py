@@ -99,7 +99,7 @@ BONUSWOORDEN = {
 CARROSSERIEWOORDEN = (
     "touring", "tourer", "combi", "kombi", "estate", "avant", "sportback",
     "shooting brake", "coupe", "cabriolet", "convertible", "roadster", "variant",
-    "allroad", "cross country", "pickup",
+    "allroad", "cross country", "country", "pickup",
 )
 
 # Modelnamen die eigenlijk een motorversie zijn: 'C 300 e' is een uitvoering van
