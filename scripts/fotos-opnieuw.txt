@@ -11,11 +11,9 @@
 # om het te merken: kijken. Wat hieronder staat is dus met het oog afgekeurd, met
 # de reden erbij, en na een geslaagde herkansing weer geschrapt.
 
-# derde poging; de beschrijving van het bestand wordt nu ook meegelezen, en daar
-# staat bij een interieurfoto vaak wel 'Innenraum' of 'interieur' in
+# vierde poging. Commons heeft voor deze drie hele reeksen beursfoto's uit
+# dezelfde sessie, zonder categorie en zonder beschrijving: 'IMG 1695',
+# 'DSC 1704'. Elke herkansing stapt een kandidaat verder in die reeks.
 renault-symbioz-etech
 skoda-superb-iv
 volvo-es90
-
-# een rij geparkeerde wagens in plaats van deze ene
-mercedes-c220d
