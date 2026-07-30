@@ -95,28 +95,51 @@ buiten de aftrekbeperking van artikel 66 WIB92, en de rekenkern kent die uitzond
 
 ### Modelfoto's
 
-Elk model hoort een echte foto te hebben. Heeft het er geen, dan valt `CarImage` terug op een
-eigen SVG-illustratie per carrosserietype: bruikbaar als noodoplossing, maar op een raster van
-dertig kaarten ziet een bezoeker meteen dat het een plaatshouder is.
+159 van de 163 modellen hebben een echte foto, één bestand per slug in `public/cars`. Ontbreekt er
+een, dan valt `CarImage` terug op een eigen SVG-illustratie per carrosserietype: bruikbaar als
+noodoplossing, maar op een raster van dertig kaarten ziet een bezoeker meteen dat het een
+plaatshouder is.
 
-De foto's staan lokaal in `public/cars`, niet bij een externe dienst: de CSP laat `img-src 'self'`
-toe en niets anders. Ze worden opgehaald door `scripts/wagenfotos.py` van Wikimedia Commons,
-alleen onder een licentie die hergebruik toelaat (publiek domein, CC0, CC BY, CC BY-SA), en
-bijgesneden op 960 × 600 zodat het raster niet schokt van de ene verhouding naar de andere.
+De vier die er geen hebben, staan met hun reden in `scripts/fotos-opnieuw.txt`. Voor die modellen
+heeft Commons vrijwel alleen interieurfoto's van beursstands, of blijft het bij een vorige
+generatie. Dat is een bewuste keuze: een dashboard op de kaart van de ë-C3 leest als een fout in de
+applicatie, een illustratie leest als 'nog geen foto'.
+
+De foto's staan lokaal, niet bij een externe dienst: de CSP laat `img-src 'self'` toe en niets
+anders. Ze komen van Wikimedia Commons, alleen onder een licentie die hergebruik toelaat (publiek
+domein, CC0, CC BY, CC BY-SA), en zijn bijgesneden op 960 × 600 zodat het raster niet schokt van
+de ene verhouding naar de andere.
 
 ```bash
 python3 scripts/wagenfotos.py --check     # welke modellen hebben er nog geen?
 python3 scripts/wagenfotos.py             # de ontbrekende ophalen
-python3 scripts/wagenfotos.py --only bmw-i5 --force   # één model vervangen
+python3 scripts/wagenfotos.py --only bmw-i5 --force              # één model vervangen
+python3 scripts/wagenfotos.py --only bmw-i5 --force --alternatief 1   # ... en dan de tweede keuze
+python3 scripts/wagenfotos_test.py        # de keuzeregels testen
 ```
+
+**Wat de keuze bepaalt.** De bestandsnaam op Commons zegt welke wagen het is, de categorieën van
+het bestand zeggen wat er op staat. Dat tweede is geen luxe: `Ford Explorer EV IAA 2023
+1X7A0592.jpg` is een dashboard, en dat is aan de naam niet te zien. Verder moeten alle
+modelwoorden als heel woord kloppen (de ID.4 is geen ID.7), is een carrosserievariant een andere
+wagen (geen Touring voor de i5), beslist het oudste jaartal over de generatie, en krijgt geen twee
+modellen hetzelfde bestand. Een motorversie zoals `C 300 e` mag terugvallen op de familienaam
+C-Klasse, want dat is dezelfde wagen.
+
+Die regels zijn niet op één keer goed geweest. Ze staan in `scripts/wagenfotos_test.py` met de
+titels en categorieën zoals Commons ze werkelijk teruggaf, inclusief de missers die ze moesten
+opvangen — van een politiewagen tot `toy` dat aansloeg op **Toyota**.
 
 Auteur, licentie en bronlink van elke foto staan in `public/cars/BRONNEN.md`. Dat bestand is de
 naamsvermelding die CC BY en CC BY-SA verplichten; het script schrijft het bij elke run opnieuw.
 `catalogusfotos.test.ts` bewaakt de rest: geen pad dat nergens heen wijst, geen externe URL die de
 CSP toch zou blokkeren, geen foto die twee modellen deelt, niets boven 400 kB.
 
-Het script heeft netwerktoegang tot `commons.wikimedia.org` en `upload.wikimedia.org` nodig. In
-een omgeving die alleen GitHub, npm en PyPI doorlaat, faalt het met `403` op de CONNECT.
+**Ophalen gebeurt in CI.** Het script heeft `commons.wikimedia.org` en `upload.wikimedia.org`
+nodig, en de omgeving waarin aan deze repository gewerkt wordt mag alleen GitHub, npm en PyPI
+bereiken: daar antwoordt elke CONNECT met `403`. Daarom draait het in
+`.github/workflows/modelfotos.yml`, met de hand aan te roepen per slug of voor alles, en het zet
+het resultaat als één commit op een doelbranch — nooit op `main`.
 
 ### Kostenmodel
 
