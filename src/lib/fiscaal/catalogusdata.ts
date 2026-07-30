@@ -336,7 +336,7 @@ const PLUGIN: CatalogCar[] = [
 /* ------------------------------------------------------------------- hybride */
 
 const HYBRIDE: CatalogCar[] = [
-  hev({ slug: "toyota-corolla", merk: "Toyota", model: "Corolla", uitv: "Hybrid 140", carrosserie: "hatchback", segment: "Compacte hatchback", kw: 103, prijs: 33900, co2: 102, verbruik: 4.5, koffer: 361, trek: 750, foto: "/cars/23-toyota-corolla.jpg" }),
+  hev({ slug: "toyota-corolla", merk: "Toyota", model: "Corolla", uitv: "Hybrid 140", carrosserie: "hatchback", segment: "Compacte hatchback", kw: 103, prijs: 33900, co2: 102, verbruik: 4.5, koffer: 361, trek: 750, foto: "/cars/toyota-corolla.jpg" }),
   hev({ slug: "toyota-corolla-ts", merk: "Toyota", model: "Corolla Touring Sports", uitv: "Hybrid 140", carrosserie: "break", segment: "Compacte break", kw: 103, prijs: 35900, co2: 105, verbruik: 4.6, koffer: 596, trek: 750, extra: ["trekhaak"], foto: "/cars/toyota-corolla-ts.jpg" }),
   hev({ slug: "toyota-yaris", merk: "Toyota", model: "Yaris", uitv: "Hybrid 130", carrosserie: "hatchback", segment: "Stadswagen", kw: 96, prijs: 28900, co2: 94, verbruik: 4.2, koffer: 286, trek: 0, foto: "/cars/toyota-yaris.jpg" }),
   hev({ slug: "toyota-yaris-cross", merk: "Toyota", model: "Yaris Cross", uitv: "Hybrid 130", carrosserie: "suv", segment: "SUV compact", kw: 96, prijs: 32900, co2: 105, verbruik: 4.7, koffer: 397, trek: 750, foto: "/cars/toyota-yaris-cross.jpg" }),
