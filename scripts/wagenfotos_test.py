@@ -24,7 +24,8 @@ from wagenfotos import Model, beoordeel, jaartallen, licentie_deugt  # noqa: E40
 
 
 def pagina(titel: str, categorieen: tuple[str, ...] = (), breedte: int = 1600,
-           hoogte: int = 1000, licentie: str = "CC BY-SA 4.0") -> dict:
+           hoogte: int = 1000, licentie: str = "CC BY-SA 4.0",
+           beschrijving: str = "") -> dict:
     return {
         "title": titel,
         "categories": [{"title": f"Category:{c}"} for c in categorieen],
@@ -38,6 +39,7 @@ def pagina(titel: str, categorieen: tuple[str, ...] = (), breedte: int = 1600,
             "extmetadata": {
                 "LicenseShortName": {"value": licentie},
                 "Artist": {"value": "Iemand"},
+                "ImageDescription": {"value": beschrijving},
             },
         }],
     }
@@ -124,6 +126,15 @@ GEVALLEN = [
     ("echt speelgoed blijft geweigerd",
      pagina("File:Toy Toyota Corolla 2023.jpg", ("Toy cars",)),
      model("Toyota", "Corolla"), False),
+
+    # De beschrijving zegt soms wat de bestandsnaam verzwijgt.
+    ("interieur, alleen in de beschrijving",
+     pagina("File:Volvo ES90 DSC 6727.jpg", beschrijving="Innenraum des Volvo ES90"),
+     model("Volvo", "ES90"), False),
+    ("een bouwjaar in de beschrijving keurt niets af",
+     pagina("File:Volvo ES90 2025.jpg",
+            beschrijving="De ES90, opvolger van de S90 uit 2016"),
+     model("Volvo", "ES90"), True),
 
     # Een modelnaam kan zelf een jaartal lijken.
     ("de e-2008 is geen wagen uit 2008",

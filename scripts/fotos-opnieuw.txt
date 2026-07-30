@@ -6,21 +6,16 @@
 # Leeg bestand = volledige verversing.
 #
 # Waarom dit bestand bestaat: de keuzeregels vinden een interieurfoto alleen als
-# Commons het bestand ook zo heeft ingedeeld. Doet de fotograaf dat niet, dan is
-# er aan de titel en de categorieën niets te zien en blijft er maar één manier
-# over om het te merken: kijken. Wat hieronder staat is dus met het oog
-# afgekeurd, met de reden erbij, en na een geslaagde herkansing weer geschrapt.
+# Commons het bestand ook zo heeft ingedeeld of beschreven. Doet de fotograaf dat
+# niet, dan is er aan de metadata niets te zien en blijft er maar één manier over
+# om het te merken: kijken. Wat hieronder staat is dus met het oog afgekeurd, met
+# de reden erbij, en na een geslaagde herkansing weer geschrapt.
 
-# interieur, zonder dat titel of categorie het zegt; tweede poging
+# derde poging; de beschrijving van het bestand wordt nu ook meegelezen, en daar
+# staat bij een interieurfoto vaak wel 'Innenraum' of 'interieur' in
 renault-symbioz-etech
 skoda-superb-iv
 volvo-es90
 
-# nog altijd de X5 E53 uit 1999; de nieuwe regel op BMW-chassiscodes moet dat nu
-# afvangen
-bmw-x5-50e
-
-# de wagen staat er wel op, maar donker en van achteren op een rijbaan
+# een rij geparkeerde wagens in plaats van deze ene
 mercedes-c220d
-mercedes-e220d
-skoda-kamiq

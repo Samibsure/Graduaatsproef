@@ -336,12 +336,24 @@ def beoordeel(pagina: dict, model: Model) -> Kandidaat | None:
     if not titel:
         return None
 
-    # De titel zegt welke wagen het is, de categorieën zeggen wat er op staat.
-    # Voor de weigeringen tellen ze samen, voor de naamherkenning alleen de titel.
+    # De titel zegt welke wagen het is; de categorieën en de beschrijving zeggen
+    # wat er op staat. Voor de weigeringen tellen ze samen, voor de naamherkenning
+    # alleen de titel.
+    #
+    # De beschrijving stond er eerst niet bij, en dat was een gemiste kans: een
+    # fotograaf die zijn bestand 'DSC 6727.jpg' noemt, schrijft er vaak wel
+    # 'Innenraum' of 'interieur' bij in de beschrijving.
     categorieen = normaliseer(
         " ".join(c.get("title", "") for c in (pagina.get("categories") or []))
     )
-    alles = f"{titel} {categorieen}"
+    beschrijving = normaliseer(
+        f"{tekst_uit(meta, 'ImageDescription')} {tekst_uit(meta, 'ObjectName')}"
+    )
+    # Wat er op de foto staat, mag uit alle drie komen. Het bouwjaar en de
+    # chassiscode niet: een beschrijving noemt geregeld ook de vorige generatie
+    # ("opvolger van het model uit 2012"), en dan zou een goede foto afvallen.
+    alles = f"{titel} {categorieen} {beschrijving}"
+    feiten = f"{titel} {categorieen}"
 
     # Aan het begin van een woord, niet ergens middenin: zo slaat 'wheel' ook aan
     # op 'wheels' en 'interior' op 'Interiors of ...', zoals categorieën heten,
@@ -394,10 +406,10 @@ def beoordeel(pagina: dict, model: Model) -> Kandidaat | None:
     # bestandsnaam terwijl er geen bouwjaar bij staat. Elke E-code is van voor
     # 2010: zo bleef 'BMW X5 E53' opduiken voor de X5 50e van 2026, ook nadat de
     # jaartaltoets er was. De F- en G-codes blijven toegelaten.
-    if normaliseer(model.merk) == "bmw" and re.search(r"\be\d{2}\b", alles):
+    if normaliseer(model.merk) == "bmw" and re.search(r"\be\d{2}\b", feiten):
         return None
 
-    jaren = jaartallen(alles, negeer=set(normaliseer(model.model).split()))
+    jaren = jaartallen(feiten, negeer=set(normaliseer(model.model).split()))
     if jaren:
         if min(jaren) < model.modeljaar - 8:
             return None
