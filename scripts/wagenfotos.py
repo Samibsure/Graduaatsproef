@@ -282,11 +282,12 @@ def zoek(term: str) -> list[dict]:
         "gsrsearch": term,
         "gsrnamespace": "6",
         "gsrlimit": "40",
-        "prop": "imageinfo|categories",
+        "prop": "imageinfo|categories|globalusage",
         "iiprop": "url|size|mime|extmetadata",
         "iiurlwidth": "1600",
         "cllimit": "max",
         "clshow": "!hidden",
+        "gulimit": "max",
     }
     antwoord = json.loads(haal(f"{API}?{urlencode(vraag)}").decode("utf-8"))
     return antwoord.get("query", {}).get("pages", []) or []
@@ -389,6 +390,22 @@ def beoordeel(pagina: dict, model: Model) -> Kandidaat | None:
 
     score = 60
     reden = [" ".join(gekozen_eis)]
+
+    # Het sterkste signaal, en het laatste dat erbij kwam: staat de foto in een
+    # artikel op een van de wiki's? Wie een artikel over een wagen illustreert,
+    # kiest een foto van die hele wagen buiten, niet het dashboard van een
+    # beursstand. Zonder deze weging bleven de Symbioz, de Superb iV en de ES90
+    # zes herkansingen lang in dezelfde reeks binnenfoto's ronddraaien: die
+    # reeksen dragen geen categorie en geen beschrijving, dus alle andere regels
+    # zijn er blind voor.
+    gebruik = pagina.get("globalusage") or []
+    if gebruik:
+        score += 45
+        reden.append(f"+45 in {len(gebruik)} artikel(en)")
+        # Nog beter: het artikel gaat over dit model.
+        if any(all(bevat(normaliseer(g.get("title", "")), t) for t in gekozen_eis) for g in gebruik):
+            score += 25
+            reden.append("+25 in het artikel over dit model")
 
     for woord, bonus in BONUSWOORDEN.items():
         if woord in alles:

@@ -25,9 +25,10 @@ from wagenfotos import Model, beoordeel, jaartallen, licentie_deugt  # noqa: E40
 
 def pagina(titel: str, categorieen: tuple[str, ...] = (), breedte: int = 1600,
            hoogte: int = 1000, licentie: str = "CC BY-SA 4.0",
-           beschrijving: str = "") -> dict:
+           beschrijving: str = "", gebruikt_op: tuple[str, ...] = ()) -> dict:
     return {
         "title": titel,
+        "globalusage": [{"title": g, "wiki": "nl.wikipedia.org"} for g in gebruikt_op],
         "categories": [{"title": f"Category:{c}"} for c in categorieen],
         "imageinfo": [{
             "thumburl": "https://upload.wikimedia.org/x.jpg",
@@ -152,8 +153,27 @@ LICENTIES = {
 }
 
 
+def rangschikking() -> list[str]:
+    """De foto uit een wiki-artikel hoort boven een willekeurige beursfoto te staan."""
+    fouten = []
+    wagen = model("Volvo", "ES90")
+    in_artikel = beoordeel(pagina("File:Volvo ES90 IAA 2025 DSC 1700.jpg",
+                                 gebruikt_op=("Volvo ES90",)), wagen)
+    los = beoordeel(pagina("File:Volvo ES90 IAA 2025 DSC 1704.jpg"), wagen)
+    if not in_artikel or not los:
+        fouten.append("FOUT  rangschikking: een van beide kandidaten viel af")
+    elif in_artikel.score <= los.score:
+        fouten.append(
+            f"FOUT  rangschikking: artikelfoto {in_artikel.score} <= losse foto {los.score}")
+    return fouten
+
+
 def main() -> int:
     fouten = 0
+
+    for melding in rangschikking():
+        fouten += 1
+        print(melding)
 
     for beschrijving, kandidaat, wagen, verwacht in GEVALLEN:
         gekregen = beoordeel(kandidaat, wagen) is not None
@@ -171,7 +191,7 @@ def main() -> int:
         fouten += 1
         print("FOUT  jaartallen(): een cameranummer mag geen bouwjaar worden")
 
-    aantal = len(GEVALLEN) + len(LICENTIES) + 1
+    aantal = len(GEVALLEN) + len(LICENTIES) + 2
     if fouten:
         print(f"\n{fouten} van {aantal} tests gefaald")
         return 1

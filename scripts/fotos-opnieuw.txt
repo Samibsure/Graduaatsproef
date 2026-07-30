@@ -11,9 +11,6 @@
 # om het te merken: kijken. Wat hieronder staat is dus met het oog afgekeurd, met
 # de reden erbij, en na een geslaagde herkansing weer geschrapt.
 
-# vierde poging. Commons heeft voor deze drie hele reeksen beursfoto's uit
-# dezelfde sessie, zonder categorie en zonder beschrijving: 'IMG 1695',
-# 'DSC 1704'. Elke herkansing stapt een kandidaat verder in die reeks.
-renault-symbioz-etech
-skoda-superb-iv
-volvo-es90
+# Leeg: de volgende push ververst de hele catalogus. De wegingsregel op
+# wiki-gebruik herrangschikt alle kandidaten, dus die hoort over alle 163
+# modellen te gaan en niet alleen over de afgekeurde.
