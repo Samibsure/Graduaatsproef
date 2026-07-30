@@ -55,22 +55,53 @@ BREEDTE, HOOGTE = 960, 600
 GOEDE_LICENTIES = ("cc0", "cc by", "public domain", "pd ", "attribution")
 SLECHTE_LICENTIES = ("nc", "nd", "fair use", "non-free")
 
-# Woorden die verraden dat een foto niet toont wat wij nodig hebben: een
+# Wat een foto onbruikbaar maakt, hoe onschuldig de bestandsnaam ook klinkt.
+# Deze woorden worden getoetst op de titel én op de categorieën van het bestand.
+# Geen straf maar een weigering: een interieur of een politiewagen wordt nooit
+# beter dan een andere kandidaat, dus een strafpunt laat hem alsnog winnen
+# wanneer de rest zwak is. Dat is in de eerste ronde precies gebeurd.
+VERBODEN = (
+    # niet de hele wagen
+    "interior", "interieur", "innenraum", "innenansicht", "dashboard", "cockpit",
+    "instrument", "steering", "lenkrad", "armaturenbrett", "engine", "motorraum",
+    "wheel", "rim", "tyre", "tire", "badge", "emblem", "logo", "grille", "headlamp",
+    "headlight", "taillight", "rucklicht", "trunk", "boot lid", "detail",
+    "cutaway", "chassis", "underbody",
+    # de wagen, maar niet zoals een bedrijf hem koopt
+    "police", "polizei", "politie", "carabinieri", "gendarmerie", "ambulance",
+    "feuerwehr", "fire brigade", "taxi", "driving school", "safety car", "race",
+    "racing", "rally", "motorsport", "livery", "tuning", "camouflage", "wrapped",
+    "crash", "damaged", "wreck", "burnt", "abandoned", "rust",
+    # helemaal geen wagen
+    "toy", "model car", "miniature", "diorama", "scale model", "lego",
+)
+
+# Woorden die er net op wijzen dat het de foto is die we zoeken: een
 # driekwartaanzicht van de hele wagen.
-STRAFWOORDEN = {
-    "interior": 40, "interieur": 40, "innenraum": 40, "dashboard": 40, "cockpit": 40,
-    "rear": 25, "heck": 25, "achterzijde": 25, "back": 12, "tail": 18,
-    "engine": 40, "motor": 20, "moteur": 20, "chassis": 30, "cutaway": 40,
-    "wheel": 30, "rim": 30, "badge": 40, "logo": 45, "emblem": 45, "grille": 25,
-    "seat": 30, "trunk": 25, "boot": 20, "charging": 15, "laadpaal": 20,
-    "crash": 45, "damaged": 45, "wreck": 45, "police": 35, "polizei": 35,
-    "taxi": 30, "camouflage": 45, "prototype": 30, "spy": 35, "concept": 25,
-    "rally": 35, "race": 30, "racing": 30, "tuning": 30, "modified": 25,
-    "museum": 15, "toy": 45, "model car": 45, "miniature": 45, "diorama": 45,
+BONUSWOORDEN = {
+    "three quarter": 18, "front quarter": 18, "quarter view": 14,
+    "vorderansicht": 8, "schragansicht": 8,
+    "iaa": 6, "genf": 6, "gims": 6, "salon": 5, "automesse": 5, "mobility show": 5,
 }
 
-# Woorden die er net op wijzen dat het wél de foto is die we zoeken.
-BONUSWOORDEN = {"front": 12, "vorderansicht": 12, "genf": 6, "iaa": 6, "salon": 5, "msp": 4}
+# Carrosseriewoorden. Staat er zo'n woord in de titel dat niet in de modelnaam
+# staat, dan is het een andere uitvoering: een i5 Touring is geen i5, en een
+# Superb Combi geen Superb. Omgekeerd hoort het woord er wel in te staan wanneer
+# de modelnaam het draagt.
+# 'van' en 'sw' staan er bewust niet in: die botsen op gewone woorden in
+# Nederlandse en Duitse bestandsnamen ("vooraanzicht van een ...").
+CARROSSERIEWOORDEN = (
+    "touring", "tourer", "combi", "kombi", "estate", "avant", "sportback",
+    "shooting brake", "coupe", "cabriolet", "convertible", "roadster", "variant",
+    "allroad", "cross country", "pickup",
+)
+
+# Modelnamen die eigenlijk een motorversie zijn: 'C 300 e' is een uitvoering van
+# de C-Klasse, '530e' een van de 5-reeks. Commons kent de motorcode niet altijd,
+# de familie wel, en de wagen ziet er hetzelfde uit. Dus eerst de code proberen
+# en anders terugvallen op de familie.
+MOTORCODE_MERCEDES = re.compile(r"^([a-z]{1,3}) (\d{3}) ?([a-z]{0,2})$")
+MOTORCODE_BMW = re.compile(r"^(\d)(\d\d)([a-z]?)$")
 
 
 def normaliseer(tekst: str) -> str:
@@ -78,6 +109,37 @@ def normaliseer(tekst: str) -> str:
     plat = unicodedata.normalize("NFKD", tekst)
     plat = "".join(t for t in plat if not unicodedata.combining(t))
     return re.sub(r"[^a-z0-9]+", " ", plat.lower()).strip()
+
+
+CAMERAVOORVOEGSELS = {"dsc", "dscf", "dscn", "img", "imgp", "dsc00", "p", "pxl", "sam", "cimg"}
+
+
+def jaartallen(tekst: str) -> list[int]:
+    """De jaartallen in een genormaliseerde tekst, zonder de nummers van camera's.
+
+    Fotografen noemen hun bestanden 'DSC 1996.jpg' en 'IMG 2019.jpg'. Dat als
+    bouwjaar lezen zou net de scherpste foto's afkeuren, dus een getal dat op een
+    cameravoorvoegsel volgt telt niet mee.
+    """
+    woorden = tekst.split()
+    jaren = []
+    for index, woord in enumerate(woorden):
+        if not re.fullmatch(r"19\d{2}|20\d{2}", woord):
+            continue
+        if index and woorden[index - 1] in CAMERAVOORVOEGSELS:
+            continue
+        jaren.append(int(woord))
+    return jaren
+
+
+def bevat(tekst: str, woordgroep: str) -> bool:
+    """Staat deze woordgroep als hele woorden in de tekst?
+
+    Met een gewone `in`-toets zou de 7 van de ID.7 ook aanslaan op het jaartal
+    2017, en 'combi' op 'combination'. Beide teksten zijn al genormaliseerd, dus
+    één spatie eromheen volstaat als woordgrens.
+    """
+    return f" {woordgroep} " in f" {tekst} "
 
 
 @dataclass
@@ -98,15 +160,34 @@ class Model:
     def zoektermen(self) -> list[str]:
         """Van specifiek naar algemeen: stopt bij de eerste die iets bruikbaars geeft."""
         merk = self.merk.replace("-Benz", "")  # Commons noemt ze meestal 'Mercedes-Benz'
-        return [
-            f"{self.merk} {self.model}",
-            f"{merk} {self.model}",
-            f"{self.merk} {self.model} {self.modeljaar}",
-        ]
+        termen = [f"{self.merk} {self.model}", f"{merk} {self.model}"]
+        for eis in self.eisen[1:]:
+            termen.append(f"{self.merk} {' '.join(eis)}")
+        termen.append(f"{self.merk} {self.model} {self.modeljaar}")
+        return termen
 
     @property
-    def kernwoorden(self) -> list[str]:
-        return [w for w in normaliseer(self.model).split() if w]
+    def eisen(self) -> list[list[str]]:
+        """Woordgroepen die in de bestandsnaam moeten staan, in volgorde van voorkeur.
+
+        Eén ervan moet volledig kloppen. Cijfers van één teken blijven staan (de
+        7 van ID.7 onderscheidt hem van de ID.4), losse letters niet: die maken
+        van 'C 300 e' een treffer op elke titel met een c en een e in.
+        """
+        naam = normaliseer(self.model)
+
+        mercedes = MOTORCODE_MERCEDES.match(naam)
+        if mercedes:
+            letters, cijfers, _ = mercedes.groups()
+            return [[f"{letters} {cijfers}"], [f"{letters} class"], [f"{letters} klasse"]]
+
+        bmw = MOTORCODE_BMW.match(naam)
+        if bmw:
+            reeks = bmw.group(1)
+            return [[naam], [f"{reeks} series"], [f"{reeks}er"], [f"{reeks} serie"]]
+
+        woorden = [w for w in naam.split() if len(w) > 1 or w.isdigit()]
+        return [woorden or [naam]]
 
 
 @dataclass
@@ -175,6 +256,14 @@ def haal(url: str) -> bytes:
 
 
 def zoek(term: str) -> list[dict]:
+    """Zoekt bestanden op Commons, met hun categorieën erbij.
+
+    Die categorieën zijn geen luxe. De eerste ronde koos voor de Ford Explorer,
+    de Hyundai Inster en de Leapmotor C10 een foto van het *interieur*, en aan de
+    bestandsnaam was dat niet te zien: 'Ford Explorer EV IAA 2023 1X7A0592.jpg'
+    zegt niets over wat er op staat. De fotograaf hangt zo'n opname wel in een
+    categorie als 'Interior of ...'. Daar valt het dus wel op te vangen.
+    """
     vraag = {
         "action": "query",
         "format": "json",
@@ -183,9 +272,11 @@ def zoek(term: str) -> list[dict]:
         "gsrsearch": term,
         "gsrnamespace": "6",
         "gsrlimit": "40",
-        "prop": "imageinfo",
+        "prop": "imageinfo|categories",
         "iiprop": "url|size|mime|extmetadata",
         "iiurlwidth": "1600",
+        "cllimit": "max",
+        "clshow": "!hidden",
     }
     antwoord = json.loads(haal(f"{API}?{urlencode(vraag)}").decode("utf-8"))
     return antwoord.get("query", {}).get("pages", []) or []
@@ -235,34 +326,64 @@ def beoordeel(pagina: dict, model: Model) -> Kandidaat | None:
     if not titel:
         return None
 
+    # De titel zegt welke wagen het is, de categorieën zeggen wat er op staat.
+    # Voor de weigeringen tellen ze samen, voor de naamherkenning alleen de titel.
+    categorieen = normaliseer(
+        " ".join(c.get("title", "") for c in (pagina.get("categories") or []))
+    )
+    alles = f"{titel} {categorieen}"
+
+    # Aan het begin van een woord, niet ergens middenin: zo slaat 'wheel' ook aan
+    # op 'wheels' en 'interior' op 'Interiors of ...', zoals categorieën heten,
+    # zonder dat 'race' een treffer wordt op 'Terrace'.
+    if any(re.search(rf"\b{re.escape(verboden)}", alles) for verboden in VERBODEN):
+        return None
+
+    # Twee wagens op één foto: welke van de twee is de onze? Zo koos de eerste
+    # ronde voor de Mercedes C 300 e een foto van een SLS AMG naast een 300 SL.
+    if "&" in pagina.get("title", "") or " und " in titel:
+        return None
+
     # De naam moet er echt in staan, anders krijgt een 'Volkswagen' willekeurig
     # welke Volkswagen mee.
     merkwoorden = normaliseer(model.merk).split()
     if not any(woord in titel for woord in merkwoorden):
         return None
-    kern = model.kernwoorden
-    treffers = sum(1 for woord in kern if woord in titel)
-    if kern and treffers == 0:
+
+    # Alle woorden van één eis, niet een deel ervan. Met 'een van de woorden'
+    # volstaat 'ID.7' voor de ID.7 Tourer en omgekeerd, en dan tonen twee rijen
+    # in de catalogus dezelfde wagen.
+    gekozen_eis = next((eis for eis in model.eisen if all(bevat(titel, t) for t in eis)), None)
+    if gekozen_eis is None:
         return None
 
-    score = 40 * treffers + (12 if treffers == len(kern) else 0)
-    reden = [f"{treffers}/{len(kern)} modelwoorden"]
+    # Een carrosserievariant is een andere wagen.
+    for woord in CARROSSERIEWOORDEN:
+        in_model = bevat(normaliseer(model.model), woord)
+        if bevat(titel, woord) != in_model:
+            return None
 
-    for woord, straf in STRAFWOORDEN.items():
-        if woord in titel:
-            score -= straf
-            reden.append(f"-{straf} {woord}")
+    score = 60
+    reden = [" ".join(gekozen_eis)]
+
     for woord, bonus in BONUSWOORDEN.items():
-        if woord in titel:
+        if woord in alles:
             score += bonus
 
     # Liefst een liggende foto rond 3:2, en liever groot dan klein.
     score += int(20 - min(20, abs(verhouding - 1.55) * 25))
     score += min(15, breedte // 400)
 
-    jaar = re.findall(r"\b(20\d{2})\b", titel)
-    if jaar and max(int(j) for j in jaar) >= model.modeljaar - 2:
-        score += 8
+    # De juiste generatie. Het *oudste* jaartal beslist, niet het jongste: bij de
+    # BMW X5 stond in de bestandsnaam de opnamedatum 2024 en in de categorie het
+    # bouwjaar 1999, en zo raakte een X5 E53 op de plaats van de X5 50e. Het
+    # jongste jaartal zei daar niets, het oudste alles.
+    jaren = jaartallen(alles)
+    if jaren:
+        if min(jaren) < model.modeljaar - 8:
+            return None
+        if max(jaren) >= model.modeljaar - 2:
+            score += 10
 
     return Kandidaat(
         titel=pagina.get("title", ""),
@@ -278,22 +399,36 @@ def beoordeel(pagina: dict, model: Model) -> Kandidaat | None:
     )
 
 
-def kies(model: Model) -> Kandidaat | None:
+def kies(model: Model, bezet: set[str], overslaan: int = 0) -> Kandidaat | None:
+    """De beste kandidaat voor dit model, of None.
+
+    `bezet` bevat de bestanden die al aan een ander model hangen. Twee rijen in
+    de catalogus die dezelfde foto tonen, lezen als een fout in de applicatie,
+    ook wanneer het om twee uitvoeringen van dezelfde wagen gaat.
+
+    `overslaan` laat de zoveel beste over: de uitweg wanneer de eerste keuze
+    ondanks alle regels niet deugt en er met de hand een andere moet komen.
+    """
     gezien: set[str] = set()
     besten: list[Kandidaat] = []
     for term in model.zoektermen:
         for pagina in zoek(term):
-            if pagina.get("title") in gezien:
+            titel = pagina.get("title", "")
+            if titel in gezien or bestandsnaam_van(titel) in bezet:
                 continue
-            gezien.add(pagina.get("title", ""))
+            gezien.add(titel)
             kandidaat = beoordeel(pagina, model)
             if kandidaat:
                 besten.append(kandidaat)
-        if besten and max(k.score for k in besten) >= 70:
+        if len(besten) > overslaan and max(k.score for k in besten) >= 85:
             break  # goed genoeg; geen extra verzoeken naar Commons
-    if not besten:
-        return None
-    return max(besten, key=lambda k: k.score)
+    op_score = sorted(besten, key=lambda k: k.score, reverse=True)
+    return op_score[overslaan] if len(op_score) > overslaan else None
+
+
+def bestandsnaam_van(titel: str) -> str:
+    """'File:BMW i5 M60.jpg' -> 'BMW i5 M60.jpg', zoals het in BRONNEN.md staat."""
+    return titel.replace("File:", "").strip()
 
 
 def snij_bij(rauw: bytes, doel: Path) -> None:
@@ -418,6 +553,13 @@ def main() -> int:
     parser.add_argument("--force", action="store_true", help="ook modellen die al een foto hebben")
     parser.add_argument("--only", default="", help="komma-gescheiden slugs")
     parser.add_argument("--dry-run", action="store_true", help="zoeken en tonen, niets bewaren")
+    parser.add_argument(
+        "--alternatief",
+        type=int,
+        default=0,
+        metavar="N",
+        help="niet de beste kandidaat nemen maar de N-de daarna, voor een keuze die niet deugt",
+    )
     argumenten = parser.parse_args()
 
     modellen = lees_modellen()
@@ -435,8 +577,15 @@ def main() -> int:
     else:
         werk = [m for m in modellen if not m.foto]
 
+    # Een volledige verversing beslist opnieuw over alles, dus begint ze met een
+    # leeg blad: de bezette bestanden worden binnen deze run opgebouwd. Een
+    # gerichte herkansing (--only) doet het omgekeerde en houdt juist rekening
+    # met wat er al hangt, inclusief de foto die nu vervangen moet worden.
+    volledig = argumenten.force and not argumenten.only
+    bronnen = {} if volledig else lees_bronnen()
+    bezet = {rij["titel"] for rij in bronnen.values()}
+
     print(f"{len(werk)} model(len) te doen\n")
-    bronnen = lees_bronnen()
     gelukt, mislukt = 0, []
 
     for teller, model in enumerate(werk, start=1):
@@ -447,7 +596,7 @@ def main() -> int:
         if teller > 1:
             time.sleep(0.5)
         try:
-            keuze = kies(model)
+            keuze = kies(model, bezet, argumenten.alternatief)
         except Exception as fout:  # noqa: BLE001 — zie de reden bij het downloaden
             print(f"{prefix} zoeken mislukt: {type(fout).__name__}: {fout}")
             mislukt.append(model)
@@ -476,9 +625,10 @@ def main() -> int:
         bronnen[bestandsnaam] = {
             "auteur": keuze.auteur,
             "licentie": keuze.licentie,
-            "titel": keuze.titel.replace("File:", ""),
+            "titel": bestandsnaam_van(keuze.titel),
             "bron": keuze.beschrijfurl,
         }
+        bezet.add(bestandsnaam_van(keuze.titel))
         zet_foto_in_catalogus(model.slug, f"/cars/{bestandsnaam}")
         schrijf_bronnen(bronnen)
         gelukt += 1
@@ -486,7 +636,33 @@ def main() -> int:
     print(f"\n{gelukt} foto's opgehaald, {len(mislukt)} niet gelukt")
     for model in mislukt:
         print(f"  {model.slug:32} {model.naam}")
+
+    if volledig and not argumenten.dry_run:
+        ruim_op(lees_modellen(), bronnen)
+
     return 0 if not mislukt else 1
+
+
+def ruim_op(modellen: list[Model], bronnen: dict[str, dict]) -> None:
+    """Verwijdert foto's waar geen model meer naar verwijst.
+
+    Na een volledige verversing heet elk bestand naar de slug van zijn model. De
+    oorspronkelijke vijfentwintig heetten `01-tesla-model-y.jpg` en dergelijke;
+    die zouden anders als weeskind in de map achterblijven, zonder bronvermelding
+    en zonder dat iets ze nog toont.
+    """
+    gebruikt = {(m.foto or "").split("/")[-1] for m in modellen}
+    verwijderd = []
+    for bestand in sorted(FOTOMAP.glob("*.jpg")):
+        if bestand.name not in gebruikt:
+            bestand.unlink()
+            bronnen.pop(bestand.name, None)
+            verwijderd.append(bestand.name)
+    if verwijderd:
+        schrijf_bronnen(bronnen)
+        print(f"\n{len(verwijderd)} ongebruikte bestanden verwijderd:")
+        for naam in verwijderd:
+            print(f"  {naam}")
 
 
 if __name__ == "__main__":

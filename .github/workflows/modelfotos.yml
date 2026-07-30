@@ -49,6 +49,12 @@ jobs:
 
       - run: pip install pillow
 
+      # De keuzeregels zijn fijnmazig geworden: interieurfoto's via categorieën,
+      # motorversies via de familienaam, generaties via het oudste jaartal. Die
+      # regels hebben tests, en die horen te draaien voordat er 163 foto's op
+      # gebaseerd worden.
+      - run: python3 scripts/wagenfotos_test.py
+
       - name: Wat ontbreekt er?
         run: python3 scripts/wagenfotos.py --check || true
 
