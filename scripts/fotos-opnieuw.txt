@@ -1,0 +1,39 @@
+# Modellen die een andere foto moeten krijgen.
+#
+# Eén slug per regel. Een push naar de bouwbranch haalt voor deze modellen een
+# nieuwe foto op in plaats van de hele catalogus te verversen; het script slaat
+# daarbij de foto over die er nu hangt, dus je krijgt de volgende kandidaat.
+# Leeg bestand = volledige verversing.
+#
+# Waarom dit bestand bestaat: de keuzeregels vinden een interieurfoto alleen als
+# Commons het bestand ook zo heeft ingedeeld. Doet de fotograaf dat niet, dan is
+# er aan de titel en de categorieën niets te zien en blijft er maar één manier
+# over om het te merken: kijken. Wat hieronder staat is dus met het oog
+# afgekeurd, met de reden erbij, en na een geslaagde herkansing weer geschrapt.
+
+# interieur, zonder dat titel of categorie het zegt
+hyundai-inster
+leapmotor-c10
+renault-symbioz-etech
+skoda-superb-iv
+volvo-es90
+
+# vorige generatie: dit is nog de X5 E53 uit 1999
+bmw-x5-50e
+
+# niet de wagen zelf: een rij geparkeerde auto's, een straatbeeld met bromfietsen
+mercedes-c220d
+mercedes-e220d
+opel-corsa-electric
+skoda-kamiq
+
+# te dicht op de wagen, of te donker om iets te zien
+porsche-taycan
+smart-3
+opel-grandland-electric
+
+# rallywagen met reclamelivery
+toyota-yaris
+
+# de wagen staat te ver weg om er iets aan te zien
+mercedes-glc220d

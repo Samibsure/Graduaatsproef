@@ -62,13 +62,17 @@ jobs:
         id: ophalen
         env:
           ONLY: ${{ inputs.only }}
-          # Een push naar de bouwbranch betekent altijd een volledige verversing:
-          # daar wordt aan de keuzeregels gewerkt, en dan is de vraag juist wat die
-          # regels voor álle modellen opleveren, niet alleen voor wat nog ontbreekt.
+          # Een push naar de bouwbranch betekent een volledige verversing, tenzij
+          # scripts/fotos-opnieuw.txt slugs bevat: dan gaat het om de modellen die
+          # met het oog zijn afgekeurd en krijgen alleen die een andere kandidaat.
           # Bij een handmatige aanroep beslist de invoer.
           FORCE: ${{ inputs.force || (github.event_name == 'push' && 'true') }}
         run: |
           argumenten=""
+          if [ -z "$ONLY" ] && [ -f scripts/fotos-opnieuw.txt ]; then
+            ONLY=$(grep -vE '^\s*(#|$)' scripts/fotos-opnieuw.txt | paste -sd, -)
+            [ -n "$ONLY" ] && echo "Herkansing voor: $ONLY"
+          fi
           [ -n "$ONLY" ] && argumenten="$argumenten --only $ONLY"
           [ "$FORCE" = "true" ] && argumenten="$argumenten --force"
           # Het script eindigt op 1 zodra één model geen bruikbare foto had. Dat
