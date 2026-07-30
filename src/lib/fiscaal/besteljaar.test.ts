@@ -3,6 +3,7 @@ import { standaardBesteljaren, vergelijkBesteljaren } from "./besteljaar";
 import { catalogPreview } from "./catalog";
 import { catalogusPerSlug } from "./catalogusdata";
 import { DEFAULT_CONTEXT } from "./defaults";
+import { berekenProjectie } from "./engine";
 
 const model = (slug: string) => {
   const c = catalogusPerSlug(slug);
@@ -76,6 +77,105 @@ describe("vergelijkBesteljaren", () => {
     const v = vergelijkBesteljaren(DEFAULT_CONTEXT, elektrisch, [2026]);
     expect(v.rijen).toHaveLength(1);
     expect(v.rijen[0].totaleKost).toBeGreaterThan(0);
+  });
+});
+
+/** De som van de drie drijvers, want die telling komt in elke test terug. */
+const totaal = (d: { aftrekbaarheid: number; voordeelAlleAard: number; rsz: number }) =>
+  d.aftrekbaarheid + d.voordeelAlleAard + d.rsz;
+
+describe("waar het verschil tussen besteljaren zit", () => {
+  const wagens: Array<[string, ReturnType<typeof catalogPreview>]> = [
+    ["diesel", diesel],
+    ["elektrisch", elektrisch],
+  ];
+
+  it.each(wagens)(
+    "de drie drijvers sommeren voor %s exact tot de kolom Verschil",
+    (_naam, wagen) => {
+      // Dit is de belofte die de tabel op het scherm doet: de balkjes in de
+      // uitleg tellen op tot het bedrag in de laatste kolom. Klopt dat niet, dan
+      // is de uitleg erger dan geen uitleg.
+      for (const opties of [undefined, { kmoTarief: true }]) {
+        const v = vergelijkBesteljaren(
+          DEFAULT_CONTEXT,
+          wagen,
+          [2024, 2025, 2026, 2027, 2028],
+          4,
+          opties,
+        );
+        for (const r of v.rijen) {
+          expect(totaal(r.drijversVerschil)).toBeCloseTo(r.meerkostTegenoverBeste, 6);
+        }
+      }
+    },
+  );
+
+  it("laat het goedkoopste besteljaar op nul staan", () => {
+    const v = vergelijkBesteljaren(DEFAULT_CONTEXT, diesel, [2025, 2026, 2027]);
+    const beste = v.rijen.find((r) => r.jaar === v.besteJaar)!;
+    expect(beste.drijversVerschil).toEqual({
+      aftrekbaarheid: 0,
+      voordeelAlleAard: 0,
+      rsz: 0,
+    });
+  });
+
+  it("dekt met de drie drijvers de volledige fiscale meerkost over de looptijd", () => {
+    // Niet alleen het verschil moet kloppen, ook het absolute bedrag: anders
+    // klopt het verschil per ongeluk omdat er twee keer hetzelfde ontbreekt.
+    const v = vergelijkBesteljaren(DEFAULT_CONTEXT, diesel, [2025, 2026], 4);
+    for (const r of v.rijen) {
+      const projectie = berekenProjectie(
+        DEFAULT_CONTEXT,
+        { ...diesel, besteldatum: `${r.jaar}-01-15`, eerste_ingebruikname: `${r.jaar}-03-01` },
+        r.jaar,
+        4,
+      );
+      const meerkost = projectie.jaren.reduce((s, j) => s + j.fiscaleMeerkost, 0);
+      expect(totaal(r.drijvers)).toBeCloseTo(meerkost, 6);
+    }
+  });
+
+  it("wijst voor een elektrische wagen de aftrekbaarheid als de drijver aan", () => {
+    // Besteld in 2026 nog 100%, besteld in 2028 nog 90%. Aan de wagen en aan de
+    // RSZ verandert bijna niets; het verschil zit in wat aftrekbaar is.
+    const v = vergelijkBesteljaren(DEFAULT_CONTEXT, elektrisch, [2026, 2028], 4);
+    const laat = v.rijen.find((r) => r.jaar === 2028)!;
+    expect(laat.drijversVerschil.aftrekbaarheid).toBeGreaterThan(0);
+    expect(laat.drijversVerschil.aftrekbaarheid).toBeGreaterThan(
+      Math.abs(laat.drijversVerschil.rsz),
+    );
+  });
+
+  it("geeft het aftrekpad over de volledige looptijd", () => {
+    const v = vergelijkBesteljaren(DEFAULT_CONTEXT, diesel, [2025], 4);
+    const r = v.rijen[0];
+    expect(r.aftrekPad).toHaveLength(4);
+    expect(r.aftrekPad[0]).toBe(r.aftrekEerste);
+    // Besteld in 2025 loopt de wagen door de uitdoofkalender: 2025 tot 2028, en
+    // dat laatste gebruiksjaar staat op nul.
+    expect(r.aftrekPad[3]).toBe(0);
+    // Een aftrekpad hoort nooit te stijgen; de kalender kent alleen dalingen.
+    for (let i = 1; i < r.aftrekPad.length; i++) {
+      expect(r.aftrekPad[i]).toBeLessThanOrEqual(r.aftrekPad[i - 1]);
+    }
+  });
+
+  it("noemt per besteljaar waar het percentage vandaan komt", () => {
+    const v = vergelijkBesteljaren(DEFAULT_CONTEXT, diesel, [2025, 2026]);
+    const perJaar = Object.fromEntries(v.rijen.map((r) => [r.jaar, r]));
+    expect(perJaar[2025].opbouw.herkomst).toBe("gramformule");
+    expect(perJaar[2026].opbouw.herkomst).toBe("levenslang_nul");
+
+    const bev = vergelijkBesteljaren(DEFAULT_CONTEXT, elektrisch, [2027]);
+    expect(bev.rijen[0].opbouw.herkomst).toBe("kalenderplafond");
+    expect(bev.rijen[0].opbouw.gramformulePct).toBeNull();
+  });
+
+  it("houdt de looptijd aan die meegegeven wordt", () => {
+    const v = vergelijkBesteljaren(DEFAULT_CONTEXT, elektrisch, [2026], 6);
+    expect(v.rijen[0].aftrekPad).toHaveLength(6);
   });
 });
 

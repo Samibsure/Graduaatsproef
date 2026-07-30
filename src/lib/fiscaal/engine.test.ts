@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { DEFAULT_CONTEXT } from "./defaults";
 import {
+  aftrekOpbouw,
   aftrekPct,
   berekenJaar,
   berekenProjectie,
@@ -111,6 +112,101 @@ describe("aftrekbaarheid (Tabel 1 en Bijlage 3)", () => {
     expect(gramformule("diesel", null)).toBe(40); // onbekende uitstoot
     const oudeDiesel = { ...diesel, besteldatum: "2023-03-01" };
     expect(aftrekPct(ctx, oudeDiesel, 2026)).toBe(120 - 0.5 * 135);
+  });
+});
+
+describe("herkomst van het aftrekpercentage", () => {
+  const voertuigen: Array<[string, Vehicle]> = [
+    ["bev 2026", bev],
+    ["bev 2027", { ...bev, besteldatum: "2027-02-01" }],
+    ["bev 2031", { ...bev, besteldatum: "2031-02-01" }],
+    ["diesel 2024", diesel],
+    ["diesel 2026", { ...diesel, besteldatum: "2026-02-01" }],
+    ["diesel 2023 H1", { ...diesel, besteldatum: "2023-03-01" }],
+    ["vuile diesel 2024", { ...diesel, co2: 250 }],
+    ["diesel zonder CO₂", { ...diesel, besteldatum: "2023-03-01", co2_onbekend: true }],
+  ];
+
+  it.each(voertuigen)("geeft voor %s hetzelfde getal als aftrekPct", (_naam, wagen) => {
+    // aftrekPct gaat door aftrekOpbouw heen. Deze test bewaakt dat die
+    // herformulering geen enkel bestaand cijfer verschoven heeft.
+    for (const gebruiksjaar of [2024, 2025, 2026, 2027, 2028, 2029, 2031]) {
+      expect(aftrekOpbouw(ctx, wagen, gebruiksjaar).pct).toBe(
+        aftrekPct(ctx, wagen, gebruiksjaar),
+      );
+    }
+  });
+
+  it("noemt bij een bestelling vóór juli 2023 de gramformule, zonder plafond", () => {
+    const oud = { ...diesel, besteldatum: "2023-03-01" };
+    const o = aftrekOpbouw(ctx, oud, 2026);
+    expect(o.herkomst).toBe("gramformule");
+    expect(o.periode.code).toBe("voor_07_2023");
+    expect(o.gramformulePct).toBe(52.5);
+    expect(o.plafondPct).toBeNull();
+    expect(o.gramCoefficient).toBe(1);
+    expect(o.gerekendeCo2).toBe(135);
+    expect(o.metMinimum).toBe(true);
+  });
+
+  it("noemt bij een elektrische wagen de kalender en niet de formule", () => {
+    const o = aftrekOpbouw(ctx, { ...bev, besteldatum: "2027-02-01" }, 2027);
+    expect(o.herkomst).toBe("kalenderplafond");
+    expect(o.plafondPct).toBe(95);
+    expect(o.gramformulePct).toBeNull();
+  });
+
+  it("onderscheidt levenslang nul van een kalenderjaar dat op nul staat", () => {
+    // Besteld vanaf 2026 is de nul een eigenschap van het besteljaar: één regel
+    // voor de hele gebruiksduur.
+    const nieuw = aftrekOpbouw(ctx, { ...diesel, besteldatum: "2026-02-01" }, 2026);
+    expect(nieuw.herkomst).toBe("levenslang_nul");
+    expect(nieuw.pct).toBe(0);
+
+    // Besteld in 2024 is de nul een trap in de uitdoofkalender, en dus iets
+    // anders om uit te leggen.
+    const overgang = aftrekOpbouw(ctx, diesel, 2028);
+    expect(overgang.herkomst).toBe("kalenderplafond");
+    expect(overgang.pct).toBe(0);
+  });
+
+  it("zegt in het overgangsregime welke van de twee bond", () => {
+    // 135 g diesel: de formule geeft 52,5%. In gebruiksjaar 2025 ligt het
+    // plafond op 75%, dus bindt de formule.
+    const formuleBindt = aftrekOpbouw(ctx, diesel, 2025);
+    expect(formuleBindt.herkomst).toBe("gramformule");
+    expect(formuleBindt.gramformulePct).toBe(52.5);
+    expect(formuleBindt.plafondPct).toBe(75);
+    expect(formuleBindt.pct).toBe(52.5);
+
+    // Een schone diesel van 40 g komt op 100% uit; dan bindt het plafond.
+    const plafondBindt = aftrekOpbouw(ctx, { ...diesel, co2: 40 }, 2026);
+    expect(plafondBindt.herkomst).toBe("kalenderplafond");
+    expect(plafondBindt.gramformulePct).toBe(100);
+    expect(plafondBindt.plafondPct).toBe(50);
+    expect(plafondBindt.pct).toBe(50);
+  });
+
+  it("meldt of de wettelijke ondergrens van 50% nog gold", () => {
+    expect(aftrekOpbouw(ctx, diesel, 2024).metMinimum).toBe(true);
+    expect(aftrekOpbouw(ctx, diesel, 2025).metMinimum).toBe(false);
+  });
+
+  it("geeft de gecorrigeerde CO₂ van een valse hybride terug", () => {
+    // Een PHEV met een te kleine batterij wordt fiscaal op een hogere uitstoot
+    // gewogen; de uitleg hoort dat cijfer te tonen en niet dat van het attest.
+    const valse: Vehicle = {
+      ...diesel,
+      voertuigtype: "PHEV",
+      brandstof: "benzine",
+      besteldatum: "2023-03-01",
+      co2: 40,
+      batterij_kwh: 1,
+      wagengewicht: 2000,
+    };
+    const o = aftrekOpbouw(ctx, valse, 2026);
+    expect(o.gerekendeCo2).toBeGreaterThan(40);
+    expect(o.gramCoefficient).toBe(0.95);
   });
 });
 

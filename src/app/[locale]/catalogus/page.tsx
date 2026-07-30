@@ -43,7 +43,7 @@ export default function CatalogusPagina() {
   const t = useTranslations("catalogus");
   const tJaar = useTranslations("besteljaar");
   const tKosten = useTranslations("kosten");
-  const { euro, pct } = formatters(useLocale());
+  const { euro, pct, getal } = formatters(useLocale());
   const sessie = useSessie();
   const router = useRouter();
 
@@ -538,7 +538,7 @@ export default function CatalogusPagina() {
               {t("sluit")}
             </Button>
           </div>
-          <Besteljaartabel vergelijking={detailVergelijking} formatters={{ euro, pct }} />
+          <Besteljaartabel vergelijking={detailVergelijking} formatters={{ euro, pct, getal }} />
         </div>
       )}
 
