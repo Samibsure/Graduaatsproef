@@ -62,7 +62,11 @@ jobs:
         id: ophalen
         env:
           ONLY: ${{ inputs.only }}
-          FORCE: ${{ inputs.force }}
+          # Een push naar de bouwbranch betekent altijd een volledige verversing:
+          # daar wordt aan de keuzeregels gewerkt, en dan is de vraag juist wat die
+          # regels voor álle modellen opleveren, niet alleen voor wat nog ontbreekt.
+          # Bij een handmatige aanroep beslist de invoer.
+          FORCE: ${{ inputs.force || (github.event_name == 'push' && 'true') }}
         run: |
           argumenten=""
           [ -n "$ONLY" ] && argumenten="$argumenten --only $ONLY"
