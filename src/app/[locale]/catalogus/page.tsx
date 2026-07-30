@@ -9,7 +9,6 @@ import { useSessie } from "@/components/SessieProvider";
 import {
   Button,
   Container,
-  Eyebrow,
   Laadskelet,
   LegeStaat,
   Melding,
@@ -225,7 +224,6 @@ export default function CatalogusPagina() {
     <Container className="pb-[140px] pt-[52px]">
       <div className="mb-[30px] flex flex-wrap items-end justify-between gap-6">
         <div>
-          <Eyebrow>{t("eyebrow")}</Eyebrow>
           <h1 className="m-0 mb-2.5 text-[clamp(30px,4vw,46px)] font-bold tracking-[-0.02em] text-ink">
             {t("kop")}
           </h1>

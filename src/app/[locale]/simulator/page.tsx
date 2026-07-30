@@ -101,7 +101,7 @@ export default function SimulatorPagina() {
 
   return (
     <Container className="py-12">
-      <PageHead eyebrow={t("eyebrow")} title={t("titel")} sub={t("intro")} />
+      <PageHead title={t("titel")} sub={t("intro")} />
 
       {fout && (
         <p role="alert" className="mb-6 rounded-[10px] border border-danger/30 bg-danger/[0.06] px-4 py-3 text-[14px] text-danger">
@@ -202,7 +202,7 @@ export default function SimulatorPagina() {
           {!geladen ? (
             <div className="grid gap-4 sm:grid-cols-2">
               {[0, 1, 2, 3].map((i) => (
-                <div key={i} className="h-[132px] animate-pulse rounded-[13px] bg-paper" />
+                <div key={i} className="h-[132px] animate-pulse rounded-[13px] bg-line" />
               ))}
             </div>
           ) : !resultaat || !gekozen ? (

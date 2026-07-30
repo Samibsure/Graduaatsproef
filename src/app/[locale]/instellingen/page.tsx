@@ -128,7 +128,7 @@ export default function InstellingenPagina() {
 
   return (
     <Container className="py-12">
-      <PageHead eyebrow={t("eyebrow")} title={sessie.bedrijf.naam} sub={t("intro")} />
+      <PageHead title={sessie.bedrijf.naam} sub={t("intro")} />
 
       {melding && (
         <div className="mb-6">

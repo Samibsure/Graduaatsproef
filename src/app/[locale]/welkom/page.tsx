@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { Melding, Veld, invoerKlasse } from "@/components/AuthKaart";
 import Icon from "@/components/Icon";
 import { useSessie } from "@/components/SessieProvider";
-import { Card, Container, Eyebrow, knopKlassen } from "@/components/ui";
+import { Card, Container, knopKlassen } from "@/components/ui";
 import { voltooiOnboarding, type BedrijfsInvoer } from "@/lib/bedrijf";
 import { magBeheren } from "@/lib/rollen";
 import { maakVoorbeeldvloot } from "@/lib/voorbeeldvloot";
@@ -84,7 +84,6 @@ export default function WelkomPagina() {
   if (!magBeheren(sessie)) {
     return (
       <Container className="max-w-[560px] py-16">
-        <Eyebrow dash>{t("eyebrow")}</Eyebrow>
         <h1 className="m-0 text-[clamp(24px,3.4vw,32px)] font-bold tracking-[-0.02em] text-ink">
           {t("geenBeheerderTitel")}
         </h1>
@@ -100,7 +99,6 @@ export default function WelkomPagina() {
 
   return (
     <Container className="max-w-[720px] py-14">
-      <Eyebrow dash>{t("eyebrow")}</Eyebrow>
       <h1 className="m-0 text-[clamp(26px,4vw,38px)] font-bold tracking-[-0.02em] text-ink">
         {t("titel")}
       </h1>

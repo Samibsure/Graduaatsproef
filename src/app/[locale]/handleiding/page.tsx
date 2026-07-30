@@ -53,12 +53,6 @@ function HandleidingInhoud() {
           }}
         />
         <div className="relative">
-          <div className="mb-3 flex items-center gap-2.5">
-            <span className="h-[1.5px] w-[26px] bg-gold" />
-            <span className="text-[12px] font-bold uppercase tracking-[0.16em] text-gold">
-              {t("eyebrow")}
-            </span>
-          </div>
           <h1 className="m-0 text-[clamp(30px,4vw,46px)] font-bold tracking-[-0.02em]">
             {t("kop")}
           </h1>

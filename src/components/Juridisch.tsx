@@ -4,13 +4,11 @@ import { Link } from "@/i18n/navigation";
 
 /** Omkadering voor de juridische pagina's: één kolom, rustig leesbaar. */
 export function JuridischePagina({
-  eyebrow,
   titel,
   intro,
   bijgewerkt,
   children,
 }: {
-  eyebrow: string;
   titel: string;
   intro: string;
   bijgewerkt: string;
@@ -19,7 +17,7 @@ export function JuridischePagina({
   return (
     <Container className="py-12">
       <div className="mx-auto max-w-[52em]">
-        <PageHead eyebrow={eyebrow} title={titel} sub={intro} />
+        <PageHead title={titel} sub={intro} />
         <Card className="p-6 sm:p-9">
           <div className="space-y-7">{children}</div>
           <p className="mt-9 border-t border-line pt-5 text-[13px] text-ink-500">{bijgewerkt}</p>

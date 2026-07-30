@@ -1,7 +1,6 @@
 import { useTranslations } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import Icon from "@/components/Icon";
-import { Eyebrow } from "@/components/ui";
 import type { Locale } from "@/i18n/routing";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: Locale }> }) {
@@ -62,7 +61,6 @@ function FiscaalKaderInhoud() {
       </aside>
 
       <article className="max-w-[720px]">
-        <Eyebrow>{t("eyebrow")}</Eyebrow>
         <h1 className="m-0 mb-[18px] text-[clamp(30px,4vw,46px)] font-bold tracking-[-0.02em]">
           {t("kop")}
         </h1>
