@@ -203,6 +203,26 @@ export type Aandrijving = "voor" | "achter" | "vierwiel";
 export type Onderhoudsklasse = "laag" | "midden" | "hoog";
 
 /**
+ * Hoe hard de cijfers van een catalogusmodel zijn.
+ *
+ * `geverifieerd` betekent dat de **fiscaal beslissende** velden tegen een
+ * genoemde bron gelegd zijn: de cataloguswaarde bij een elektrische wagen (de
+ * CO₂ is daar per definitie 0) en de CO₂ bij een plug-in hybride, want die twee
+ * bepalen het VAA, de verworpen uitgaven en de RSZ-bijdrage.
+ *
+ * Niet te verwarren met `Zekerheid` uit bronnen.ts: die gaat over de rechtsbron
+ * van een fiscaal cijfer (staat het in het Staatsblad of is het aangekondigd),
+ * deze over de hardheid van wagendata (heeft iemand die CO2 nagekeken).
+ *
+ * `raming` betekent: een plausibel fabrikantscijfer dat niemand nagekeken heeft.
+ * Zo'n cijfer is niet waardeloos — het is de goede orde van grootte — maar het
+ * hoort niet als vaststaand op het scherm te komen. Een fout cijfer is erger dan
+ * een ontbrekend cijfer, en het onderscheid zichtbaar maken is het enige
+ * alternatief voor het ene of het andere weglaten.
+ */
+export type Modelzekerheid = "geverifieerd" | "raming";
+
+/**
  * Referentiemodel uit de wagencatalogus.
  *
  * De eerste elf velden komen overeen met de kolommen van de tabel `car_catalog`
@@ -239,6 +259,14 @@ export interface CatalogCar {
   modeljaar_tot?: number | null;
   /** Waar de cijfers vandaan komen, zodat ze na te kijken zijn. */
   bron?: string | null;
+  /** Nagekeken tegen een bron, of niet. Zonder waarde: behandel als raming. */
+  zekerheid?: Modelzekerheid | null;
+  /**
+   * Voorbehoud bij dit model, als sleutel onder `catalogus.voorbehoud_*` in
+   * messages/*.json. Een sleutel en geen tekst, want dit hoort ook in het Frans
+   * en het Engels te staan.
+   */
+  voorbehoud?: string | null;
 
   carrosserie?: Carrosserie | null;
   aandrijving?: Aandrijving | null;

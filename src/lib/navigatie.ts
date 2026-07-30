@@ -99,6 +99,7 @@ export const VOETTEKST_KOLOMMEN: readonly { sleutel: string; links: readonly Nav
       { href: "/parameters", sleutel: "parameters" },
       { href: "/handleiding", sleutel: "handleiding" },
       { href: "/over", sleutel: "over" },
+      { href: "/steunen", sleutel: "steunen" },
     ],
   },
   {

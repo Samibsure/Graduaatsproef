@@ -1,3 +1,4 @@
+import { CONTACT } from "./contact";
 import { isOntbrekendeTabel } from "./postgrest";
 import { supabase } from "./supabase";
 
@@ -25,7 +26,11 @@ import { supabase } from "./supabase";
  * melding komt aan.
  */
 
-export const FEEDBACK_EMAIL = "contact@autofiscaliteit.com";
+/**
+ * Hetzelfde adres als op de Over-pagina en in de privacyverklaring: een melding
+ * die ergens anders toekomt dan een vraag, splitst de mailbox zonder reden.
+ */
+export const FEEDBACK_EMAIL = CONTACT;
 
 export type Feedbacksoort = "bug" | "idee" | "vraag";
 

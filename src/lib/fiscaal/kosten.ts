@@ -1,4 +1,4 @@
-import type { CatalogCar, Gewest, Onderhoudsklasse, Voertuigtype } from "./types";
+import type { Brandstof, CatalogCar, Gewest, Onderhoudsklasse, Voertuigtype } from "./types";
 
 /**
  * Wat een wagen per jaar kost, berekend uit zijn specificaties.
@@ -24,7 +24,9 @@ import type { CatalogCar, Gewest, Onderhoudsklasse, Voertuigtype } from "./types
  * geen formule. De gewestelijke regels hangen af van cilinderinhoud, euronorm
  * en vermogen in fiscale paardenkracht, verschillen per gewest en wijzigen
  * geregeld. Een half nagebouwde formule zou een precisie voorwenden die er niet
- * is; een richtbedrag dat je zelf kan bijstellen, is eerlijker.
+ * is; een richtbedrag dat je zelf kan bijstellen, is eerlijker. Waar bronnen
+ * elkaar tegenspreken, staat het hoogste bedrag in de tabel en de tegenspraak
+ * in VERKEERSBELASTING_VOORBEHOUD, zodat ze op het scherm terechtkomt.
  *
  * Alles wat hier uitkomt, is een vertrekpunt. De gebruiker kan elk bedrag
  * overschrijven met de cijfers uit zijn offerte.
@@ -36,6 +38,49 @@ import type { CatalogCar, Gewest, Onderhoudsklasse, Voertuigtype } from "./types
  */
 
 export type { Gewest };
+
+/**
+ * Restwaarde per aandrijftype, na **36 maanden en 60.000 km**.
+ *
+ * Bron: JD Power / Autovista24, Duitse markt, gegevens november 2025.
+ *
+ * Waarom niet per model? Omdat dat cijfer voor België niet bestaat. Autovista en
+ * Eurotax publiceren op 36 maanden en 60.000 km, op modelniveau achter een
+ * betaalmuur; een restwaarde na vier jaar en 80.000 km per Belgisch model is
+ * publiek nergens erkend te vinden. Wat in de catalogus stond, waren dus
+ * honderdzestig getallen die iemand plausibel had gevonden — met een spreiding
+ * van 32% tot 52% die niets meer betekende dan de gok die eronder zat.
+ *
+ * De volgorde die deze ranges tonen, is wél robuust en over meerdere markten
+ * bevestigd: HEV ≈ benzine ≈ diesel > PHEV > BEV.
+ */
+export const RESTWAARDE_36M: Record<string, number> = {
+  HEV: 49.8,
+  benzine: 49.2,
+  diesel: 48,
+  PHEV: 45.1,
+  BEV: 37.6,
+};
+
+/**
+ * Van 36 naar 48 maanden: `rest48 = rest36 ^ (4/3)`.
+ *
+ * De app rekent op vier jaar, de bron meet op drie. Dat gat wordt hier in één
+ * regel overbrugd in plaats van weggemoffeld door het driejarige cijfer als
+ * vierjarig te gebruiken — dat laatste zou de restwaarde overschatten en dus de
+ * TCO te laag voorstellen, precies de fout die deze applicatie hoort te
+ * vermijden. Waardeverlies verloopt meetkundig: elk jaar gaat er ongeveer
+ * hetzelfde deel van de resterende waarde af.
+ *
+ * Het resultaat blijft een schatting, en zo staat het ook op het scherm.
+ */
+export const restwaarde48 = (pct36: number) => Math.round((pct36 / 100) ** (4 / 3) * 1000) / 10;
+
+/** Restwaarde na vier jaar voor een aandrijving, uit de gesourcete ranges. */
+export function restwaardeVoor(voertuigtype: Voertuigtype, brandstof: Brandstof): number {
+  const sleutel = voertuigtype === "fossiel" ? brandstof : voertuigtype;
+  return restwaarde48(RESTWAARDE_36M[sleutel] ?? RESTWAARDE_36M.benzine);
+}
 
 export interface KostenParameters {
   /** Brandstof en stroom, in euro. */
@@ -100,19 +145,70 @@ export const KOSTENPARAMETERS: KostenParameters = {
   verzekering_per_1000_euro: 8.5,
   verzekering_per_10_kw: 22,
 
+  /*
+   * De BEV-bedragen zijn per 2026 herzien; zie VERKEERSBELASTING_VOORBEHOUD voor
+   * waar ze vandaan komen en waar ze betwist zijn.
+   *
+   * Vlaanderen: de vrijstelling voor nieuwe elektrische wagens verviel voor
+   * inschrijvingen vanaf 1/1/2026. De gepubliceerde vork is €69,72 tot €87,24
+   * naargelang de fiscale pk; hier staat de bovengrens.
+   *
+   * Wallonië en Brussel: €102,96, het minimumtarief 1/7/2025–30/6/2026. Eén bron
+   * zegt dat elektrische wagens daar niets betalen; die tegenspraak staat in het
+   * voorbehoud en niet stil in dit getal.
+   *
+   * De niet-BEV-bedragen blijven ongewijzigd. Voor Wallonië bestaat sinds
+   * 1/7/2025 een formule (basisbedrag × CO₂/115 × M/1838 × C), maar zonder het
+   * basisbedrag levert die geen cijfer op dat dit richtbedrag kan vervangen.
+   */
   verkeersbelasting: {
-    // Vlaanderen publiceerde voor elektrische wagens ingeschreven vanaf 2026 een
-    // tarief van € 69,72 (1 fiscale pk) tot € 87,24 (5 pk). Een bedrijfswagen
-    // zit vrijwel altijd op vijf pk; vandaar dat bedrag als richtwaarde.
-    vlaanderen: { BEV: 87, PHEV: 130, HEV: 310, fossiel: 420 },
-    wallonie: { BEV: 84, PHEV: 250, HEV: 350, fossiel: 480 },
-    brussel: { BEV: 84, PHEV: 250, HEV: 350, fossiel: 480 },
+    // De Vlaamse vork loopt van € 69,72 (1 fiscale pk) tot € 87,24 (5 pk). Een
+    // bedrijfswagen zit vrijwel altijd op vijf pk, dus is de bovengrens hier niet
+    // alleen de voorzichtige keuze maar ook de waarschijnlijke.
+    vlaanderen: { BEV: 87.24, PHEV: 130, HEV: 310, fossiel: 420 },
+    wallonie: { BEV: 102.96, PHEV: 250, HEV: 350, fossiel: 480 },
+    brussel: { BEV: 102.96, PHEV: 250, HEV: 350, fossiel: 480 },
   },
 
   phev_verbranding_basis: 5.4,
   phev_verbranding_per_kw: 0.011,
   phev_elektrisch_aandeel: 0.55,
 };
+
+/**
+ * Waar de verkeersbelasting hierboven betwist of onvolledig is.
+ *
+ * Een bedrag dat in een totaal verdwijnt, kan niet zeggen dat er iets aan
+ * scheelt. Dit kan dat wel, en het hoort zichtbaar te zijn op elke plaats waar
+ * dat totaal getoond wordt: het verschil tussen €0 en €102,96 per jaar is over
+ * vier jaar meer dan €400 en dus geen voetnoot.
+ *
+ * `sleutel` verwijst naar `kosten.voorbehoud_*` in messages/*.json, zodat de
+ * waarschuwing ook in het Frans en het Engels bestaat.
+ */
+export interface Belastingvoorbehoud {
+  gewest: Gewest;
+  voertuigtype: Voertuigtype;
+  sleutel: string;
+}
+
+export const VERKEERSBELASTING_VOORBEHOUD: Belastingvoorbehoud[] = [
+  { gewest: "vlaanderen", voertuigtype: "BEV", sleutel: "bevVlaanderen" },
+  { gewest: "wallonie", voertuigtype: "BEV", sleutel: "bevWallonieBrussel" },
+  { gewest: "brussel", voertuigtype: "BEV", sleutel: "bevWallonieBrussel" },
+];
+
+/** Het voorbehoud bij deze combinatie, of null wanneer er geen is. */
+export function verkeersbelastingVoorbehoud(
+  gewest: Gewest,
+  voertuigtype: Voertuigtype,
+): string | null {
+  return (
+    VERKEERSBELASTING_VOORBEHOUD.find(
+      (v) => v.gewest === gewest && v.voertuigtype === voertuigtype,
+    )?.sleutel ?? null
+  );
+}
 
 export interface Gebruiksprofiel {
   km_per_jaar: number;
@@ -229,7 +325,8 @@ export function verzekeringskost(car: CatalogCar, p: KostenParameters = KOSTENPA
  */
 export function afschrijving(car: CatalogCar, gebruik: Gebruiksprofiel): number {
   const jaren = Math.max(1, gebruik.looptijd_jaren);
-  const restNa4 = (car.restwaarde_pct_4j ?? 42) / 100;
+  const restNa4 =
+    (car.restwaarde_pct_4j ?? restwaardeVoor(car.voertuigtype, car.brandstof)) / 100;
   const perJaarFactor = restNa4 ** (1 / 4);
   const restwaarde = car.cataloguswaarde * perJaarFactor ** jaren;
   return (car.cataloguswaarde - restwaarde) / jaren;

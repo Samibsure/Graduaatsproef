@@ -28,6 +28,8 @@ verworpen uitgaven, en is sindsdien uitgebouwd tot een publiek product.
    het bedrijfsprofiel, het fiscaal profiel en het team op `/instellingen`.
 8. **Melden**: een knop op elke pagina om een fout in een berekening te melden of een verbetering
    te vragen.
+9. **Over en steunen**: het verhaal achter de tool, de toelichting bij Ekoon ICT, en de pagina voor
+   de vrijwillige bijdrage.
 
 ### Onboarding
 
@@ -74,8 +76,19 @@ gegevens per model en modeljaar, uit publieke fabrikants- en WLTP-cijfers voor d
 Elke rij draagt een modeljaar en een bron, zodat een cijfer na te kijken valt. Ze zijn
 richtinggevend, niet contractueel.
 
+**Geverifieerd of raming.** Van de 163 rijen zijn er negen tegen een genoemde bron gelegd; dat staat
+per rij in `zekerheid`. Geverifieerd betekent dat de fiscaal beslissende velden nagekeken zijn: de
+cataloguswaarde bij een elektrische wagen (de CO₂ is daar per definitie 0) en de CO₂ bij een plug-in
+hybride. De catalogus toont standaard alleen die negen, met een schakelaar bovenaan die de ramingen
+erbij zet; elke keuzelijst in de app zet beide groepen apart met een kop erboven. De ramingen blijven
+in de dataset staan in plaats van geschrapt te worden: promoveren is dan één bron per regel in plaats
+van alle cijfers opnieuw opzoeken. Waar een bron een vork geeft, staat de **hoogste** waarde in de
+data — een hoger CO₂-cijfer betekent een hoger VAA, een hogere bijdrage en een grotere kans dat de
+valse-hybridetoets kantelt, en wie zich vergist hoort zich naar de veilige kant te vergissen.
+
 Alles wat daaruit volgt, rekent de applicatie zelf uit. `docs/catalogus.md` is de volledige lijst,
-gegenereerd uit dezelfde data; een snapshot-test bewaakt dat beide gelijk lopen.
+gegenereerd uit dezelfde data, met per geverifieerd model de bron erbij; een snapshot-test bewaakt
+dat beide gelijk lopen.
 
 Lichte vracht staat er bewust niet in: een bestelwagen die als lichte vracht is ingeschreven valt
 buiten de aftrekbeperking van artikel 66 WIB92, en de rekenkern kent die uitzondering nog niet.
@@ -115,6 +128,19 @@ parameters.
 
 De verkeersbelasting is bewust een parametertabel en geen formule: de gewestelijke regels hangen af
 van cilinderinhoud, euronorm en fiscale paardenkracht, verschillen per gewest en wijzigen geregeld.
+Waar bronnen elkaar tegenspreken, staat het hoogste bedrag in de tabel en de tegenspraak in
+`VERKEERSBELASTING_VOORBEHOUD`, zodat ze op het scherm terechtkomt in plaats van in een getal te
+verdwijnen. Dat geldt vandaag voor de elektrische wagen: Vlaanderen liet de vrijstelling vervallen per
+1 januari 2026 (vork € 69,72–€ 87,24 naar fiscale pk), en over Wallonië en Brussel spreken de bronnen
+elkaar tegen (€ 0 tegenover € 102,96 per jaar). Over vier jaar is dat meer dan € 400 verschil; het
+hoort uitgeklaard te worden met SPW Finances en Brussel Fiscaliteit.
+
+**Restwaarde.** Die is niet per model bepaald, want dat cijfer bestaat voor België niet publiek:
+Autovista en Eurotax publiceren op 36 maanden en 60.000 km, op modelniveau achter een betaalmuur. De
+app rekent daarom met ranges per aandrijftype (JD Power/Autovista24, Duitse markt, november 2025):
+hybride 49,8%, benzine 49,2%, diesel 48%, plug-in 45,1% en elektrisch 37,6% na 36 maanden, in één
+regel meetkundig doorgerekend naar 48 maanden. Elke restwaarde in de app is dus een schatting, en de
+rangorde is wat de bron robuust noemt: hybride ≈ benzine ≈ diesel > plug-in > elektrisch.
 
 ### Besteljaar
 
@@ -152,7 +178,8 @@ besteljaar vasthoudt en het gebruiksjaar laat lopen.
   criteria die niets zeggen over de vraag of het gerief erin past.
 - **Afgeleide scores**: flexibiliteit en restwaarde komen uit de specificaties van het model
   (actieradius, laadvermogen, verwacht waardebehoud) in plaats van uit een getal dat de gebruiker
-  zelf van 1 tot 10 intikt.
+  zelf van 1 tot 10 intikt. De restwaardescore is herijkt op de band 25%–42%, want de gesourcete
+  ranges liggen lager dan de geraden cijfers die er eerst stonden.
 
 De rekenkern is bewust vrij van UI en database, zodat de formules los te testen zijn. De unit tests
 valideren de uitkomsten tegen een uitgewerkt referentiedossier.
@@ -214,6 +241,26 @@ in alle drie de bestanden: een ontbrekende sleutel valt zichtbaar door de mand.
 Interne functie- en veldnamen blijven Nederlands (`laadWagens`, `verworpenUitgaven`). Die hernoemen
 raakt elk bestand en de tests, zonder winst voor de gebruiker.
 
+### Vrijwillige bijdrage
+
+De applicatie blijft gratis; `/steunen` legt uit wat het draaien kost en biedt twee kanalen aan: een
+externe pagina (Buy Me a Coffee of gelijkaardig) en een gewone overschrijving. Er zit **geen**
+betaalintegratie in de applicatie: er wordt geen enkel betaalgegeven verwerkt of bewaard, het
+rekeningnummer wordt alleen getoond. De waarden staan in `src/lib/steun.ts` en zijn elk te
+overschrijven via de omgeving, zodat een rekeningnummer kan wijzigen zonder deployment van nieuwe
+code. Het staat er wel als standaardwaarde: een pagina die om een bijdrage vraagt en vervolgens niet
+zegt waarheen, is erger dan geen pagina, en het nummer is sowieso publiek want het staat op de site
+zelf. Blijft een waarde leeg, dan verdwijnt dat kanaal en blijven alleen de manieren over om gratis
+te helpen.
+
+De vraag komt op vier plaatsen terug en nergens als pop-up of banner: een knop in de voettekst, een
+kaart onderaan `/over`, een regel onderaan `/handleiding` en één regel op `/vergelijking`, pas nadat
+een beslissing bewaard is. Dat laatste is bewust het enige moment in de applicatie zelf: daar heeft
+de tool net iets opgeleverd.
+
+Vragen, foutmeldingen en suggesties gaan naar het adres in `src/lib/contact.ts`. Dat staat op één
+plaats, want het komt terug op de Over-pagina, de handleiding, de privacyverklaring en de foutpagina.
+
 ## Lokaal draaien
 
 ```bash
@@ -239,7 +286,11 @@ deployment niet afhangt van instellingen in het dashboard.
 | `NEXT_PUBLIC_SUPABASE_URL` | nee | URL van het Supabase-project; standaard het publieke project |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | nee | Publishable key (publiek; RLS doet de afscherming) |
 | `NEXT_PUBLIC_SITE_URL` | nee | Basis-URL voor metadata, standaard `https://autofiscaliteit.com` |
-| `NEXT_PUBLIC_DONATIE_URL` | nee | Externe donatiepagina; leeg laten verbergt de knop |
+| `NEXT_PUBLIC_DONATIE_URL` | nee | Externe donatiepagina (Buy Me a Coffee); leeg laten verbergt die kaart |
+| `NEXT_PUBLIC_DONATIE_IBAN` | nee | Rekeningnummer voor een overschrijving; leeg laten verbergt die kaart |
+| `NEXT_PUBLIC_DONATIE_BIC` | nee | BIC bij het rekeningnummer, voor buitenlandse overschrijvingen |
+| `NEXT_PUBLIC_DONATIE_BEGUNSTIGDE` | nee | Naam van de begunstigde bij het rekeningnummer |
+| `NEXT_PUBLIC_DONATIE_MEDEDELING` | nee | Voorgestelde mededeling, standaard `Autofiscaliteit` |
 
 De Supabase-waarden mogen ook onder de namen staan die de Vercel-marketplace-integratie zet:
 `SUPABASE_URL` en `SUPABASE_ANON_KEY` of `SUPABASE_PUBLISHABLE_KEY`. `next.config.ts` neemt de
