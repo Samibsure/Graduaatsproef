@@ -1,0 +1,112 @@
+name: Modelfotos
+
+# De foto's van de catalogus ophalen gebeurt hier en niet op een werkstation,
+# om één praktische reden: de omgeving waarin aan deze repository gewerkt wordt,
+# mag alleen GitHub, npm en PyPI bereiken. Een runner van Actions mag wel naar
+# commons.wikimedia.org, dus draait het script daar.
+#
+# Wat het oplevert: de ontbrekende foto's in public/cars, de bronvermelding in
+# public/cars/BRONNEN.md en de aangevulde `foto:`-velden in catalogusdata.ts,
+# vastgelegd in één commit op de doelbranch. Nooit rechtstreeks op main.
+
+on:
+  workflow_dispatch:
+    inputs:
+      doelbranch:
+        description: "Branch waarop het resultaat komt"
+        required: true
+        default: claude/auto-photos-placeholder-77mhhp
+      only:
+        description: "Alleen deze slugs (komma-gescheiden), leeg = alle ontbrekende"
+        required: false
+        default: ""
+      force:
+        description: "Ook modellen die al een foto hebben"
+        type: boolean
+        default: false
+  push:
+    branches: [claude/fotos-bouw]
+
+# De runner moet kunnen pushen: hij levert het resultaat af als commit.
+permissions:
+  contents: write
+
+concurrency:
+  group: modelfotos
+  cancel-in-progress: false
+
+jobs:
+  ophalen:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: pip install pillow
+
+      - name: Wat ontbreekt er?
+        run: python3 scripts/wagenfotos.py --check || true
+
+      - name: Foto's ophalen
+        id: ophalen
+        env:
+          ONLY: ${{ inputs.only }}
+          FORCE: ${{ inputs.force }}
+        run: |
+          argumenten=""
+          [ -n "$ONLY" ] && argumenten="$argumenten --only $ONLY"
+          [ "$FORCE" = "true" ] && argumenten="$argumenten --force"
+          # Het script eindigt op 1 zodra één model geen bruikbare foto had. Dat
+          # mag de job niet doen stoppen: de overige foto's zijn dan wel binnen
+          # en horen bewaard te worden. De samenvatting hieronder toont de rest.
+          python3 -u scripts/wagenfotos.py $argumenten | tee /tmp/uitvoer.txt || true
+
+      - name: Samenvatting
+        run: |
+          {
+            echo "## Modelfoto's"
+            echo
+            echo '```'
+            python3 scripts/wagenfotos.py --check || true
+            echo '```'
+            echo
+            echo "### Logboek"
+            echo '```'
+            tail -60 /tmp/uitvoer.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Resultaat vastleggen
+        env:
+          DOEL: ${{ inputs.doelbranch || 'claude/auto-photos-placeholder-77mhhp' }}
+        run: |
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "Niets gewijzigd, dus niets te committen."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # De doelbranch begint bij de commit waarop deze run gebaseerd is, en
+          # bestaande foto's op die branch blijven staan: het script vult aan.
+          git fetch origin "$DOEL" || true
+          if git rev-parse --verify "origin/$DOEL" >/dev/null 2>&1; then
+            git stash push --include-untracked
+            git checkout -B "$DOEL" "origin/$DOEL"
+            git stash pop
+          else
+            git checkout -B "$DOEL"
+          fi
+
+          aantal=$(git status --porcelain public/cars | grep -c '\.jpg' || true)
+          git add -A public/cars src/lib/fiscaal/catalogusdata.ts
+          git commit -m "Modelfoto's van de catalogus ophalen ($aantal bestanden)" \
+                     -m "Opgehaald door .github/workflows/modelfotos.yml met scripts/wagenfotos.py, van Wikimedia Commons, alleen onder een licentie die hergebruik toelaat. Auteur, licentie en bronlink per foto staan in public/cars/BRONNEN.md." \
+                     -m "[skip ci]"
+          git push origin "$DOEL"

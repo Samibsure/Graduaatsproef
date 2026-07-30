@@ -32,6 +32,7 @@ import json
 import re
 import subprocess
 import sys
+import time
 import unicodedata
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -440,6 +441,11 @@ def main() -> int:
 
     for teller, model in enumerate(werk, start=1):
         prefix = f"[{teller:3}/{len(werk)}] {model.slug:32}"
+        # Commons vraagt om terughoudend gebruik. Honderdvijftig modellen zijn
+        # een paar honderd verzoeken; een halve seconde ertussen kost drie
+        # minuten en houdt ons ruim binnen wat de API verwacht.
+        if teller > 1:
+            time.sleep(0.5)
         try:
             keuze = kies(model)
         except RuntimeError as fout:
