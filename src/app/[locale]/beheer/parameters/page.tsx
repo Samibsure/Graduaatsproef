@@ -213,7 +213,14 @@ export default function BeheerParametersPagina() {
       </Card>
 
       <Card className="p-5">
-        <h2 className="font-semibold">{t("multiplicatorTitel")}</h2>
+        <h2 className="font-semibold">{t("beheerMultiplicatorTitel")}</h2>
+        {/* Deze kolom staat in de databank en is hier aanpasbaar, maar
+            rszBijdrageMaand leest ze niet: die neemt de multiplicator van het
+            bijdragejaar uit tax_parameters. Zonder deze waarschuwing denkt een
+            beheerder dat hij hier iets wijzigt wat doorwerkt in de berekening. */}
+        <Melding soort="let-op" className="mt-3">
+          {t("beheerMultiplicatorNoot")}
+        </Melding>
         <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {ctx?.periodes.map((p) => (
             <label key={p.code} className="block text-sm">

@@ -8,6 +8,7 @@ import type {
   Projectie,
   TaxParameters,
   Vehicle,
+  Voertuigtype,
 } from "./types";
 
 /** Standaard BTW-tarief op autokosten in België. */
@@ -26,8 +27,14 @@ const BTW_FORFAIT = 35;
  * uit de RSZ-instructies.
  */
 
-/** Coëfficiënt in de gramformule per brandstoftype (FOD Financiën, 2025). */
-const GRAMFORMULE_COEFF: Record<Brandstof, number> = {
+/**
+ * Coëfficiënt in de gramformule per brandstoftype (FOD Financiën, 2025).
+ *
+ * Geëxporteerd zodat /fiscaal-kader hem kan tonen. De coëfficiënt uit de formule
+ * terugrekenen leek eerst eleganter, maar dat werkt op hele grammen en gaf voor
+ * CNG 0,91 in plaats van 0,9.
+ */
+export const GRAMFORMULE_COEFF: Record<Brandstof, number> = {
   diesel: 1,
   benzine: 0.95,
   lpg: 0.95,
@@ -125,8 +132,12 @@ export function gramformule(
  * Het overgangsregime: wagens besteld tussen 1 juli 2023 en 31 december 2025.
  * Wordt afgeleid uit de periodegrenzen zelf, zodat de code niet vasthangt aan
  * de codenaam van een rij in de databank.
+ *
+ * Geëxporteerd omdat `regimes.ts` de matrix voor de uitlegpagina's hierop bouwt:
+ * of de gramformule nog meespeelt, is precies wat die pagina's moeten vertellen,
+ * en dat elders nabouwen zou een tweede waarheid maken.
  */
-function isOvergangsregime(periode: Bestelperiode): boolean {
+export function isOvergangsregime(periode: Bestelperiode): boolean {
   return (
     periode.van !== null &&
     periode.van >= "2023-07-01" &&
@@ -139,15 +150,19 @@ function isOvergangsregime(periode: Bestelperiode): boolean {
  * Het maximumplafond uit de aftrekkalender voor deze wagen en dit gebruiksjaar.
  * Voor een elektrische wagen is dat meteen het definitieve percentage; voor een
  * verbrandingswagen in het overgangsregime is het enkel een bovengrens.
+ *
+ * Geëxporteerd om dezelfde reden als `isOvergangsregime`: het onderscheid tussen
+ * "dit is het percentage" en "dit is enkel een plafond" is wat de uitlegpagina's
+ * vandaag verzwijgen, en het hoort uit één bron te komen.
  */
-function plafondUitKalender(
+export function plafondUitKalender(
   ctx: FiscaleContext,
-  vehicle: Vehicle,
+  voertuigtype: Voertuigtype,
   periode: Bestelperiode,
   gebruiksjaar: number,
 ): number {
   const regels = ctx.regels.filter(
-    (r) => r.voertuigtype === vehicle.voertuigtype && r.bestelperiode === periode.code,
+    (r) => r.voertuigtype === voertuigtype && r.bestelperiode === periode.code,
   );
   const exact = regels.find((r) => r.gebruiksjaar === gebruiksjaar);
   if (exact) return exact.aftrek_pct;
@@ -184,7 +199,7 @@ export function aftrekPct(ctx: FiscaleContext, vehicle: Vehicle, gebruiksjaar: n
     return gramformule(vehicle.brandstof, co2);
   }
 
-  const plafond = plafondUitKalender(ctx, vehicle, periode, gebruiksjaar);
+  const plafond = plafondUitKalender(ctx, vehicle.voertuigtype, periode, gebruiksjaar);
   if (vehicle.voertuigtype === "BEV" || !isOvergangsregime(periode)) return plafond;
 
   return Math.min(
@@ -212,7 +227,7 @@ export function aftrekPctElektriciteit(
   if (vehicle.voertuigtype !== "PHEV") return aftrekPct(ctx, vehicle, gebruiksjaar);
   const periode = bestelperiodeVoorDatum(ctx, vehicle.besteldatum);
   if (periode.code === "voor_07_2023") return aftrekPct(ctx, vehicle, gebruiksjaar);
-  return plafondUitKalender(ctx, { ...vehicle, voertuigtype: "BEV" }, periode, gebruiksjaar);
+  return plafondUitKalender(ctx, "BEV", periode, gebruiksjaar);
 }
 
 /**
