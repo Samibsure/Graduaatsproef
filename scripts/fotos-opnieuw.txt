@@ -14,28 +14,8 @@
 
 # interieur, zonder enig spoor daarvan in de metadata
 citroen-ec3
-fiat-600e
-leapmotor-c10
-renault-clio-etech
-renault-megane-etech
-renault-scenic-etech
 renault-symbioz-etech
-skoda-superb-iv
 volvo-es90
 
-# vorige generatie: Tucson JM (2004), Sportage KM (2004), Prius XW30 (2009)
+# nog altijd de Tucson JM uit 2004
 hyundai-tucson-hev
-kia-sportage-phev
-toyota-prius-phev
-
-# closeup van een achterklep met typeplaatje
-kia-ev3
-
-# rallywagen met reclamelivery
-hyundai-ioniq5
-
-# camouflagewikkel op een testwagen
-vw-tiguan-ehybrid
-
-# een Golf Country uit 1990; de nieuwe variantnaamregel vangt die nu af
-vw-golf-ehybrid
