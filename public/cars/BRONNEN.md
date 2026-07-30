@@ -40,7 +40,7 @@ Deze lijst wordt geschreven door `scripts/wagenfotos.py`. Pas ze niet met de han
 | `byd-seal-u-dmi.jpg` | Alexander-93 | CC BY-SA 4.0 | [BYD Seal U IAA 2023 1X7A0368.jpg](https://commons.wikimedia.org/wiki/File:BYD_Seal_U_IAA_2023_1X7A0368.jpg) |
 | `byd-seal.jpg` | Alexander-93 | CC BY-SA 4.0 | [BYD Seal U DM-i GIMS 2024 1X7A2192.jpg](https://commons.wikimedia.org/wiki/File:BYD_Seal_U_DM-i_GIMS_2024_1X7A2192.jpg) |
 | `byd-sealion-7.jpg` | LuvsMG481 | CC BY-SA 4.0 | [2025 BYD Sealion 7 Performance front.jpg](https://commons.wikimedia.org/wiki/File:2025_BYD_Sealion_7_Performance_front.jpg) |
-| `citroen-ec3.jpg` | Alexander-93 | CC BY-SA 4.0 | [Citroën ë-C3 Auto Zuerich 2024 DSC 6644.jpg](https://commons.wikimedia.org/wiki/File:Citro%C3%ABn_%C3%AB-C3_Auto_Zuerich_2024_DSC_6644.jpg) |
+| `citroen-ec3.jpg` | Alexander-93 | CC BY-SA 4.0 | [Citroën ë-C3 Auto Zuerich 2024 DSC 6643.jpg](https://commons.wikimedia.org/wiki/File:Citro%C3%ABn_%C3%AB-C3_Auto_Zuerich_2024_DSC_6643.jpg) |
 | `citroen-ec4.jpg` | Alexander-93 | CC BY-SA 4.0 | [Citroën e-C4 X 1X7A6869.jpg](https://commons.wikimedia.org/wiki/File:Citro%C3%ABn_e-C4_X_1X7A6869.jpg) |
 | `citroen-ec5-aircross.jpg` | Alexander Migl | CC BY-SA 4.0 | [Citroën ë-C5 Aircross Auto Zuerich 2025 DSC 3094.jpg](https://commons.wikimedia.org/wiki/File:Citro%C3%ABn_%C3%AB-C5_Aircross_Auto_Zuerich_2025_DSC_3094.jpg) |
 | `cupra-born.jpg` | Alexander-93 | CC BY-SA 4.0 | [Cupra Born 1X7A6953.jpg](https://commons.wikimedia.org/wiki/File:Cupra_Born_1X7A6953.jpg) |
@@ -50,7 +50,7 @@ Deze lijst wordt geschreven door `scripts/wagenfotos.py`. Pas ze niet met de han
 | `dacia-duster.jpg` | Alexander Migl | CC BY-SA 4.0 | [Dacia Duster II Facelift IAA 2021 1X7A0132.jpg](https://commons.wikimedia.org/wiki/File:Dacia_Duster_II_Facelift_IAA_2021_1X7A0132.jpg) |
 | `ds-3-etense.jpg` | Alexander Migl | CC BY-SA 4.0 | [DS 3 Crossback E-Tense IMG 2554.jpg](https://commons.wikimedia.org/wiki/File:DS_3_Crossback_E-Tense_IMG_2554.jpg) |
 | `fiat-500e.jpg` | Alexander Migl | CC BY-SA 4.0 | [Fiat 500e (2020) Auto Zuerich 2021 IMG 0604.jpg](https://commons.wikimedia.org/wiki/File:Fiat_500e_(2020)_Auto_Zuerich_2021_IMG_0604.jpg) |
-| `fiat-600e.jpg` | Alexander-93 | CC BY-SA 4.0 | [Fiat 600e Auto Zuerich 2023 1X7A1300.jpg](https://commons.wikimedia.org/wiki/File:Fiat_600e_Auto_Zuerich_2023_1X7A1300.jpg) |
+| `fiat-600e.jpg` | Alexander-93 | CC BY-SA 4.0 | [Fiat 600e Auto Zuerich 2024 DSC 6368.jpg](https://commons.wikimedia.org/wiki/File:Fiat_600e_Auto_Zuerich_2024_DSC_6368.jpg) |
 | `fiat-grande-panda.jpg` | Alexander-93 | CC BY-SA 4.0 | [Fiat Grande Panda Electric Auto Zuerich 2024 DSC 6729.jpg](https://commons.wikimedia.org/wiki/File:Fiat_Grande_Panda_Electric_Auto_Zuerich_2024_DSC_6729.jpg) |
 | `ford-capri-ev.jpg` | Calreyn88 | CC BY-SA 4.0 | [2024 Ford Capri 3.jpg](https://commons.wikimedia.org/wiki/File:2024_Ford_Capri_3.jpg) |
 | `ford-explorer-ev.jpg` | Alexander-93 | CC BY-SA 4.0 | [Ford Explorer EV Auto Zuerich 2024 DSC 6360.jpg](https://commons.wikimedia.org/wiki/File:Ford_Explorer_EV_Auto_Zuerich_2024_DSC_6360.jpg) |
@@ -61,20 +61,20 @@ Deze lijst wordt geschreven door `scripts/wagenfotos.py`. Pas ze niet met de han
 | `honda-crv-ehev.jpg` | © M 93 | CC BY-SA 3.0 de | [Honda CR-V e-PHEV Advance Tech 2WD (VI) – h 05052024.jpg](https://commons.wikimedia.org/wiki/File:Honda_CR-V_e-PHEV_Advance_Tech_2WD_(VI)_%E2%80%93_h_05052024.jpg) |
 | `honda-eny1.jpg` | Alexander-93 | CC BY-SA 4.0 | [Honda e-Ny1 IAA 2023 1X7A0562.jpg](https://commons.wikimedia.org/wiki/File:Honda_e-Ny1_IAA_2023_1X7A0562.jpg) |
 | `hyundai-inster.jpg` | Alexander-93 | CC BY-SA 4.0 | [Hyundai Inster Auto Zuerich 2024 DSC 6722.jpg](https://commons.wikimedia.org/wiki/File:Hyundai_Inster_Auto_Zuerich_2024_DSC_6722.jpg) |
-| `hyundai-ioniq5.jpg` | Alexander Migl | CC BY-SA 4.0 | [Hyundai Ioniq 5 N TA Spec Auto Zuerich 2025 DSC 3735.jpg](https://commons.wikimedia.org/wiki/File:Hyundai_Ioniq_5_N_TA_Spec_Auto_Zuerich_2025_DSC_3735.jpg) |
+| `hyundai-ioniq5.jpg` | Alexander Migl | CC BY-SA 4.0 | [Hyundai Ioniq 5 Robotaxi IAA 2021 1X7A0002.jpg](https://commons.wikimedia.org/wiki/File:Hyundai_Ioniq_5_Robotaxi_IAA_2021_1X7A0002.jpg) |
 | `hyundai-ioniq6.jpg` | Alexander-93 | CC BY-SA 4.0 | [Hyundai Ioniq 6 1X7A7260.jpg](https://commons.wikimedia.org/wiki/File:Hyundai_Ioniq_6_1X7A7260.jpg) |
 | `hyundai-kona-electric.jpg` | Alexander-93 | CC BY-SA 4.0 | [Hyundai Kona Electric (SX2) Auto Zuerich 2023 1X7A1159.jpg](https://commons.wikimedia.org/wiki/File:Hyundai_Kona_Electric_(SX2)_Auto_Zuerich_2023_1X7A1159.jpg) |
 | `hyundai-santa-fe-phev.jpg` | Matti Blume | CC BY-SA 4.0 | [Hyundai Santa Fe, GIMS 2018, Le Grand-Saconnex (1X7A1735).jpg](https://commons.wikimedia.org/wiki/File:Hyundai_Santa_Fe,_GIMS_2018,_Le_Grand-Saconnex_(1X7A1735).jpg) |
-| `hyundai-tucson-hev.jpg` | Dinkun Chen | CC BY-SA 4.0 | [HYUNDAI TUCSON (JM) China (4).jpg](https://commons.wikimedia.org/wiki/File:HYUNDAI_TUCSON_(JM)_China_(4).jpg) |
+| `hyundai-tucson-hev.jpg` | Dinkun Chen | CC BY-SA 4.0 | [HYUNDAI TUCSON (JM) China (3).jpg](https://commons.wikimedia.org/wiki/File:HYUNDAI_TUCSON_(JM)_China_(3).jpg) |
 | `hyundai-tucson-phev.jpg` | Dinkun Chen | CC BY-SA 4.0 | [HYUNDAI TUCSON (TL) China (31).jpg](https://commons.wikimedia.org/wiki/File:HYUNDAI_TUCSON_(TL)_China_(31).jpg) |
 | `jeep-avenger-ev.jpg` | Alexander-93 | CC BY-SA 4.0 | [Jeep Avenger 4xe The North Face Edition Auto Zuerich 2024 DSC 6154.jpg](https://commons.wikimedia.org/wiki/File:Jeep_Avenger_4xe_The_North_Face_Edition_Auto_Zuerich_2024_DSC_6154.jpg) |
-| `kia-ev3.jpg` | Alexander-93 | CC BY-SA 4.0 | [Kia EV3 GT-Line Automesse Ludwigsburg 2024 IMG 1601.jpg](https://commons.wikimedia.org/wiki/File:Kia_EV3_GT-Line_Automesse_Ludwigsburg_2024_IMG_1601.jpg) |
+| `kia-ev3.jpg` | Alexander-93 | CC BY-SA 4.0 | [Kia EV3 GT-Line Automesse Ludwigsburg 2024 IMG 1353.jpg](https://commons.wikimedia.org/wiki/File:Kia_EV3_GT-Line_Automesse_Ludwigsburg_2024_IMG_1353.jpg) |
 | `kia-ev6.jpg` | Alexander-93 | CC BY-SA 4.0 | [2025 Kia EV6 GT IAA 2025 DSC 2508.jpg](https://commons.wikimedia.org/wiki/File:2025_Kia_EV6_GT_IAA_2025_DSC_2508.jpg) |
 | `kia-ev9.jpg` | Alexander-93 | CC BY-SA 4.0 | [Kia EV9 GT IAA 2025 DSC 2082.jpg](https://commons.wikimedia.org/wiki/File:Kia_EV9_GT_IAA_2025_DSC_2082.jpg) |
 | `kia-niro-ev.jpg` | Alexander Migl | CC BY-SA 4.0 | [Kia Niro EV (2021) IMG 5313.jpg](https://commons.wikimedia.org/wiki/File:Kia_Niro_EV_(2021)_IMG_5313.jpg) |
 | `kia-niro-hev.jpg` | Alexander Migl | CC BY-SA 4.0 | [Kia Niro (SG2) PHEV Leonberg 2022 1X7A0474.jpg](https://commons.wikimedia.org/wiki/File:Kia_Niro_(SG2)_PHEV_Leonberg_2022_1X7A0474.jpg) |
-| `kia-sportage-phev.jpg` | Jengtingchen | CC BY-SA 4.0 | [Kia Sportage (KM) Chinese facelift 001.jpg](https://commons.wikimedia.org/wiki/File:Kia_Sportage_(KM)_Chinese_facelift_001.jpg) |
-| `leapmotor-c10.jpg` | Alexander-93 | CC BY-SA 4.0 | [Leapmotor C10 EV Auto Zuerich 2024 DSC 6847.jpg](https://commons.wikimedia.org/wiki/File:Leapmotor_C10_EV_Auto_Zuerich_2024_DSC_6847.jpg) |
+| `kia-sportage-phev.jpg` | Alexander Migl | CC BY-SA 4.0 | [2025 Kia Sportage (NQ5) Automesse Ludwigsburg 2025 DSC 2533.jpg](https://commons.wikimedia.org/wiki/File:2025_Kia_Sportage_(NQ5)_Automesse_Ludwigsburg_2025_DSC_2533.jpg) |
+| `leapmotor-c10.jpg` | Alexander-93 | CC BY-SA 4.0 | [Leapmotor C10 EREV Classic-Gala 2025 DSC 0779.jpg](https://commons.wikimedia.org/wiki/File:Leapmotor_C10_EREV_Classic-Gala_2025_DSC_0779.jpg) |
 | `leapmotor-t03.jpg` | Alexander Migl | CC BY-SA 4.0 | [Leapmotor T03 Auto Zuerich 2024 DSC 6327.jpg](https://commons.wikimedia.org/wiki/File:Leapmotor_T03_Auto_Zuerich_2024_DSC_6327.jpg) |
 | `lexus-rz.jpg` | Aos.1905 | CC BY-SA 4.0 | [Lexus RZ 500e version L (front three-quarter view) at Grand Front Osaka.png](https://commons.wikimedia.org/wiki/File:Lexus_RZ_500e_version_L_(front_three-quarter_view)_at_Grand_Front_Osaka.png) |
 | `mazda-6e.jpg` | Matti Blume | CC BY-SA | [Mazda 6e, Auto 2025, Zurich (20251029-P1074538).jpg](https://commons.wikimedia.org/wiki/File:Mazda_6e,_Auto_2025,_Zurich_(20251029-P1074538).jpg) |
@@ -119,17 +119,17 @@ Deze lijst wordt geschreven door `scripts/wagenfotos.py`. Pas ze niet met de han
 | `renault-4-etech.jpg` | Alexander Migl | CC BY-SA 4.0 | [Renault 4 E-Tech Electric IMG 3530.jpg](https://commons.wikimedia.org/wiki/File:Renault_4_E-Tech_Electric_IMG_3530.jpg) |
 | `renault-5-etech.jpg` | Alexander-93 | CC BY-SA 4.0 | [Renault 5 E-Tech GIMS 2024 1X7A2319.jpg](https://commons.wikimedia.org/wiki/File:Renault_5_E-Tech_GIMS_2024_1X7A2319.jpg) |
 | `renault-captur-etech.jpg` | Alexander-93 | CC BY-SA 4.0 | [2024 Renault Captur II Automesse Ludwigsburg 2024 IMG 1382.jpg](https://commons.wikimedia.org/wiki/File:2024_Renault_Captur_II_Automesse_Ludwigsburg_2024_IMG_1382.jpg) |
-| `renault-clio-etech.jpg` | Alexander-93 | CC BY-SA 4.0 | [Renault Clio V (2023) Esprit Alpine Automesse Ludwigsburg 2023 1X7A0088.jpg](https://commons.wikimedia.org/wiki/File:Renault_Clio_V_(2023)_Esprit_Alpine_Automesse_Ludwigsburg_2023_1X7A0088.jpg) |
-| `renault-megane-etech.jpg` | Alexander Migl | CC BY-SA 4.0 | [Renault Megane E-Tech IAA 2021 1X7A0086.jpg](https://commons.wikimedia.org/wiki/File:Renault_Megane_E-Tech_IAA_2021_1X7A0086.jpg) |
-| `renault-scenic-etech.jpg` | Alexander-93 | CC BY-SA 4.0 | [Renault Scénic E-Tech IAA 2023 1X7A0322.jpg](https://commons.wikimedia.org/wiki/File:Renault_Sc%C3%A9nic_E-Tech_IAA_2023_1X7A0322.jpg) |
-| `renault-symbioz-etech.jpg` | Alexander-93 | CC BY-SA 4.0 | [Renault Symbioz Automesse Ludwigsburg 2024 IMG 1695.jpg](https://commons.wikimedia.org/wiki/File:Renault_Symbioz_Automesse_Ludwigsburg_2024_IMG_1695.jpg) |
+| `renault-clio-etech.jpg` | Alexander-93 | CC BY-SA 4.0 | [Renault Clio V (2023) Esprit Alpine Automesse Ludwigsburg 2023 1X7A0012.jpg](https://commons.wikimedia.org/wiki/File:Renault_Clio_V_(2023)_Esprit_Alpine_Automesse_Ludwigsburg_2023_1X7A0012.jpg) |
+| `renault-megane-etech.jpg` | Alexander Migl | CC BY-SA 4.0 | [Renault Mégane E-Tech DSC 7207.jpg](https://commons.wikimedia.org/wiki/File:Renault_M%C3%A9gane_E-Tech_DSC_7207.jpg) |
+| `renault-scenic-etech.jpg` | Alexander-93 | CC BY-SA 4.0 | [Renault Scénic E-Tech IAA 2023 1X7A0238.jpg](https://commons.wikimedia.org/wiki/File:Renault_Sc%C3%A9nic_E-Tech_IAA_2023_1X7A0238.jpg) |
+| `renault-symbioz-etech.jpg` | Alexander-93 | CC BY-SA 4.0 | [Renault Symbioz Automesse Ludwigsburg 2024 IMG 1696.jpg](https://commons.wikimedia.org/wiki/File:Renault_Symbioz_Automesse_Ludwigsburg_2024_IMG_1696.jpg) |
 | `skoda-elroq.jpg` | Alexander Migl | CC BY-SA 4.0 | [Škoda Elroq RS IAA 2025 DSC 2336.jpg](https://commons.wikimedia.org/wiki/File:%C5%A0koda_Elroq_RS_IAA_2025_DSC_2336.jpg) |
 | `skoda-enyaq-coupe.jpg` | Alexander Migl | CC BY-SA 4.0 | [2025 Škoda Enyaq Coupé RS Auto Zuerich 2025 DSC 3258.jpg](https://commons.wikimedia.org/wiki/File:2025_%C5%A0koda_Enyaq_Coup%C3%A9_RS_Auto_Zuerich_2025_DSC_3258.jpg) |
 | `skoda-enyaq.jpg` | Alexander-93 | CC BY-SA 4.0 | [Škoda Enyaq IMG 1190.jpg](https://commons.wikimedia.org/wiki/File:%C5%A0koda_Enyaq_IMG_1190.jpg) |
 | `skoda-kamiq.jpg` | Alexander-93 | CC BY-SA 4.0 | [Škoda Kamiq Facelift IMG 8638.jpg](https://commons.wikimedia.org/wiki/File:%C5%A0koda_Kamiq_Facelift_IMG_8638.jpg) |
 | `skoda-kodiaq-iv.jpg` | Alexander Migl | CC BY-SA 4.0 | [Škoda Kodiaq II RS MYLE Festival 2025 DSC 9601.jpg](https://commons.wikimedia.org/wiki/File:%C5%A0koda_Kodiaq_II_RS_MYLE_Festival_2025_DSC_9601.jpg) |
 | `skoda-octavia-tdi.jpg` | Alexander-93 | CC BY-SA 4.0 | [Škoda Octavia IV Combi Facelift Automesse Ludwigsburg 2024 IMG 1649.jpg](https://commons.wikimedia.org/wiki/File:%C5%A0koda_Octavia_IV_Combi_Facelift_Automesse_Ludwigsburg_2024_IMG_1649.jpg) |
-| `skoda-superb-iv.jpg` | Johannes Maximilian | CC BY-SA 4.0 | [Škoda Superb III IAA 2019 JM 0329.jpg](https://commons.wikimedia.org/wiki/File:%C5%A0koda_Superb_III_IAA_2019_JM_0329.jpg) |
+| `skoda-superb-iv.jpg` | Alexander Migl | CC BY-SA 4.0 | [Škoda Superb IV IMG 4524.jpg](https://commons.wikimedia.org/wiki/File:%C5%A0koda_Superb_IV_IMG_4524.jpg) |
 | `skoda-superb-tdi.jpg` | Alexander-93 | CC BY-SA 4.0 | [Škoda Superb IV Combi Automesse Ludwigsburg 2024 IMG 1477.jpg](https://commons.wikimedia.org/wiki/File:%C5%A0koda_Superb_IV_Combi_Automesse_Ludwigsburg_2024_IMG_1477.jpg) |
 | `smart-1.jpg` | Alexander-93 | CC BY-SA 4.0 | [Smart ♯1 1X7A6880.jpg](https://commons.wikimedia.org/wiki/File:Smart_%E2%99%AF1_1X7A6880.jpg) |
 | `smart-3.jpg` | Alexander Migl | CC BY-SA 4.0 | [Smart Hashtag 3 Keith Haring Edition IAA 2025 DSC 1849.jpg](https://commons.wikimedia.org/wiki/File:Smart_Hashtag_3_Keith_Haring_Edition_IAA_2025_DSC_1849.jpg) |
@@ -141,14 +141,14 @@ Deze lijst wordt geschreven door `scripts/wagenfotos.py`. Pas ze niet met de han
 | `toyota-chr-phev.jpg` | Dinkun Chen | CC BY-SA 4.0 | [TOYOTA C-HR HYBRID China.jpg](https://commons.wikimedia.org/wiki/File:TOYOTA_C-HR_HYBRID_China.jpg) |
 | `toyota-corolla-ts.jpg` | Alexander-93 | CC BY-SA 4.0 | [2024 Toyota Corolla Touring Sports Hybrid (E210) IMG 9888.jpg](https://commons.wikimedia.org/wiki/File:2024_Toyota_Corolla_Touring_Sports_Hybrid_(E210)_IMG_9888.jpg) |
 | `toyota-corolla.jpg` | Alexander Migl | CC BY-SA 4.0 | [Toyota Corolla Trek Hybrid Genf 2019 1Y7A5587.jpg](https://commons.wikimedia.org/wiki/File:Toyota_Corolla_Trek_Hybrid_Genf_2019_1Y7A5587.jpg) |
-| `toyota-prius-phev.jpg` | Dinkun Chen | CC BY-SA 4.0 | [TOYOTA PRIUS (XW30) China (4).jpg](https://commons.wikimedia.org/wiki/File:TOYOTA_PRIUS_(XW30)_China_(4).jpg) |
+| `toyota-prius-phev.jpg` | Alexander-93 | CC BY-SA 4.0 | [Toyota Prius c IMG 7739.jpg](https://commons.wikimedia.org/wiki/File:Toyota_Prius_c_IMG_7739.jpg) |
 | `toyota-rav4-hev.jpg` | Dinkun Chen | CC BY-SA 4.0 | [TOYOTA RAV4 (XA50) China.jpg](https://commons.wikimedia.org/wiki/File:TOYOTA_RAV4_(XA50)_China.jpg) |
 | `toyota-rav4-phev.jpg` | Matti Blume | CC BY-SA 4.0 | [Toyota RAV4 Hybrid, GIMS 2019, Le Grand-Saconnex (GIMS0518).jpg](https://commons.wikimedia.org/wiki/File:Toyota_RAV4_Hybrid,_GIMS_2019,_Le_Grand-Saconnex_(GIMS0518).jpg) |
 | `toyota-urban-cruiser.jpg` | Alexander Migl | CC BY-SA 4.0 | [Toyota Urban Cruiser (electric) Auto Zuerich 2025 DSC 3550.jpg](https://commons.wikimedia.org/wiki/File:Toyota_Urban_Cruiser_(electric)_Auto_Zuerich_2025_DSC_3550.jpg) |
 | `toyota-yaris-cross.jpg` | Alexander Migl | CC BY-SA 4.0 | [Toyota Yaris Cross Hybrid Automesse Ludwigsburg 2022 1X7A5988.jpg](https://commons.wikimedia.org/wiki/File:Toyota_Yaris_Cross_Hybrid_Automesse_Ludwigsburg_2022_1X7A5988.jpg) |
 | `toyota-yaris.jpg` | Alexander-93 | CC BY-SA 4.0 | [Toyota GR Yaris RC (2024) Leonberg 2024 IMG 1063.jpg](https://commons.wikimedia.org/wiki/File:Toyota_GR_Yaris_RC_(2024)_Leonberg_2024_IMG_1063.jpg) |
 | `volvo-ec40.jpg` | Ethan Llamas | CC BY-SA 4.0 | [Volvo EC40 Crystal White Pearl - front.jpg](https://commons.wikimedia.org/wiki/File:Volvo_EC40_Crystal_White_Pearl_-_front.jpg) |
-| `volvo-es90.jpg` | Alexander-93 | CC BY-SA 4.0 | [Volvo ES90 IAA 2025 DSC 1699.jpg](https://commons.wikimedia.org/wiki/File:Volvo_ES90_IAA_2025_DSC_1699.jpg) |
+| `volvo-es90.jpg` | Alexander-93 | CC BY-SA 4.0 | [Volvo ES90 IAA 2025 DSC 1704.jpg](https://commons.wikimedia.org/wiki/File:Volvo_ES90_IAA_2025_DSC_1704.jpg) |
 | `volvo-ex30.jpg` | Alexander-93 | CC BY-SA 4.0 | [Volvo EX30 IMG 8564.jpg](https://commons.wikimedia.org/wiki/File:Volvo_EX30_IMG_8564.jpg) |
 | `volvo-ex40.jpg` | Charles from Port Chester, New York | CC0 | [Volvo EX40 (2025) (54848375749).jpg](https://commons.wikimedia.org/wiki/File:Volvo_EX40_(2025)_(54848375749).jpg) |
 | `volvo-ex90.jpg` | Alexander Migl | CC BY-SA 4.0 | [Volvo EX90 IAA 2025 DSC 1520 (cropped).jpg](https://commons.wikimedia.org/wiki/File:Volvo_EX90_IAA_2025_DSC_1520_(cropped).jpg) |
@@ -157,7 +157,7 @@ Deze lijst wordt geschreven door `scripts/wagenfotos.py`. Pas ze niet met de han
 | `volvo-xc60-b5.jpg` | Alexander Migl | CC BY-SA 4.0 | [2026 Volvo XC60 (SPA) DSC 2675.jpg](https://commons.wikimedia.org/wiki/File:2026_Volvo_XC60_(SPA)_DSC_2675.jpg) |
 | `volvo-xc60-t6.jpg` | Alexander Migl | CC BY-SA 4.0 | [2026 Volvo XC60 (SPA) autoMOBIL Tübingen 2025 DSC 2771.jpg](https://commons.wikimedia.org/wiki/File:2026_Volvo_XC60_(SPA)_autoMOBIL_T%C3%BCbingen_2025_DSC_2771.jpg) |
 | `volvo-xc90-t8.jpg` | Alexander Migl | CC BY-SA 4.0 | [2025 Volvo XC90 II autoMOBIL Tübingen 2025 DSC 2767.jpg](https://commons.wikimedia.org/wiki/File:2025_Volvo_XC90_II_autoMOBIL_T%C3%BCbingen_2025_DSC_2767.jpg) |
-| `vw-golf-ehybrid.jpg` | Alexander Migl | CC BY-SA 4.0 | [Volkswagen Golf Country 1X7A0284.jpg](https://commons.wikimedia.org/wiki/File:Volkswagen_Golf_Country_1X7A0284.jpg) |
+| `vw-golf-ehybrid.jpg` | Alexander-93 | CC BY-SA 4.0 | [Volkswagen Golf VIII R 333 Limited Edition IMG 9486.jpg](https://commons.wikimedia.org/wiki/File:Volkswagen_Golf_VIII_R_333_Limited_Edition_IMG_9486.jpg) |
 | `vw-golf.jpg` | Alexander-93 | CC BY-SA 4.0 | [Volkswagen Golf VIII Facelift IMG 8947.jpg](https://commons.wikimedia.org/wiki/File:Volkswagen_Golf_VIII_Facelift_IMG_8947.jpg) |
 | `vw-id-buzz.jpg` | Alexander Migl | CC BY-SA 4.0 | [Volkswagen ID. Buzz GTX IAA 2025 DSC 1798.jpg](https://commons.wikimedia.org/wiki/File:Volkswagen_ID._Buzz_GTX_IAA_2025_DSC_1798.jpg) |
 | `vw-id3.jpg` | Alexander-93 | CC BY-SA 4.0 | [Volkswagen ID.3 GTX Fire+Ice IAA 2025 DSC 2027.jpg](https://commons.wikimedia.org/wiki/File:Volkswagen_ID.3_GTX_Fire%2BIce_IAA_2025_DSC_2027.jpg) |
@@ -168,6 +168,6 @@ Deze lijst wordt geschreven door `scripts/wagenfotos.py`. Pas ze niet met de han
 | `vw-passat-ehybrid.jpg` | Alexander Migl | CC BY-SA 4.0 | [Volkswagen Passat B8 (2019) IMG 1992.jpg](https://commons.wikimedia.org/wiki/File:Volkswagen_Passat_B8_(2019)_IMG_1992.jpg) |
 | `vw-passat-tdi.jpg` | Dinkun Chen | CC BY-SA 4.0 | [VOLKSWAGEN PASSAT PRO (VOLKSWAGEN PASSAT B9) China (2).jpg](https://commons.wikimedia.org/wiki/File:VOLKSWAGEN_PASSAT_PRO_(VOLKSWAGEN_PASSAT_B9)_China_(2).jpg) |
 | `vw-t-roc.jpg` | Alexander Migl | CC BY-SA 4.0 | [Volkswagen T-Roc (2021) 1X7A0333.jpg](https://commons.wikimedia.org/wiki/File:Volkswagen_T-Roc_(2021)_1X7A0333.jpg) |
-| `vw-tiguan-ehybrid.jpg` | Alexander-93 | CC BY-SA 4.0 | [Volkswagen Tiguan III IAA 2023 1X7A0489.jpg](https://commons.wikimedia.org/wiki/File:Volkswagen_Tiguan_III_IAA_2023_1X7A0489.jpg) |
+| `vw-tiguan-ehybrid.jpg` | Alexander-93 | CC BY-SA 4.0 | [Volkswagen Tiguan III eHybrid Auto Zuerich 2023 1X7A1109.jpg](https://commons.wikimedia.org/wiki/File:Volkswagen_Tiguan_III_eHybrid_Auto_Zuerich_2023_1X7A1109.jpg) |
 | `vw-tiguan-tdi.jpg` | Alexander-93 | CC BY-SA 4.0 | [Volkswagen Tiguan III IMG 8823.jpg](https://commons.wikimedia.org/wiki/File:Volkswagen_Tiguan_III_IMG_8823.jpg) |
 | `xpeng-g6.jpg` | Alexander-93 | CC BY-SA 4.0 | [XPeng G6 (2025) IAA 2025 DSC 2057.jpg](https://commons.wikimedia.org/wiki/File:XPeng_G6_(2025)_IAA_2025_DSC_2057.jpg) |
