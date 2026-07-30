@@ -109,6 +109,19 @@ GEVALLEN = [
     ("een goede foto gaat door",
      pagina("File:Volkswagen ID.7 GTX IAA 2025 DSC 1796.jpg", ("Volkswagen ID.7",)),
      model("Volkswagen", "ID.7"), True),
+    # 'toy' stond op de verbodslijst, en die woorden worden vanaf een woordgrens
+    # vergeleken. Gevolg: alle tien Toyota's in de catalogus werden geweigerd.
+    ("een Toyota is geen speelgoed",
+     pagina("File:Toyota Corolla E210 2023 IMG 4711.jpg", ("Toyota Corolla (E210)",)),
+     model("Toyota", "Corolla"), True),
+    ("echt speelgoed blijft geweigerd",
+     pagina("File:Toy Toyota Corolla 2023.jpg", ("Toy cars",)),
+     model("Toyota", "Corolla"), False),
+
+    # Een modelnaam kan zelf een jaartal lijken.
+    ("de e-2008 is geen wagen uit 2008",
+     pagina("File:Peugeot e-2008 II 2024.jpg"), model("Peugeot", "e-2008"), True),
+
     ("staande foto is te smal na bijsnijden",
      pagina("File:Kia EV9 2025.jpg", breedte=900, hoogte=1400), model("Kia", "EV9"), False),
 ]

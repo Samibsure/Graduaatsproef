@@ -73,8 +73,14 @@ VERBODEN = (
     "racing", "rally", "motorsport", "livery", "tuning", "camouflage", "wrapped",
     "crash", "damaged", "wreck", "burnt", "abandoned", "rust",
     # helemaal geen wagen
-    "toy", "model car", "miniature", "diorama", "scale model", "lego",
+    "model car", "miniature", "diorama", "scale model", "lego",
 )
+
+# Woorden die alleen als héél woord verboden zijn. 'toy' stond eerst gewoon in de
+# lijst hierboven, en die woorden worden vanaf een woordgrens vergeleken zodat een
+# meervoud als 'Interiors of ...' ook aanslaat. Gevolg: 'toy' sloeg aan op
+# **Toyota**, en alle tien Toyota's in de catalogus werden geweigerd.
+VERBODEN_WOORDEN = ("toy", "toys", "replica", "concept")
 
 # Woorden die er net op wijzen dat het de foto is die we zoeken: een
 # driekwartaanzicht van de hele wagen.
@@ -114,12 +120,14 @@ def normaliseer(tekst: str) -> str:
 CAMERAVOORVOEGSELS = {"dsc", "dscf", "dscn", "img", "imgp", "dsc00", "p", "pxl", "sam", "cimg"}
 
 
-def jaartallen(tekst: str) -> list[int]:
-    """De jaartallen in een genormaliseerde tekst, zonder de nummers van camera's.
+def jaartallen(tekst: str, negeer: set[str] | None = None) -> list[int]:
+    """De jaartallen in een genormaliseerde tekst, zonder wat geen bouwjaar is.
 
-    Fotografen noemen hun bestanden 'DSC 1996.jpg' en 'IMG 2019.jpg'. Dat als
-    bouwjaar lezen zou net de scherpste foto's afkeuren, dus een getal dat op een
-    cameravoorvoegsel volgt telt niet mee.
+    Twee soorten valse jaartallen. Fotografen noemen hun bestanden 'DSC 1996.jpg'
+    en 'IMG 2019.jpg', dus een getal dat op een cameravoorvoegsel volgt telt niet
+    mee. En een modelnaam kan zelf een jaartal lijken: de Peugeot e-2008 werd zo
+    voor een wagen uit 2008 gehouden en om zijn ouderdom geweigerd. Wat in de
+    naam van het model staat, hoort dus in `negeer`.
     """
     woorden = tekst.split()
     jaren = []
@@ -127,6 +135,8 @@ def jaartallen(tekst: str) -> list[int]:
         if not re.fullmatch(r"19\d{2}|20\d{2}", woord):
             continue
         if index and woorden[index - 1] in CAMERAVOORVOEGSELS:
+            continue
+        if negeer and woord in negeer:
             continue
         jaren.append(int(woord))
     return jaren
@@ -338,6 +348,8 @@ def beoordeel(pagina: dict, model: Model) -> Kandidaat | None:
     # zonder dat 'race' een treffer wordt op 'Terrace'.
     if any(re.search(rf"\b{re.escape(verboden)}", alles) for verboden in VERBODEN):
         return None
+    if any(bevat(alles, verboden) for verboden in VERBODEN_WOORDEN):
+        return None
 
     # Twee wagens op één foto: welke van de twee is de onze? Zo koos de eerste
     # ronde voor de Mercedes C 300 e een foto van een SLS AMG naast een 300 SL.
@@ -378,7 +390,7 @@ def beoordeel(pagina: dict, model: Model) -> Kandidaat | None:
     # BMW X5 stond in de bestandsnaam de opnamedatum 2024 en in de categorie het
     # bouwjaar 1999, en zo raakte een X5 E53 op de plaats van de X5 50e. Het
     # jongste jaartal zei daar niets, het oudste alles.
-    jaren = jaartallen(alles)
+    jaren = jaartallen(alles, negeer=set(normaliseer(model.model).split()))
     if jaren:
         if min(jaren) < model.modeljaar - 8:
             return None
@@ -637,7 +649,9 @@ def main() -> int:
     for model in mislukt:
         print(f"  {model.slug:32} {model.naam}")
 
-    if volledig and not argumenten.dry_run:
+    # Ook na een gerichte herkansing: zodra een model van bestandsnaam wisselt,
+    # blijft de oude achter zonder dat iets er nog naar verwijst.
+    if not argumenten.dry_run:
         ruim_op(lees_modellen(), bronnen)
 
     return 0 if not mislukt else 1
