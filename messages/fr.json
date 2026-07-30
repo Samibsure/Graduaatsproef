@@ -449,7 +449,27 @@
     "specTrek": "Charge tractable",
     "specVermogen": "Puissance",
     "bronAlle": "Tous les modèles",
-    "bronEigen": "Modèles propres"
+    "bronEigen": "Modèles propres",
+    "zekerheidTitel": "Uniquement les modèles vérifiés",
+    "zekerheidUitleg": "Pour {geverifieerd} des {totaal} modèles, les chiffres fiscalement déterminants ont été confrontés à une source citée : la valeur catalogue pour une voiture électrique, le CO₂ pour une hybride rechargeable. Les autres sont des estimations : le bon ordre de grandeur, mais vérifiées par personne.",
+    "zekerheidToonRamingen": "Afficher aussi les {aantal} estimations",
+    "zekerheidVerbergRamingen": "Uniquement les {aantal} modèles vérifiés",
+    "badgeGeverifieerd": "Vérifié",
+    "badgeRaming": "Estimation",
+    "bronLabel": "Source",
+    "voorbehoudLabel": "Réserve",
+    "voorbehoud_teslaModelY": "La consommation WLTP et l'autonomie ne concordent pas (629 km à 15,9 kWh/100 km suppose environ 100 kWh, contre 75 kWh utiles). Le configurateur belge propose également une Standard Long Range RWD. Fiez-vous au certificat de conformité de la version exacte.",
+    "voorbehoud_audiQ4Facelift": "Depuis le restylage 2026, cette version s'appelle « 45 performance » et la batterie a changé. Le prix est celui de la version 82 kWh.",
+    "voorbehoud_bmwI4Btw": "Le prix est déduit de la liste fiscale hors TVA (50 247,93 € × 1,21) et doit être confirmé.",
+    "voorbehoud_buitenlandseBron": "Les chiffres proviennent d'un site constructeur étranger. CO₂, consommation et prix diffèrent selon la version belge ; à remplacer par une source belge.",
+    "voorbehoud_valseHybrideGrensgeval": "Cas limite pour le test des fausses hybrides : le CO₂ se situe autour du seuil de 75 g/km (Euro 6e-bis) ou de 50 g/km (homologation antérieure). Le régime applicable dépend de la valeur exacte du certificat de conformité.",
+    "voorbehoud_bmw530eGeneratie": "Les chiffres proviennent de la liste fiscale belge et décrivent l'ancienne génération G30, pas la G60 actuelle.",
+    "voorbehoud_prijsNietGesourcet": "Les spécifications ont été vérifiées, la valeur catalogue non. Pour une voiture électrique, tout le calcul fiscal repose sur cette valeur.",
+    "voorbehoud_bmwIx1Uitvoering": "Seules les données de la xDrive30 ont été retrouvées ; l'eDrive20 n'est pas confirmée.",
+    "voorbehoud_bmwIx3Generatie": "La liste belge montre l'ancienne G08 ; les chiffres de la Neue Klasse ne sont pas confirmés.",
+    "voorbehoud_bmwX5Ontbreekt": "La xDrive50e ne figure pas dans la liste de prix belge consultée, seule la xDrive45e plus ancienne y apparaît.",
+    "voorbehoud_co2NietGevonden": "Aucun chiffre CO₂ homologué retrouvé pour la version belge. Pour une hybride rechargeable, c'est précisément ce chiffre qui détermine l'ATN et la cotisation.",
+    "restwaardeSchatting": "La valeur résiduelle est une estimation par type de motorisation, pas par modèle : un chiffre belge reconnu par modèle n'existe pas."
   },
   "parameters": {
     "titel": "Paramètres fiscaux",
@@ -874,7 +894,7 @@
     "actieradius": "Autonomie (km)",
     "laadvermogen": "Charge rapide (kW)",
     "restwaarde": "Valeur résiduelle après 4 ans (%)",
-    "restwaardeHint": "Détermine l'amortissement dans le calcul des coûts.",
+    "restwaardeHint": "Détermine l'amortissement dans le calcul des coûts. Le catalogue utilise des fourchettes par motorisation (hybride 39,5 %, essence 38,8 %, diesel 37,6 %, hybride rechargeable 34,6 %, électrique 27,1 %) ; un chiffre issu de votre propre offre est préférable.",
     "zitplaatsen": "Places assises",
     "koffer": "Coffre (litres)",
     "trekgewicht": "Charge tractable (kg)",
@@ -900,5 +920,10 @@
     "importKlaar": "{gelukt} modèles importés, {mislukt} ignorés.",
     "regel": "Ligne",
     "nogNietBeschikbaar": "La bibliothèque de modèles propres n'est pas encore préparée dans la base de données. Exécutez la migration 0010 sur le projet Supabase ; cette page apparaîtra ensuite d'elle-même. Tant que ce n'est pas fait, tout reste masqué au lieu de générer une erreur."
+  },
+  "kosten": {
+    "voorbehoudTitel": "Réserve sur la taxe de circulation",
+    "voorbehoud_bevVlaanderen": "Flandre : l'exonération pour les nouvelles voitures électriques a pris fin pour les immatriculations à partir du 1er janvier 2026. La fourchette publiée va de 69,72 € à 87,24 € par an selon les chevaux fiscaux (pour une électrique : 0,013 × kW + 0,5, arrondi, maximum 5), plus une TMC forfaitaire de 61,50 €. Le calcul retient 87,24 €, la limite supérieure.",
+    "voorbehoud_bevWallonieBrussel": "Wallonie et Bruxelles : les sources se contredisent. Selon carvex.be, les voitures électriques n'y paient aucune taxe de circulation ; FLEET.be mentionne explicitement le tarif minimum de 102,96 € par an (tarif du 1er juillet 2025 au 30 juin 2026). Le calcul retient 102,96 €, le montant le plus élevé. Sur quatre ans, l'écart dépasse 400 € : faites-le confirmer par le SPW Finances ou Bruxelles Fiscalité avant de vous y fier."
   }
 }

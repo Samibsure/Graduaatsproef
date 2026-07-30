@@ -6,7 +6,7 @@ import CarImage from "@/components/CarImage";
 import Icon from "@/components/Icon";
 import { StatCard } from "@/components/ui";
 import { laadCatalogus, laadFiscaleContext } from "@/lib/data";
-import { catalogPreview } from "@/lib/fiscaal/catalog";
+import { catalogPreview, perZekerheid } from "@/lib/fiscaal/catalog";
 import { berekenJaar } from "@/lib/fiscaal/engine";
 import type { CatalogCar, FiscaleContext } from "@/lib/fiscaal/types";
 import { formatters } from "@/lib/format";
@@ -35,7 +35,11 @@ export default function FiscaalVoorbeeld() {
         setCtx(c);
         // De meest aftrekbare wagen uit de catalogus: dat is het punt dat de
         // kaart wil maken, niet "de eerste rij van de tabel".
-        setWagen(k.find((car) => car.voertuigtype === "BEV") ?? k[0] ?? null);
+        // Bij voorkeur een nagekeken wagen: het voorbeeld op de startpagina
+        // hoort te rusten op cijfers met een bron.
+        const bev = (car: CatalogCar) => car.voertuigtype === "BEV";
+        const { nagekeken, ramingen } = perZekerheid(k);
+        setWagen(nagekeken.find(bev) ?? ramingen.find(bev) ?? k[0] ?? null);
       })
       .catch(() => {
         /* De hero blijft zonder cijfers gewoon staan; dit is geen kernfunctie. */

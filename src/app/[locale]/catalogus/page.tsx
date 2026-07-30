@@ -21,6 +21,7 @@ import { laadEigenModellen } from "@/lib/eigenModellen";
 import { standaardBesteljaren, vergelijkBesteljaren } from "@/lib/fiscaal/besteljaar";
 import { catalogNaarWagen, catalogPreview } from "@/lib/fiscaal/catalog";
 import { berekenJaar } from "@/lib/fiscaal/engine";
+import { STANDAARD_GEBRUIK, verkeersbelastingVoorbehoud } from "@/lib/fiscaal/kosten";
 import type { CatalogCar, FiscaleContext, Voertuigtype } from "@/lib/fiscaal/types";
 import { formatters } from "@/lib/format";
 
@@ -42,6 +43,7 @@ type Sortering = "prijsOp" | "prijsAf" | "co2Op" | "aftrekAf" | "radiusAf" | "me
 export default function CatalogusPagina() {
   const t = useTranslations("catalogus");
   const tJaar = useTranslations("besteljaar");
+  const tKosten = useTranslations("kosten");
   const { euro, pct } = formatters(useLocale());
   const sessie = useSessie();
   const router = useRouter();
@@ -50,6 +52,15 @@ export default function CatalogusPagina() {
   const [catalogus, setCatalogus] = useState<CatalogCar[] | null>(null);
   const [eigen, setEigen] = useState<CatalogCar[]>([]);
   const [bron, setBron] = useState<"alle" | "eigen">("alle");
+  /**
+   * Standaard alleen wat nagekeken is.
+   *
+   * Van de honderdzestig modellen zijn er negen tegen een genoemde bron gelegd.
+   * De rest is een raming, en een raming hoort niet als vaststaand op het scherm
+   * te komen wanneer er een fiscale berekening op gebouwd wordt. Ze zijn niet
+   * weggegooid: één klik zet ze erbij, met hun label.
+   */
+  const [ookRamingen, setOokRamingen] = useState(false);
   const [besteljaar, setBesteljaar] = useState(2026);
   const [filter, setFilter] = useState<Voertuigtype | "alle">("alle");
   const [merkFilter, setMerkFilter] = useState("alle");
@@ -81,9 +92,31 @@ export default function CatalogusPagina() {
       .catch(() => setEigen([]));
   }, []);
 
-  const alles = useMemo(
+  /**
+   * Alles wat er is, vóór de zekerheidsschakelaar: die telt eigen modellen niet
+   * mee. Een model dat het bedrijf zelf invoerde, is zijn eigen bron; de app
+   * heeft niets nagekeken en hoort het ook niet weg te filteren.
+   */
+  const beschikbaar = useMemo(
     () => (bron === "eigen" ? eigen : [...eigen, ...(catalogus ?? [])]),
     [bron, eigen, catalogus],
+  );
+
+  const ramingen = useMemo(
+    () => (catalogus ?? []).filter((c) => c.zekerheid !== "geverifieerd"),
+    [catalogus],
+  );
+  const nagekeken = useMemo(
+    () => (catalogus ?? []).filter((c) => c.zekerheid === "geverifieerd"),
+    [catalogus],
+  );
+
+  const alles = useMemo(
+    () =>
+      ookRamingen || bron === "eigen"
+        ? beschikbaar
+        : beschikbaar.filter((c) => c.zekerheid === "geverifieerd" || eigen.includes(c)),
+    [beschikbaar, ookRamingen, bron, eigen],
   );
 
   const merken = useMemo(
@@ -143,7 +176,10 @@ export default function CatalogusPagina() {
   }, [alles, filter, merkFilter, carrosserieFilter, query, sortering, preview]);
 
   // Bij elke wijziging opnieuw vanaf het begin tonen.
-  useEffect(() => setZichtbaar(PER_PAGINA), [filter, merkFilter, carrosserieFilter, query, sortering, bron]);
+  useEffect(
+    () => setZichtbaar(PER_PAGINA),
+    [filter, merkFilter, carrosserieFilter, query, sortering, bron, ookRamingen],
+  );
 
   async function voegToe(car: CatalogCar) {
     // De catalogus is bewust publiek: pas bij het toevoegen is een account
@@ -168,6 +204,15 @@ export default function CatalogusPagina() {
   const toegevoegdeNamen = alles
     .filter((c) => toegevoegd.includes(c.id))
     .map((c) => `${c.merk} ${c.model}`);
+
+  /*
+   * Alleen waarschuwen wanneer het ook ergens over gaat: staat er geen enkele
+   * elektrische wagen in het resultaat, dan raakt de betwiste verkeersbelasting
+   * geen enkel cijfer op het scherm.
+   */
+  const toonBelastingvoorbehoud = gefilterd.some(
+    (c) => verkeersbelastingVoorbehoud(STANDAARD_GEBRUIK.gewest, c.voertuigtype) !== null,
+  );
 
   const detailVergelijking =
     ctx && detail
@@ -224,6 +269,55 @@ export default function CatalogusPagina() {
           {tJaar("kiesBesteljaarHint")}
         </p>
       </div>
+
+      {/*
+        Welke cijfers nagekeken zijn, en welke niet. Dit staat boven de filters en
+        niet in een voetnoot: het onderscheid bepaalt hoeveel je op een getal op
+        deze pagina mag bouwen, en dat is belangrijker dan elke filter eronder.
+      */}
+      {catalogus !== null && ramingen.length > 0 && (
+        <div className="mb-6 rounded-[12px] border border-line bg-paper px-5 py-4">
+          <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
+            <div className="max-w-[52em]">
+              <div className="flex items-center gap-2 text-[14px] font-bold text-ink">
+                <Icon name="check" size={16} />
+                {t("zekerheidTitel")}
+              </div>
+              <p className="m-0 mt-1.5 text-[13.5px] leading-relaxed text-ink-700">
+                {t("zekerheidUitleg", {
+                  geverifieerd: nagekeken.length,
+                  totaal: nagekeken.length + ramingen.length,
+                })}
+              </p>
+              <p className="m-0 mt-1.5 text-[13px] leading-relaxed text-ink-500">
+                {t("restwaardeSchatting")}
+              </p>
+            </div>
+            <Button
+              variant={ookRamingen ? "secundair" : "stil"}
+              maat="sm"
+              aria-pressed={ookRamingen}
+              onClick={() => setOokRamingen((aan) => !aan)}
+            >
+              {ookRamingen
+                ? t("zekerheidVerbergRamingen", { aantal: nagekeken.length })
+                : t("zekerheidToonRamingen", { aantal: ramingen.length })}
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/*
+        De verkeersbelasting zit in de jaarkost van elke wagen hierboven, en voor
+        een elektrische wagen is dat bedrag in 2026 betwist. Een getal in een som
+        kan dat zelf niet zeggen.
+      */}
+      {toonBelastingvoorbehoud && (
+        <Melding soort="let-op" className="mb-6">
+          <span className="font-bold">{tKosten("voorbehoudTitel")}</span>{" "}
+          {tKosten("voorbehoud_bevVlaanderen")} {tKosten("voorbehoud_bevWallonieBrussel")}
+        </Melding>
+      )}
 
       {eigen.length > 0 && (
         <div className="mb-5 flex flex-wrap items-center gap-2.5">
@@ -385,6 +479,8 @@ export default function CatalogusPagina() {
                       </div>
                     )}
 
+                    <Zekerheidsregel car={car} labels={t} />
+
                     <div className="mb-4 mt-[16px] grid grid-cols-2 gap-px overflow-hidden rounded-[10px] border border-line bg-line">
                       <Cel label={t("cellAftrek")} waarde={j ? pct(j.aftrekPct) : "—"} />
                       <Cel label="CO₂" waarde={`${car.co2} g/km`} />
@@ -487,6 +583,50 @@ function Cel({ label, waarde }: { label: string; waarde: string }) {
     <div className="bg-white px-[13px] py-[11px]">
       <div className="text-[11.5px] text-ink-500">{label}</div>
       <div className="text-[16px] font-bold text-ink">{waarde}</div>
+    </div>
+  );
+}
+
+/**
+ * Of de cijfers van deze wagen nagekeken zijn, en waar ze vandaan komen.
+ *
+ * Een raming zonder label is een bewering. Dit maakt er een raming van, met de
+ * bron erbij en met het voorbehoud dat het onderzoek erover maakte: dat de
+ * cijfers van deze BMW de oude generatie beschrijven, dat die CO₂ vlak bij de
+ * drempel van de valse-hybridetoets ligt. Dat hoort op de kaart en niet in een
+ * document dat niemand opent.
+ */
+function Zekerheidsregel({
+  car,
+  labels,
+}: {
+  car: CatalogCar;
+  labels: (sleutel: string, waarden?: Record<string, string | number>) => string;
+}) {
+  const nagekeken = car.zekerheid === "geverifieerd";
+  const voorbehoud = car.voorbehoud
+    ? labels(`voorbehoud_${car.voorbehoud}`, {})
+    : null;
+  if (!car.bron && !voorbehoud) return null;
+
+  return (
+    <div className="mt-2.5 border-t border-line pt-2.5 text-[12px] leading-relaxed">
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+        <span
+          className={`inline-flex items-center gap-1 rounded-full px-2 py-[3px] text-[11px] font-bold ${
+            nagekeken ? "bg-accent-soft text-ink" : "bg-line text-ink-700"
+          }`}
+        >
+          <Icon name={nagekeken ? "check" : "info"} size={12} />
+          {labels(nagekeken ? "badgeGeverifieerd" : "badgeRaming", {})}
+        </span>
+        {car.bron && <span className="min-w-0 text-ink-500">{car.bron}</span>}
+      </div>
+      {voorbehoud && (
+        <p className="m-0 mt-1.5 text-ink-700">
+          <span className="font-bold">{labels("voorbehoudLabel", {})}:</span> {voorbehoud}
+        </p>
+      )}
     </div>
   );
 }
