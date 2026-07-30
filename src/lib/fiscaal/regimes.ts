@@ -1,7 +1,7 @@
 import {
   AFTREK_HOGE_UITSTOOT,
   HOGE_UITSTOOT_VANAF,
-  LAATSTE_JAAR_MET_MINIMUMAFTREK,
+  aftrekOpbouw,
   aftrekPct,
   aftrekPctBrandstofPhev,
   aftrekPctElektriciteit,
@@ -10,7 +10,6 @@ import {
   isOvergangsregime,
   plafondUitKalender,
 } from "./engine";
-import { fiscaleCo2 } from "./hybride";
 import type { Bestelperiode, Brandstof, FiscaleContext, Vehicle, Voertuigtype } from "./types";
 
 /**
@@ -119,7 +118,7 @@ function verbrandingsregime(
       soort: "plafondPerJaar",
       stappen: jaren.map((gebruiksjaar) => ({
         gebruiksjaar,
-        plafond: plafondUitKalender(ctx, voertuigtype, periode, gebruiksjaar),
+        plafond: plafondUitKalender(ctx, voertuigtype, periode, gebruiksjaar).pct,
       })),
     };
   }
@@ -129,7 +128,7 @@ function verbrandingsregime(
   // is dan een even goede vraag als elk ander.
   return {
     soort: "vast",
-    pct: plafondUitKalender(ctx, voertuigtype, periode, jaren[0] ?? 2026),
+    pct: plafondUitKalender(ctx, voertuigtype, periode, jaren[0] ?? 2026).pct,
   };
 }
 
@@ -154,7 +153,7 @@ export function regimebanden(ctx: FiscaleContext, vandaag: string): Regimeband[]
       bev:
         periode.code === "voor_07_2023"
           ? gramformule("elektrisch", 0)
-          : plafondUitKalender(ctx, "BEV", periode, 2026),
+          : plafondUitKalender(ctx, "BEV", periode, 2026).pct,
       verbranding: verbrandingsregime(ctx, periode, "fossiel"),
       isVandaag: periode.code === huidige.code,
     }));
@@ -244,31 +243,34 @@ export function aftrekMatrix(
   return wagens.map((wagen) => {
     const vehicle = proefwagen(wagen);
     const periode = bestelperiodeVoorDatum(ctx, vehicle.besteldatum);
-    const overgang = isOvergangsregime(periode);
-    const oudsteRegime = periode.code === "voor_07_2023";
 
     const cellen: Matrixcel[] = jaren.map((gebruiksjaar) => {
-      const aftrek = aftrekPct(ctx, vehicle, gebruiksjaar);
+      // Volledig gedelegeerd aan `aftrekOpbouw`. Deze functie berekende de
+      // formule en het plafond eerst zelf opnieuw, met een eigen kopie van de
+      // vraag of de ondergrens nog gold en van de valse-hybridecorrectie. Dat is
+      // precies de tweede waarheid die dit bestand hoort te vermijden, en de
+      // rekenkern geeft die opbouw sinds kort zelf terug.
+      const opbouw = aftrekOpbouw(ctx, vehicle, gebruiksjaar);
+      const { gramformulePct, plafondPct } = opbouw;
 
-      if (wagen.aandrijving === "BEV" || (!overgang && !oudsteRegime)) {
-        return { gebruiksjaar, aftrek, formule: null, plafond: null, bindend: "kalender" };
-      }
+      const bindend: Matrixcel["bindend"] =
+        gramformulePct === null
+          ? "kalender"
+          : plafondPct === null
+            ? "formule"
+            : gramformulePct === plafondPct
+              ? "gelijk"
+              : gramformulePct < plafondPct
+                ? "formule"
+                : "plafond";
 
-      // Met de fiscale uitstoot en niet met de waarde uit het dossier. Bij een
-      // valse hybride rekent `aftrekPct` met de gecorrigeerde uitstoot, en een
-      // formulekolom die de ruwe waarde toont, zou naast de aftrek staan die ze
-      // hoort te verklaren.
-      const formule = gramformule(vehicle.brandstof, fiscaleCo2(vehicle).co2, {
-        metMinimum: oudsteRegime || gebruiksjaar <= LAATSTE_JAAR_MET_MINIMUMAFTREK,
-      });
-
-      if (oudsteRegime) {
-        return { gebruiksjaar, aftrek, formule, plafond: null, bindend: "formule" };
-      }
-
-      const plafond = plafondUitKalender(ctx, vehicle.voertuigtype, periode, gebruiksjaar);
-      const bindend = formule === plafond ? "gelijk" : formule < plafond ? "formule" : "plafond";
-      return { gebruiksjaar, aftrek, formule, plafond, bindend };
+      return {
+        gebruiksjaar,
+        aftrek: opbouw.pct,
+        formule: gramformulePct,
+        plafond: plafondPct,
+        bindend,
+      };
     });
 
     return {

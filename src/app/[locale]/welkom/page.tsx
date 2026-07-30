@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { Melding, Veld, invoerKlasse } from "@/components/AuthKaart";
 import Icon from "@/components/Icon";
 import { useSessie } from "@/components/SessieProvider";
+import Stappenbalk from "@/components/Stappenbalk";
 import { Card, Container, knopKlassen } from "@/components/ui";
 import { voltooiOnboarding, type BedrijfsInvoer } from "@/lib/bedrijf";
 import { magBeheren } from "@/lib/rollen";
@@ -104,19 +105,14 @@ export default function WelkomPagina() {
       </h1>
       <p className="mt-2.5 text-[16.5px] text-ink-700">{t("intro")}</p>
 
-      <ol className="m-0 mt-7 flex list-none gap-2 p-0" aria-label={t("voortgang")}>
-        {Array.from({ length: STAPPEN }, (_, i) => i + 1).map((n) => (
-          <li key={n} className="flex-1">
-            <span
-              aria-current={n === stap ? "step" : undefined}
-              className={`block h-[5px] rounded-full ${n <= stap ? "bg-gold" : "bg-line"}`}
-            />
-            <span className="mt-2 block text-[12.5px] font-bold text-ink-500">
-              {t(`stap${n}Label`)}
-            </span>
-          </li>
-        ))}
-      </ol>
+      <div className="mt-7">
+        <Stappenbalk
+          stappen={Array.from({ length: STAPPEN }, (_, i) => t(`stap${i + 1}Label`))}
+          huidige={stap}
+          label={t("voortgang")}
+          onGa={setStap}
+        />
+      </div>
 
       {fout && (
         <div className="mt-6">

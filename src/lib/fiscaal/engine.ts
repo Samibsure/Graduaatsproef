@@ -146,6 +146,19 @@ export function isOvergangsregime(periode: Bestelperiode): boolean {
   );
 }
 
+/** Een plafond uit de aftrekkalender, met de herkomst van dat getal erbij. */
+interface Kalenderplafond {
+  pct: number;
+  /**
+   * True wanneer dit percentage niet van het gebruiksjaar afhangt: een regel voor
+   * de hele gebruiksduur, of geen regel (en dan levenslang nul). Dat verschil is
+   * geen finesse maar de kern van de uitleg: "0% levenslang omdat je vanaf 2026
+   * besteld hebt" is een ander verhaal dan "0% omdat de uitdoofkalender in 2028
+   * op nul staat".
+   */
+  levenslang: boolean;
+}
+
 /**
  * Het maximumplafond uit de aftrekkalender voor deze wagen en dit gebruiksjaar.
  * Voor een elektrische wagen is dat meteen het definitieve percentage; voor een
@@ -160,22 +173,56 @@ export function plafondUitKalender(
   voertuigtype: Voertuigtype,
   periode: Bestelperiode,
   gebruiksjaar: number,
-): number {
+): Kalenderplafond {
   const regels = ctx.regels.filter(
     (r) => r.voertuigtype === voertuigtype && r.bestelperiode === periode.code,
   );
   const exact = regels.find((r) => r.gebruiksjaar === gebruiksjaar);
-  if (exact) return exact.aftrek_pct;
+  if (exact) return { pct: exact.aftrek_pct, levenslang: false };
   const levenslang = regels.find((r) => r.gebruiksjaar === null);
-  if (levenslang) return levenslang.aftrek_pct;
+  if (levenslang) return { pct: levenslang.aftrek_pct, levenslang: true };
   // Uitdoofkalender: vóór het eerste kalenderjaar geldt de hoogste trap,
   // na het laatste kalenderjaar de laagste (0%).
   const perJaar = regels
     .filter((r) => r.gebruiksjaar !== null)
     .sort((a, b) => (a.gebruiksjaar as number) - (b.gebruiksjaar as number));
-  if (perJaar.length === 0) return 0;
-  if (gebruiksjaar < (perJaar[0].gebruiksjaar as number)) return perJaar[0].aftrek_pct;
-  return perJaar[perJaar.length - 1].aftrek_pct;
+  if (perJaar.length === 0) return { pct: 0, levenslang: true };
+  if (gebruiksjaar < (perJaar[0].gebruiksjaar as number)) {
+    return { pct: perJaar[0].aftrek_pct, levenslang: false };
+  }
+  return { pct: perJaar[perJaar.length - 1].aftrek_pct, levenslang: false };
+}
+
+/** Waar het aftrekpercentage vandaan komt. */
+export type Aftrekherkomst = "gramformule" | "kalenderplafond" | "levenslang_nul";
+
+/**
+ * Het aftrekpercentage mét de weg ernaartoe.
+ *
+ * `aftrekPct` gaf alleen het getal terug, en daarmee viel de enige vraag die de
+ * gebruiker echt stelt buiten de rekenkern: waaróm is het dit percentage? Het
+ * antwoord zat er al in (welk regime, welk plafond, of de formule of de kalender
+ * bond) maar werd bij het teruggeven weggegooid, waardoor de interface het zou
+ * moeten naspelen. Twee formules die hetzelfde horen te zeggen lopen uiteen; deze
+ * struct houdt het bij één.
+ */
+export interface Aftrekopbouw {
+  pct: number;
+  herkomst: Aftrekherkomst;
+  periode: Bestelperiode;
+  /**
+   * Uitkomst van de gramformule, of null wanneer ze niet van toepassing is: bij
+   * een elektrische wagen en buiten het overgangsregime speelt ze niet mee.
+   */
+  gramformulePct: number | null;
+  /** Plafond uit de aftrekkalender, of null onder het regime van vóór juli 2023. */
+  plafondPct: number | null;
+  /** De CO₂ waarmee gerekend is, dus na de valse-hybridecorrectie. */
+  gerekendeCo2: number | null;
+  /** Coëfficiënt van de gramformule voor deze brandstof: diesel 1, benzine 0,95, cng 0,9. */
+  gramCoefficient: number;
+  /** True wanneer de wettelijke ondergrens van 50% in dit gebruiksjaar nog gold. */
+  metMinimum: boolean;
 }
 
 /**
@@ -191,23 +238,64 @@ export function plafondUitKalender(
  * - Besteld vanaf 1 januari 2026: verbrandingswagens vallen op 0%, elektrische
  *   wagens houden levenslang het percentage van hun besteljaar.
  */
-export function aftrekPct(ctx: FiscaleContext, vehicle: Vehicle, gebruiksjaar: number): number {
+export function aftrekOpbouw(
+  ctx: FiscaleContext,
+  vehicle: Vehicle,
+  gebruiksjaar: number,
+): Aftrekopbouw {
   const periode = bestelperiodeVoorDatum(ctx, vehicle.besteldatum);
-  const co2 = fiscaleCo2(vehicle).co2;
+  const gerekendeCo2 = fiscaleCo2(vehicle).co2;
+  const gramCoefficient = GRAMFORMULE_COEFF[vehicle.brandstof];
 
   if (periode.code === "voor_07_2023") {
-    return gramformule(vehicle.brandstof, co2);
+    const pct = gramformule(vehicle.brandstof, gerekendeCo2);
+    return {
+      pct,
+      herkomst: "gramformule",
+      periode,
+      gramformulePct: pct,
+      plafondPct: null,
+      gerekendeCo2,
+      gramCoefficient,
+      metMinimum: true,
+    };
   }
 
   const plafond = plafondUitKalender(ctx, vehicle.voertuigtype, periode, gebruiksjaar);
-  if (vehicle.voertuigtype === "BEV" || !isOvergangsregime(periode)) return plafond;
 
-  return Math.min(
-    plafond,
-    gramformule(vehicle.brandstof, co2, {
-      metMinimum: gebruiksjaar <= LAATSTE_JAAR_MET_MINIMUMAFTREK,
-    }),
-  );
+  if (vehicle.voertuigtype === "BEV" || !isOvergangsregime(periode)) {
+    return {
+      pct: plafond.pct,
+      herkomst: plafond.pct === 0 && plafond.levenslang ? "levenslang_nul" : "kalenderplafond",
+      periode,
+      gramformulePct: null,
+      plafondPct: plafond.pct,
+      gerekendeCo2,
+      gramCoefficient,
+      metMinimum: false,
+    };
+  }
+
+  const metMinimum = gebruiksjaar <= LAATSTE_JAAR_MET_MINIMUMAFTREK;
+  const gramformulePct = gramformule(vehicle.brandstof, gerekendeCo2, { metMinimum });
+
+  return {
+    pct: Math.min(plafond.pct, gramformulePct),
+    // Bij gelijkspel wint de formule als verklaring: zij is de regel, het plafond
+    // is er de begrenzing van.
+    herkomst: gramformulePct <= plafond.pct ? "gramformule" : "kalenderplafond",
+    periode,
+    gramformulePct,
+    plafondPct: plafond.pct,
+    gerekendeCo2,
+    gramCoefficient,
+    metMinimum,
+  };
+}
+
+/** Alleen het percentage. Zie `aftrekOpbouw` voor de weg ernaartoe. */
+export function aftrekPct(ctx: FiscaleContext, vehicle: Vehicle, gebruiksjaar: number): number {
+  return aftrekOpbouw(ctx, vehicle, gebruiksjaar).pct;
 }
 
 /**
@@ -227,7 +315,7 @@ export function aftrekPctElektriciteit(
   if (vehicle.voertuigtype !== "PHEV") return aftrekPct(ctx, vehicle, gebruiksjaar);
   const periode = bestelperiodeVoorDatum(ctx, vehicle.besteldatum);
   if (periode.code === "voor_07_2023") return aftrekPct(ctx, vehicle, gebruiksjaar);
-  return plafondUitKalender(ctx, "BEV", periode, gebruiksjaar);
+  return plafondUitKalender(ctx, "BEV", periode, gebruiksjaar).pct;
 }
 
 /**
