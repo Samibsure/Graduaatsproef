@@ -1,4 +1,5 @@
-import { existsSync, statSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { existsSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { DEFAULT_CATALOGUS } from "./catalogusdata";
@@ -37,7 +38,7 @@ describe("catalogusfoto's", () => {
     }
   });
 
-  it("deelt geen enkele foto tussen twee modellen", () => {
+  it("deelt geen enkel pad tussen twee modellen", () => {
     const perPad = new Map<string, string[]>();
     for (const car of metFoto) {
       const namen = perPad.get(car.image_url!) ?? [];
@@ -46,6 +47,23 @@ describe("catalogusfoto's", () => {
     }
     const gedeeld = [...perPad.entries()].filter(([, namen]) => namen.length > 1);
     expect(gedeeld.map(([pad, namen]) => `${pad}: ${namen.join(", ")}`)).toEqual([]);
+  });
+
+  it("deelt ook geen enkele afbeelding, ook niet onder twee namen", () => {
+    // Twee paden met dezelfde inhoud passeren de vorige test wel: zo stonden
+    // `20-bmw-330e.jpg` en `24-bmw-320d.jpg` byte voor byte gelijk, en toonde één
+    // van beide dus de verkeerde wagen. Alleen de inhoud verraadt dat.
+    const perSom = new Map<string, string[]>();
+    for (const car of metFoto) {
+      const som = createHash("sha1")
+        .update(readFileSync(join(PUBLIEK, car.image_url!.replace(/^\//, ""))))
+        .digest("hex");
+      const namen = perSom.get(som) ?? [];
+      namen.push(`${car.merk} ${car.model} (${car.image_url})`);
+      perSom.set(som, namen);
+    }
+    const gedeeld = [...perSom.values()].filter((namen) => namen.length > 1);
+    expect(gedeeld.map((namen) => namen.join(" == "))).toEqual([]);
   });
 
   it("houdt elke foto onder de 400 kB", () => {
