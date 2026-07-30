@@ -2,7 +2,8 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useMemo, useState } from "react";
-import { Badge, Card, Container, PageHead } from "@/components/ui";
+import { Badge, Card, Container, Melding, PageHead } from "@/components/ui";
+import { Link } from "@/i18n/navigation";
 import { laadFiscaleContext } from "@/lib/data";
 import { ZEKERHEID_TINT } from "@/lib/fiscaal/bronnen";
 import type { Zekerheid } from "@/lib/fiscaal/bronnen";
@@ -29,6 +30,7 @@ import {
 import { WEGENVIGNET_TARIEVEN, WEGENVIGNET_VANAF } from "@/lib/fiscaal/wegenvignet";
 import { formatters } from "@/lib/format";
 import { PARAM_VELDEN } from "@/lib/parameterVelden";
+import { periodenaam } from "@/lib/periodenaam";
 
 const TYPES: Voertuigtype[] = ["BEV", "PHEV", "HEV", "fossiel"];
 
@@ -55,8 +57,11 @@ function StatusBadge({ zekerheid, label }: { zekerheid: Zekerheid; label: string
 
 export default function ParametersPagina() {
   const t = useTranslations("parameters");
+  // De periodenamen komen uit dezelfde sleutels als de regimematrix, zodat er één
+  // benaming voor die perioden in de applicatie bestaat.
+  const tRegimes = useTranslations("regimes");
   const locale = useLocale();
-  const { getal, euro, euroCent } = formatters(locale);
+  const { getal, euro, euroCent, coefficient, datum } = formatters(locale);
   const [ctx, setCtx] = useState<FiscaleContext | null>(null);
   const [jaar, setJaar] = useState(2026);
   const [fout, setFout] = useState<string | null>(null);
@@ -82,6 +87,17 @@ export default function ParametersPagina() {
   }, []);
 
   const params = ctx?.parameters.find((p) => p.year === jaar) ?? null;
+
+  /**
+   * De naam van een bestelperiode uit haar grensdatums, in de actieve taal. Het
+   * `label` in de databank staat in het Nederlands en werd hier rechtstreeks
+   * gerenderd, dus op /fr en /en stond er Nederlands in deze tabel.
+   */
+  const periodeLabel = (code: string) => {
+    const periode = ctx?.periodes.find((p) => p.code === code);
+    if (!periode) return code;
+    return periodenaam(periode, tRegimes, datum);
+  };
 
   /**
    * De gewestelijke tarieven die wél als bedrag gepubliceerd zijn. De volledige
@@ -168,39 +184,70 @@ export default function ParametersPagina() {
           </label>
         </div>
 
-        {params && (
-          <dl className="mt-5 grid gap-x-8 gap-y-3.5 sm:grid-cols-2 lg:grid-cols-3">
-            {PARAM_VELDEN.map(({ veld, sleutel, eenheid }) => (
-              <div key={veld} className="flex items-baseline justify-between gap-3 border-b border-line pb-2.5">
-                <dt className="text-[13.5px] text-ink-700">{t(sleutel)}</dt>
-                <dd className="m-0 shrink-0 text-[14.5px] font-bold text-ink">
-                  {getal(params[veld] as number)}
-                  {eenheid && <span className="ml-1 font-normal text-ink-500">{t(eenheid)}</span>}
-                </dd>
-              </div>
-            ))}
-          </dl>
-        )}
-      </Card>
+        <Melding soort="info" className="mt-4">
+          {t("jaarBereik")}
+        </Melding>
 
-      <Card className="p-5 sm:p-6">
-        <h2 className="m-0 text-[18px] font-bold text-ink">{t("multiplicatorTitel")}</h2>
-        <p className="mt-1.5 text-[14.5px] text-ink-700">{t("multiplicatorIntro")}</p>
-        <dl className="mt-4 grid gap-x-8 gap-y-3.5 sm:grid-cols-2">
-          {ctx?.periodes.map((p) => (
-            <div key={p.code} className="flex items-baseline justify-between gap-3 border-b border-line pb-2.5">
-              <dt className="text-[13.5px] text-ink-700">{p.label}</dt>
-              <dd className="m-0 shrink-0 text-[14.5px] font-bold text-ink">
-                × {getal(p.rsz_multiplicator)}
-              </dd>
-            </div>
-          ))}
-        </dl>
+        {params && (
+          // Elk veld met een zin die zegt wat het is en welke formule het voedt.
+          // De vorige weergave was een raster van zestien label-waardeparen, en
+          // dan is "VAA → VU met tank-/laadkaart: 40%" een cijfer zonder
+          // betekenis. De uitleg is hier de kolom die het meeste werk doet.
+          <div className="mt-4 overflow-hidden rounded-[12px] border border-line">
+            <table className="w-full text-sm">
+              <caption className="sr-only">{t("perJaar")}</caption>
+              <thead className="border-b border-line bg-paper text-left text-xs uppercase tracking-wide text-ink-500">
+                <tr>
+                  <Kop>{t("kolomParameter")}</Kop>
+                  <Kop rechts>{t("kolomWaarde")}</Kop>
+                  <Kop>{t("kolomWatZeDoet")}</Kop>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {PARAM_VELDEN.map(({ veld, sleutel, eenheid, anker }) => (
+                  <tr key={veld}>
+                    <td className="px-3 py-3 align-top text-[13.5px] font-bold text-ink">
+                      {t(sleutel)}
+                    </td>
+                    <td className="whitespace-nowrap px-3 py-3 align-top text-right text-[14.5px] font-bold text-ink">
+                      {veld === "rsz_index"
+                        ? coefficient(params[veld] as number)
+                        : getal(params[veld] as number)}
+                      {eenheid && (
+                        <span className="ml-1 font-normal text-ink-500">{t(eenheid)}</span>
+                      )}
+                    </td>
+                    <td className="px-3 py-3 text-[13.5px] leading-[1.6] text-ink-700">
+                      {t(`${sleutel}Uitleg`)}
+                      {anker && (
+                        <>
+                          {" "}
+                          <Link
+                            href={`/fiscaal-kader#${anker}`}
+                            className="whitespace-nowrap font-bold text-accent"
+                          >
+                            {t("naarFormule")}
+                          </Link>
+                        </>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </Card>
 
       <Card className="p-5 sm:p-6">
         <h2 className="m-0 text-[18px] font-bold text-ink">{t("kalenderTitel")}</h2>
         <p className="mt-1.5 text-[14.5px] text-ink-700">{t("kalenderIntro")}</p>
+        {/* Hierboven stond een kaart "RSZ-multiplicator per bestelperiode" met de
+            waarden uit bestelperiodes.rsz_multiplicator. Die kolom wordt door
+            rszBijdrageMaand nooit gelezen: die neemt de multiplicator van het
+            bijdragejaar uit tax_parameters. De pagina toonde dus x6 vanaf 2028
+            terwijl geen enkele berekening dat cijfer gebruikt. Wat de rekenkern
+            echt doet, staat nu in één regel bij het veld zelf. */}
 
         {TYPES.map((type) => {
           const regels = ctx?.regels.filter((r) => r.voertuigtype === type) ?? [];
@@ -221,8 +268,7 @@ export default function ParametersPagina() {
                     {regels.map((r) => (
                       <tr key={`${r.bestelperiode}-${r.gebruiksjaar ?? "alle"}`}>
                         <td className="px-3 py-1.5 text-ink-700">
-                          {ctx?.periodes.find((p) => p.code === r.bestelperiode)?.label ??
-                            r.bestelperiode}
+                          {periodeLabel(r.bestelperiode)}
                         </td>
                         <td className="px-3 py-1.5 text-ink-700">
                           {r.gebruiksjaar ?? t("heleGebruiksduur")}

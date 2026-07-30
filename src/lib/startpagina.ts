@@ -42,13 +42,14 @@ export const POSTEN: readonly string[] = [
   "rekenHybride",
 ];
 
-/** De omslag naar elektrisch: `${sleutel}Periode`, `Waarde` en `Tekst`. */
-export const OMSLAG: readonly string[] = [
-  "omslagOud",
-  "omslagOvergang",
-  "omslag2026",
-  "omslagAfbouw",
-];
+/**
+ * De omslagsectie had hier een lijst van vier kaarten met per kaart een
+ * `Periode`, een `Waarde` en een `Tekst`. Die staat er niet meer, en dat is de
+ * kern van de herwerking: de percentages waren handgetypte tekst, los van
+ * `defaults.ts`, en twee ervan waren onjuist. Ze komen nu uit `regimebanden` in
+ * `fiscaal/regimes.ts`, dus uit de aftrekkalender zelf. Er valt hier niets meer
+ * te bewaken omdat er niets meer samengesteld wordt.
+ */
 
 /** De veelgestelde vragen: `${sleutel}Vraag` en `Antwoord`. */
 export const VRAGEN: readonly string[] = [
@@ -64,7 +65,6 @@ export function samengesteldeSleutels(): string[] {
   return [
     ...ONDERDELEN.flatMap((o) => [`${o.sleutel}Titel`, `${o.sleutel}Tekst`, `${o.sleutel}Link`]),
     ...POSTEN.flatMap((p) => [`${p}Titel`, `${p}Tekst`]),
-    ...OMSLAG.flatMap((o) => [`${o}Periode`, `${o}Waarde`, `${o}Tekst`]),
     ...VRAGEN.flatMap((v) => [`${v}Vraag`, `${v}Antwoord`]),
   ];
 }

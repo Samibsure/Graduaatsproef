@@ -2,10 +2,24 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import FiscaalVoorbeeld, { Kerncijfers } from "./_start/FiscaalVoorbeeld";
 import UitgelichteWagens from "./_start/UitgelichteWagens";
 import Icon from "@/components/Icon";
+import Regimematrix from "@/components/Regimematrix";
 import { Container, knopKlassen } from "@/components/ui";
 import { Link } from "@/i18n/navigation";
+import { DEFAULT_CONTEXT } from "@/lib/fiscaal/defaults";
+import { regimebanden } from "@/lib/fiscaal/regimes";
+import { formatters } from "@/lib/format";
 import { START_HIER_HREF } from "@/lib/navigatie";
-import { OMSLAG, ONDERDELEN, POSTEN, VRAGEN } from "@/lib/startpagina";
+import { ONDERDELEN, POSTEN, VRAGEN } from "@/lib/startpagina";
+
+/**
+ * De pagina wordt statisch gebouwd, dus "vandaag" moet uit de bouw komen en niet
+ * uit een `new Date()` in de render: anders wijst de markering in de regimematrix
+ * naar de bestelperiode van de dag waarop er toevallig gedeployd is.
+ *
+ * `revalidate` hieronder houdt die markering fris over een jaargrens heen. De
+ * percentages zelf hebben dat niet nodig, die komen uit de aftrekkalender.
+ */
+export const revalidate = 86400;
 
 /**
  * De startpagina.
@@ -37,6 +51,11 @@ export default async function Startpagina({
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations({ locale, namespace: "dashboard" });
+  const opmaak = formatters(locale);
+
+  // Bij de bouw vastgezet en door `revalidate` dagelijks verversd, zodat de
+  // markering "geldt vandaag" in de matrix niet op de deploydatum blijft staan.
+  const peildatum = new Date().toISOString().slice(0, 10);
 
   const stappen = [
     { nummer: "01", icoon: "car", titel: t("stap1Titel"), tekst: t("stap1Tekst") },
@@ -179,30 +198,25 @@ export default async function Startpagina({
       </section>
 
       {/* DE OMSLAG
-          Waarom dit nu telt. Vier haltes, met de percentages erbij, want die
-          zijn het hele verhaal. */}
+          Waarom dit nu telt. Hier stonden vier kaarten met handgetypte waarden
+          ("50 tot 100%", "Daalt naar 0%", "0% of 100%", "95% tot 67,5%"). Vier
+          verschillende soorten uitspraken op dezelfde plek, twee ervan onjuist, en
+          geen enkele verbonden met de aftrekkalender. De matrix eronder leest die
+          kalender uit, dus wat hier staat kan niet meer stil verouderen. */}
       <section className="border-y border-line bg-paper">
         <Container className="py-[68px]">
-          <div className="mb-11 max-w-[680px]">
+          <div className="mb-9 max-w-[680px]">
             <h2 className="m-0 mb-4 text-[clamp(28px,3.4vw,40px)] font-bold tracking-[-0.02em] text-ink">
               {t("omslagKop")}
             </h2>
             <p className="m-0 text-[17px] leading-relaxed text-ink-700">{t("omslagIntro")}</p>
           </div>
 
-          <ol className="m-0 grid list-none gap-5 p-0 md:grid-cols-4">
-            {OMSLAG.map((o) => (
-              <li key={o} className="rounded-[14px] border border-line bg-white p-6">
-                <div className="text-[13px] font-bold text-accent">{t(`${o}Periode`)}</div>
-                <div className="mt-2 text-[26px] font-bold leading-none tracking-[-0.02em] text-ink">
-                  {t(`${o}Waarde`)}
-                </div>
-                <p className="m-0 mt-3 text-[14.5px] leading-relaxed text-ink-700">
-                  {t(`${o}Tekst`)}
-                </p>
-              </li>
-            ))}
-          </ol>
+          <Regimematrix
+            banden={regimebanden(DEFAULT_CONTEXT, peildatum)}
+            formatters={{ pct: opmaak.pct, datum: opmaak.datum }}
+            vouwVanaf="2027"
+          />
 
           <p className="m-0 mt-7 flex max-w-[54em] items-start gap-2.5 text-[14.5px] leading-relaxed text-ink-700">
             <span className="mt-0.5 flex-none text-accent">
@@ -210,6 +224,15 @@ export default async function Startpagina({
             </span>
             {t("omslagWaarschuwing")}
           </p>
+
+          <div className="mt-7 flex flex-wrap gap-3.5">
+            <Link href="/fiscaal-kader#fk-regime" className={knopKlassen("stil", "md")}>
+              <Icon name="info" size={17} /> {t("omslagNaarKader")}
+            </Link>
+            <Link href={START_HIER_HREF} className={knopKlassen("stil", "md")}>
+              <Icon name="calculator" size={17} /> {t("omslagNaarSimulator")}
+            </Link>
+          </div>
         </Container>
       </section>
 
