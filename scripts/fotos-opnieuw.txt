@@ -9,13 +9,21 @@
 # Commons het bestand ook zo heeft ingedeeld of beschreven. Bij een beursreeks
 # als 'Auto Zuerich 2024 DSC 6644.jpg' staat er in titel, categorie noch
 # beschrijving iets over wat er op de foto staat, en blijft er maar één manier
-# over om het te merken: kijken. Wat hieronder staat is met het oog afgekeurd,
-# met de reden erbij, en na een geslaagde herkansing weer geschrapt.
+# over om het te merken: kijken.
+#
+# Deze vier staan er nog op na vier herkansingen, en hebben op dit moment géén
+# foto: ze vallen terug op de SVG-illustratie van CarImage. Dat is bewust. Een
+# dashboard op de kaart van de ë-C3 is een fout die een bezoeker als een fout
+# leest; een illustratie leest als 'nog geen foto'. Wie hier later langs komt:
+# zet de slug in dit bestand en draai de workflow, of kies met de hand een
+# bestand op Commons en zet het pad in catalogusdata.ts met een regel in
+# BRONNEN.md erbij.
 
-# interieur, zonder enig spoor daarvan in de metadata
+# Commons heeft voor deze drie vrijwel alleen interieurfoto's van beursstands
 citroen-ec3
 renault-symbioz-etech
 volvo-es90
 
-# nog altijd de Tucson JM uit 2004
+# blijft op de Tucson JM uit 2004 landen; de huidige generatie zit wel bij
+# hyundai-tucson-phev, maar twee rijen mogen niet dezelfde foto delen
 hyundai-tucson-hev

@@ -95,9 +95,15 @@ buiten de aftrekbeperking van artikel 66 WIB92, en de rekenkern kent die uitzond
 
 ### Modelfoto's
 
-Elk model heeft een echte foto, één bestand per slug in `public/cars`. Ontbreekt er een, dan valt
-`CarImage` terug op een eigen SVG-illustratie per carrosserietype: bruikbaar als noodoplossing,
-maar op een raster van dertig kaarten ziet een bezoeker meteen dat het een plaatshouder is.
+159 van de 163 modellen hebben een echte foto, één bestand per slug in `public/cars`. Ontbreekt er
+een, dan valt `CarImage` terug op een eigen SVG-illustratie per carrosserietype: bruikbaar als
+noodoplossing, maar op een raster van dertig kaarten ziet een bezoeker meteen dat het een
+plaatshouder is.
+
+De vier die er geen hebben, staan met hun reden in `scripts/fotos-opnieuw.txt`. Voor die modellen
+heeft Commons vrijwel alleen interieurfoto's van beursstands, of blijft het bij een vorige
+generatie. Dat is een bewuste keuze: een dashboard op de kaart van de ë-C3 leest als een fout in de
+applicatie, een illustratie leest als 'nog geen foto'.
 
 De foto's staan lokaal, niet bij een externe dienst: de CSP laat `img-src 'self'` toe en niets
 anders. Ze komen van Wikimedia Commons, alleen onder een licentie die hergebruik toelaat (publiek
