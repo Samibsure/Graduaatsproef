@@ -448,8 +448,8 @@ def main() -> int:
             time.sleep(0.5)
         try:
             keuze = kies(model)
-        except RuntimeError as fout:
-            print(f"{prefix} netwerkfout: {fout}")
+        except Exception as fout:  # noqa: BLE001 — zie de reden bij het downloaden
+            print(f"{prefix} zoeken mislukt: {type(fout).__name__}: {fout}")
             mislukt.append(model)
             continue
         if not keuze:
@@ -463,9 +463,13 @@ def main() -> int:
 
         bestandsnaam = f"{model.slug}.jpg"
         try:
-            snij_bij(haal(keuze.thumburl, binair=True), FOTOMAP / bestandsnaam)
-        except RuntimeError as fout:
-            print(f"{prefix} downloaden mislukt: {fout}")
+            snij_bij(haal(keuze.thumburl), FOTOMAP / bestandsnaam)
+        # Bewust breed. Eén model dat struikelt — een thumbnail die Pillow niet
+        # leest, een verbinding die wegvalt — mag de honderdzevenendertig andere
+        # niet meesleuren. Wat overblijft staat onderaan in de lijst 'niet gelukt'
+        # en is met --only opnieuw te proberen.
+        except Exception as fout:  # noqa: BLE001
+            print(f"{prefix} downloaden mislukt: {type(fout).__name__}: {fout}")
             mislukt.append(model)
             continue
 

@@ -93,20 +93,16 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          # De doelbranch begint bij de commit waarop deze run gebaseerd is, en
-          # bestaande foto's op die branch blijven staan: het script vult aan.
-          git fetch origin "$DOEL" || true
-          if git rev-parse --verify "origin/$DOEL" >/dev/null 2>&1; then
-            git stash push --include-untracked
-            git checkout -B "$DOEL" "origin/$DOEL"
-            git stash pop
-          else
-            git checkout -B "$DOEL"
-          fi
+          # De doelbranch begint altijd bij de commit waarop deze run draait, en
+          # wordt geforceerd gepusht. Voortbouwen op wat er al op die branch stond
+          # gaat mis zodra ze van een gemergede pull request komt: na een squash
+          # is die oude tip geen voorouder van main meer, dus zou het resultaat op
+          # verouderde historie landen in plaats van op de huidige catalogus.
+          git checkout -B "$DOEL"
 
           aantal=$(git status --porcelain public/cars | grep -c '\.jpg' || true)
           git add -A public/cars src/lib/fiscaal/catalogusdata.ts
           git commit -m "Modelfoto's van de catalogus ophalen ($aantal bestanden)" \
                      -m "Opgehaald door .github/workflows/modelfotos.yml met scripts/wagenfotos.py, van Wikimedia Commons, alleen onder een licentie die hergebruik toelaat. Auteur, licentie en bronlink per foto staan in public/cars/BRONNEN.md." \
                      -m "[skip ci]"
-          git push origin "$DOEL"
+          git push --force origin "$DOEL"
