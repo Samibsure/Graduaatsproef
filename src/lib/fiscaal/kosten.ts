@@ -1,4 +1,4 @@
-import type { Brandstof, CatalogCar, Onderhoudsklasse, Voertuigtype } from "./types";
+import type { Brandstof, CatalogCar, Gewest, Onderhoudsklasse, Voertuigtype } from "./types";
 
 /**
  * Wat een wagen per jaar kost, berekend uit zijn specificaties.
@@ -30,9 +30,14 @@ import type { Brandstof, CatalogCar, Onderhoudsklasse, Voertuigtype } from "./ty
  *
  * Alles wat hier uitkomt, is een vertrekpunt. De gebruiker kan elk bedrag
  * overschrijven met de cijfers uit zijn offerte.
+ *
+ * Voor wie het wettelijke bedrag nodig heeft in plaats van een richtbedrag:
+ * gewesten.ts bouwt de gewestelijke formules wél na, maar geeft geen uitkomst
+ * wanneer het barema ontbreekt. Die twee benaderingen vullen elkaar aan; ze
+ * horen niet door elkaar gebruikt te worden.
  */
 
-export type Gewest = "vlaanderen" | "wallonie" | "brussel";
+export type { Gewest };
 
 /**
  * Restwaarde per aandrijftype, na **36 maanden en 60.000 km**.
@@ -157,6 +162,9 @@ export const KOSTENPARAMETERS: KostenParameters = {
    * basisbedrag levert die geen cijfer op dat dit richtbedrag kan vervangen.
    */
   verkeersbelasting: {
+    // De Vlaamse vork loopt van € 69,72 (1 fiscale pk) tot € 87,24 (5 pk). Een
+    // bedrijfswagen zit vrijwel altijd op vijf pk, dus is de bovengrens hier niet
+    // alleen de voorzichtige keuze maar ook de waarschijnlijke.
     vlaanderen: { BEV: 87.24, PHEV: 130, HEV: 310, fossiel: 420 },
     wallonie: { BEV: 102.96, PHEV: 250, HEV: 350, fossiel: 480 },
     brussel: { BEV: 102.96, PHEV: 250, HEV: 350, fossiel: 480 },

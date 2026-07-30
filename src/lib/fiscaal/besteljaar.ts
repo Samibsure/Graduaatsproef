@@ -8,9 +8,9 @@ import type { FiscaleContext, Vehicle } from "./types";
  * scherm. De catalogus vulde stil `besteldatum = 15 januari van het gekozen jaar`
  * in en toonde het resultaat alsof dat een eigenschap van de wagen was. Het is
  * een eigenschap van het *moment*: dezelfde verbrandingswagen die besteld in 2025
- * nog 75% aftrekbaar is in zijn eerste gebruiksjaar, is besteld in 2026 meteen
- * 0% aftrekbaar. Dat verschil loopt over vier jaar in de duizenden euro's, en de
- * gebruiker zag alleen het eindcijfer.
+ * nog via de gramformule aftrekbaar is in zijn eerste gebruiksjaar, is besteld in
+ * 2026 meteen 0% aftrekbaar. Dat verschil loopt over vier jaar in de duizenden
+ * euro's, en de gebruiker zag alleen het eindcijfer.
  *
  * Deze module varieert het besteljaar bij een vaste wagen. Dat is het spiegelbeeld
  * van uitfasering.ts, dat het besteljaar vasthoudt en het gebruiksjaar laat lopen.

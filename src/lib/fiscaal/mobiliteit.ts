@@ -25,6 +25,105 @@
 /** Bijzondere werknemersbijdrage op het saldo in cash (pijler 3). */
 export const PIJLER3_BIJDRAGE_PCT = 38.07;
 
+/**
+ * De grenzen van het budget (bedragen 2026, geïndexeerd).
+ *
+ * Het budget is niet vrij te kiezen: het ligt tussen een absoluut minimum en het
+ * laagste van twintig procent van het brutojaarloon en een absoluut maximum.
+ * Wie een goedkope wagen vervangt, moet dus toch het minimum toekennen, en wie
+ * een dure wagen vervangt, ziet het budget afgetopt.
+ */
+export const BUDGETGRENZEN = {
+  minimum: 3233,
+  maximumAbsoluut: 17_244,
+  /** Aandeel van het brutojaarloon dat het maximum mee bepaalt. */
+  aandeelBrutoloon: 0.2,
+};
+
+/** Vanaf wanneer werkgevers met bedrijfswagens het budget moeten aanbieden. */
+export const AANBODPLICHT_VANAF = "2027-01-01";
+
+export interface BudgetgrenzenResultaat {
+  /** Het budget na toepassing van de grenzen. */
+  budget: number;
+  /** De bovengrens die van toepassing was. */
+  maximum: number;
+  /** Werd het budget opgetrokken tot het minimum? */
+  opgetrokken: boolean;
+  /** Werd het budget afgetopt? */
+  afgetopt: boolean;
+  toelichting: string;
+}
+
+/**
+ * Brengt een berekende total cost of ownership binnen de wettelijke grenzen.
+ * De TCO van de wagen die de werknemer inruilt, is het vertrekpunt; wat eruit
+ * komt, is het budget dat effectief toegekend mag worden.
+ */
+export function begrensBudget(tco: number, brutojaarloon: number): BudgetgrenzenResultaat {
+  const maximum = Math.min(
+    BUDGETGRENZEN.maximumAbsoluut,
+    Math.max(0, brutojaarloon) * BUDGETGRENZEN.aandeelBrutoloon,
+  );
+  const vertrek = Math.max(0, tco);
+
+  if (vertrek < BUDGETGRENZEN.minimum) {
+    return {
+      budget: BUDGETGRENZEN.minimum,
+      maximum,
+      opgetrokken: true,
+      afgetopt: false,
+      toelichting: `De TCO ligt onder het wettelijke minimum; het budget wordt opgetrokken tot € ${BUDGETGRENZEN.minimum}.`,
+    };
+  }
+  if (vertrek > maximum) {
+    return {
+      budget: maximum,
+      maximum,
+      opgetrokken: false,
+      afgetopt: true,
+      toelichting: `Afgetopt op € ${Math.round(maximum)}: het laagste van twintig procent van het brutojaarloon en € ${BUDGETGRENZEN.maximumAbsoluut}.`,
+    };
+  }
+  return {
+    budget: vertrek,
+    maximum,
+    opgetrokken: false,
+    afgetopt: false,
+    toelichting: "De TCO valt binnen de wettelijke grenzen en wordt volledig toegekend.",
+  };
+}
+
+/**
+ * De total cost of ownership volgens de werkelijke-kostenmethode
+ * (KB 10/9/2023, circulaire 2024/C/16). Bij aankoop wordt twintig procent van
+ * de aanschafwaarde per kalenderjaar afgeschreven; bij leasing telt de
+ * leasefactuur. Alle fiscale en parafiscale lasten horen erbij: dat is precies
+ * waar een zelfgemaakte TCO doorgaans te laag uitkomt.
+ */
+export interface TcoPosten {
+  /** Leasekost, of 20% van de aanschafwaarde bij aankoop. */
+  afschrijvingOfLease: number;
+  brandstofOfStroom: number;
+  verzekering: number;
+  /** BIV, verkeersbelasting en de CO2-solidariteitsbijdrage samen. */
+  fiscaleLasten: number;
+  overige?: number;
+}
+
+/** Afschrijvingsritme voor een aangekochte wagen in de TCO-berekening. */
+export const TCO_AFSCHRIJVING_PCT = 20;
+
+export function berekenTco(posten: TcoPosten): number {
+  return (
+    Math.max(0, posten.afschrijvingOfLease) +
+    Math.max(0, posten.brandstofOfStroom) +
+    Math.max(0, posten.verzekering) +
+    Math.max(0, posten.fiscaleLasten) +
+    Math.max(0, posten.overige ?? 0)
+  );
+}
+
 export interface BudgetVerdeling {
   /** Deel dat naar een milieuvriendelijke bedrijfswagen gaat. */
   pijler1: number;

@@ -111,15 +111,22 @@ describe("catalogus: het besteljaar", () => {
   it("staat bovenaan en verandert het aftrekpercentage", async () => {
     const gebruiker = userEvent.setup();
     rendermetIntl(<CatalogusPagina />);
-    await waitFor(() => expect(screen.getByText("BMW 330e")).toBeTruthy());
+    await waitFor(() => expect(screen.getByText("BMW i4")).toBeTruthy());
+
+    // Deze test heeft juist de diesel nodig, want daarop bijt de gramformule, en
+    // de 320d is een raming: die staat standaard niet in het raster.
+    await gebruiker.click(screen.getByRole("button", { name: /ramingen tonen/i }));
+    await waitFor(() => expect(screen.getByText("BMW 320d")).toBeTruthy());
 
     const keuze = screen.getByRole("combobox", { name: /Besteljaar/i });
     expect((keuze as HTMLSelectElement).value).toBe("2026");
 
-    // Besteld in 2026 is een plug-in meteen 0% aftrekbaar; besteld in 2025 niet.
-    // Dat verschil was tot nu toe volledig onzichtbaar op deze pagina.
+    // Besteld in 2026 is een diesel meteen 0% aftrekbaar; besteld in 2025 niet.
+    // Dat verschil was tot nu toe volledig onzichtbaar op deze pagina. In het
+    // overgangsregime van 2025 telt de gramformule: de 320d van 122 g komt op
+    // 120 − 0,5 × 122 = 59% uit, ruim onder het plafond van 75% voor dat jaar.
     await gebruiker.selectOptions(keuze, "2025");
-    await waitFor(() => expect(screen.getAllByText(/75%/).length).toBeGreaterThan(0));
+    await waitFor(() => expect(screen.getAllByText(/59%/).length).toBeGreaterThan(0));
   });
 });
 

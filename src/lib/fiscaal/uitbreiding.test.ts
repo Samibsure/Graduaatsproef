@@ -168,6 +168,60 @@ describe("laadinfrastructuur", () => {
   });
 });
 
+describe("kostensoorten met een eigen aftrekregime", () => {
+  it("houdt verkeersboetes volledig buiten de aftrek", () => {
+    const r = berekenJaar(ctx, { ...diesel, kosten_boetes: 300 }, 2026);
+    // De volle 300 belandt in de verworpen uitgaven, niet de helft.
+    expect(r.nietAftrekbaar).toBeCloseTo(berekenJaar(ctx, diesel, 2026).nietAftrekbaar + 300, 2);
+    expect(r.kostenverdeling.kostenNietAftrekbaar).toBe(300);
+  });
+
+  it("laat de laadstroom van een PHEV het pad van de elektrische wagens volgen", () => {
+    // Een PHEV besteld in 2026 is zelf 0% aftrekbaar, maar zijn laadstroom
+    // volgt het EV-pad en blijft in 2026 volledig aftrekbaar.
+    const phev = {
+      ...diesel,
+      voertuigtype: "PHEV" as const,
+      brandstof: "benzine" as const,
+      besteldatum: "2026-01-15",
+      co2: 30,
+      batterij_kwh: 18,
+      wagengewicht: 1900,
+      laadstroom_jaar: 600,
+    };
+    const r = berekenJaar(ctx, phev, 2026);
+    expect(r.aftrekPct).toBe(0);
+    expect(r.aftrekPctElektriciteit).toBe(100);
+    // Alleen de wagenkosten zijn verworpen, de laadstroom niet.
+    expect(r.nietAftrekbaar).toBeCloseTo(9200, 2);
+  });
+
+  it("topt het brandstofdeel van een PHEV af op 50% en zet het nul vanaf 2028", () => {
+    const phev = {
+      ...diesel,
+      voertuigtype: "PHEV" as const,
+      brandstof: "benzine" as const,
+      besteldatum: "2024-03-01",
+      co2: 40,
+      batterij_kwh: 18,
+      wagengewicht: 1900,
+      kosten_brandstof: 2000,
+    };
+    // In 2026 is de wagen zelf 50% aftrekbaar; het brandstofdeel eveneens.
+    const r2026 = berekenJaar(ctx, phev, 2026);
+    expect(r2026.aftrekPctBrandstof).toBe(50);
+    // Vanaf 2028 valt het brandstofdeel weg, ook voor deze oudere bestelling.
+    expect(berekenJaar(ctx, phev, 2028).aftrekPctBrandstof).toBe(0);
+  });
+
+  it("blijft neutraal voor een wagen die de nieuwe velden niet invult", () => {
+    const basis = berekenJaar(ctx, diesel, 2026);
+    const leeg = berekenJaar(ctx, { ...diesel, kosten_boetes: 0, kosten_brandstof: 0 }, 2026);
+    expect(leeg.totaleKost).toBeCloseTo(basis.totaleKost, 6);
+    expect(leeg.nietAftrekbaar).toBeCloseTo(basis.nietAftrekbaar, 6);
+  });
+});
+
 describe("de uitbreidingen samen", () => {
   it("laten een BEV met eigen bijdrage en BTW-aftrek goedkoper uitvallen", () => {
     const kaal = berekenJaar(ctx, bev, 2026);

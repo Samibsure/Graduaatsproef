@@ -1,14 +1,57 @@
 import { describe, expect, it } from "vitest";
 import {
+  BUDGETGRENZEN,
   PIJLER3_BIJDRAGE_PCT,
+  begrensBudget,
   berekenFietsvergoeding,
   berekenMobiliteitsbudget,
+  berekenTco,
 } from "./mobiliteit";
 import { DEFAULT_CONTEXT } from "./defaults";
 import { eigenBijdrageVoorVaa, pasBinnenBudget, rangschikCatalogus } from "./optimalisatie";
 import type { CatalogCar, Vehicle } from "./types";
 
 const ctx = DEFAULT_CONTEXT;
+
+describe("de grenzen van het budget", () => {
+  it("telt de TCO op uit alle posten, fiscale lasten inbegrepen", () => {
+    // Precies die laatste post wordt in een zelfgemaakte TCO vergeten, waardoor
+    // het budget te laag uitvalt.
+    const tco = berekenTco({
+      afschrijvingOfLease: 7200,
+      brandstofOfStroom: 1400,
+      verzekering: 900,
+      fiscaleLasten: 1100,
+    });
+    expect(tco).toBe(10_600);
+  });
+
+  it("trekt een te laag budget op tot het wettelijke minimum", () => {
+    const r = begrensBudget(2500, 45_000);
+    expect(r.budget).toBe(BUDGETGRENZEN.minimum);
+    expect(r.opgetrokken).toBe(true);
+  });
+
+  it("topt af op twintig procent van het brutojaarloon", () => {
+    // 20% van € 40.000 is € 8.000, ruim onder het absolute maximum.
+    const r = begrensBudget(12_000, 40_000);
+    expect(r.budget).toBe(8000);
+    expect(r.afgetopt).toBe(true);
+  });
+
+  it("topt af op het absolute maximum bij een hoog loon", () => {
+    // 20% van € 120.000 is € 24.000, maar het plafond blijft € 17.244.
+    const r = begrensBudget(20_000, 120_000);
+    expect(r.budget).toBe(BUDGETGRENZEN.maximumAbsoluut);
+  });
+
+  it("laat een budget binnen de grenzen ongemoeid", () => {
+    const r = begrensBudget(9000, 60_000);
+    expect(r.budget).toBe(9000);
+    expect(r.opgetrokken).toBe(false);
+    expect(r.afgetopt).toBe(false);
+  });
+});
 
 describe("mobiliteitsbudget", () => {
   it("laat pijler 2 volledig netto bij de werknemer terechtkomen", () => {

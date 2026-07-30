@@ -1,8 +1,10 @@
+import { fiscaleCo2 } from "./hybride";
 import type {
   Bestelperiode,
   Brandstof,
   FiscaleContext,
   JaarResultaat,
+  Kostenverdeling,
   Projectie,
   TaxParameters,
   Vehicle,
@@ -45,6 +47,38 @@ const RSZ_CONSTANTE: Record<Brandstof, number> = {
 /** Datum vanaf wanneer het verhoogde RSZ-regime (hoger minimum + multiplicator) geldt. */
 const RSZ_VERHOGING_VANAF = "2023-07-01";
 
+/**
+ * Forfaitaire uitstoot voor de RSZ-bijdrage wanneer de CO2-waarde ontbreekt.
+ * De RSZ-instructies noemen 182 g/km voor benzine en 165 g/km voor diesel; LPG
+ * en CNG volgen het benzinespoor.
+ */
+const RSZ_CO2_FORFAIT: Record<Brandstof, number> = {
+  diesel: 165,
+  benzine: 182,
+  lpg: 182,
+  cng: 182,
+  elektrisch: 182,
+};
+
+/** Uitstoot vanaf wanneer de aftrek forfaitair op 40% wordt afgetopt. */
+export const HOGE_UITSTOOT_VANAF = 200;
+
+/** Aftrekpercentage bij een uitstoot van 200 g/km of meer, en bij onbekende uitstoot. */
+export const AFTREK_HOGE_UITSTOOT = 40;
+
+/**
+ * Laatste gebruiksjaar waarin het overgangsregime nog een minimumaftrek van 50%
+ * kent. Vanaf aanslagjaar 2026 (belastbaar tijdperk vanaf 1/1/2025) valt dat
+ * minimum weg en telt enkel nog het dalende maximumplafond.
+ */
+export const LAATSTE_JAAR_MET_MINIMUMAFTREK = 2024;
+
+/** Plafond op het brandstofdeel van een plug-inhybride (art. 66 §1 WIB92). */
+export const PHEV_BRANDSTOF_PLAFOND = 50;
+
+/** Vanaf dit gebruiksjaar is het brandstofdeel van elke PHEV niet meer aftrekbaar. */
+export const PHEV_BRANDSTOF_NUL_VANAF = 2028;
+
 export function parametersVoorJaar(ctx: FiscaleContext, jaar: number): TaxParameters {
   const exact = ctx.parameters.find((p) => p.year === jaar);
   if (exact) return exact;
@@ -65,20 +99,53 @@ export function bestelperiodeVoorDatum(ctx: FiscaleContext, besteldatum: string)
 }
 
 /**
- * Gramformule voor wagens besteld vóór 1 juli 2023:
- * 120% − (0,5% × coëfficiënt × CO₂), begrensd tussen 50% en 100%.
+ * Gramformule (art. 66 WIB92): 120% − (0,5% × coëfficiënt × CO₂).
+ *
+ * Twee begrenzingen horen bij de formule zelf. Bovenaan 100%, en vanaf 200 g/km
+ * of bij een onbekende uitstoot een aftopping op 40%. Onderaan geldt een
+ * minimum van 50%, maar dat minimum verdwijnt in het overgangsregime vanaf
+ * aanslagjaar 2026; daarvoor dient `metMinimum`.
  */
-export function gramformule(brandstof: Brandstof, co2: number): number {
+export function gramformule(
+  brandstof: Brandstof,
+  co2: number | null,
+  opties: { metMinimum?: boolean } = {},
+): number {
+  // Zonder waarde op het attest is er geen formule om toe te passen; de wet
+  // legt dan het forfait op, ook wanneer de ondergrens niet meer geldt.
+  if (co2 === null) return AFTREK_HOGE_UITSTOOT;
+
   const pct = 120 - 0.5 * GRAMFORMULE_COEFF[brandstof] * co2;
-  return Math.min(100, Math.max(50, pct));
+  const plafond = co2 >= HOGE_UITSTOOT_VANAF ? AFTREK_HOGE_UITSTOOT : 100;
+  const ondergrens = (opties.metMinimum ?? true) ? 50 : 0;
+  return Math.min(plafond, Math.max(ondergrens, pct));
 }
 
-/** Aftrekbaarheid in VenB voor een wagen in een bepaald gebruiksjaar (Tabel 1). */
-export function aftrekPct(ctx: FiscaleContext, vehicle: Vehicle, gebruiksjaar: number): number {
-  const periode = bestelperiodeVoorDatum(ctx, vehicle.besteldatum);
-  if (periode.code === "voor_07_2023") {
-    return gramformule(vehicle.brandstof, vehicle.co2);
-  }
+/**
+ * Het overgangsregime: wagens besteld tussen 1 juli 2023 en 31 december 2025.
+ * Wordt afgeleid uit de periodegrenzen zelf, zodat de code niet vasthangt aan
+ * de codenaam van een rij in de databank.
+ */
+function isOvergangsregime(periode: Bestelperiode): boolean {
+  return (
+    periode.van !== null &&
+    periode.van >= "2023-07-01" &&
+    periode.tot !== null &&
+    periode.tot <= "2025-12-31"
+  );
+}
+
+/**
+ * Het maximumplafond uit de aftrekkalender voor deze wagen en dit gebruiksjaar.
+ * Voor een elektrische wagen is dat meteen het definitieve percentage; voor een
+ * verbrandingswagen in het overgangsregime is het enkel een bovengrens.
+ */
+function plafondUitKalender(
+  ctx: FiscaleContext,
+  vehicle: Vehicle,
+  periode: Bestelperiode,
+  gebruiksjaar: number,
+): number {
   const regels = ctx.regels.filter(
     (r) => r.voertuigtype === vehicle.voertuigtype && r.bestelperiode === periode.code,
   );
@@ -94,6 +161,69 @@ export function aftrekPct(ctx: FiscaleContext, vehicle: Vehicle, gebruiksjaar: n
   if (perJaar.length === 0) return 0;
   if (gebruiksjaar < (perJaar[0].gebruiksjaar as number)) return perJaar[0].aftrek_pct;
   return perJaar[perJaar.length - 1].aftrek_pct;
+}
+
+/**
+ * Aftrekbaarheid in de vennootschapsbelasting voor een wagen in een bepaald
+ * gebruiksjaar. Drie regimes, allemaal opgehangen aan de aanschaffingsdatum,
+ * dat wil zeggen de datum van de bestelbon of van het leasecontract.
+ *
+ * - Besteld vóór 1 juli 2023: de gramformule, levenslang behouden.
+ * - Besteld tussen 1 juli 2023 en 31 december 2025: nog steeds de gramformule,
+ *   maar afgetopt op een plafond dat per aanslagjaar zakt van 75% naar 0%. Dat
+ *   de formule blijft meetellen is geen detail: een benzinewagen van 120 g komt
+ *   op 63% uit en zit daarmee in aanslagjaar 2026 onder het plafond van 75%.
+ * - Besteld vanaf 1 januari 2026: verbrandingswagens vallen op 0%, elektrische
+ *   wagens houden levenslang het percentage van hun besteljaar.
+ */
+export function aftrekPct(ctx: FiscaleContext, vehicle: Vehicle, gebruiksjaar: number): number {
+  const periode = bestelperiodeVoorDatum(ctx, vehicle.besteldatum);
+  const co2 = fiscaleCo2(vehicle).co2;
+
+  if (periode.code === "voor_07_2023") {
+    return gramformule(vehicle.brandstof, co2);
+  }
+
+  const plafond = plafondUitKalender(ctx, vehicle, periode, gebruiksjaar);
+  if (vehicle.voertuigtype === "BEV" || !isOvergangsregime(periode)) return plafond;
+
+  return Math.min(
+    plafond,
+    gramformule(vehicle.brandstof, co2, {
+      metMinimum: gebruiksjaar <= LAATSTE_JAAR_MET_MINIMUMAFTREK,
+    }),
+  );
+}
+
+/**
+ * Aftrekbaarheid van de elektriciteit om de wagen te laden.
+ *
+ * Laadstroom volgt niet de gramformule maar het afbouwpad van de elektrische
+ * wagens, en dat geldt ook voor het elektrische deel van een plug-inhybride. Een
+ * PHEV besteld in 2026 is zelf 0% aftrekbaar, maar zijn laadstroom blijft
+ * volledig aftrekbaar. Voor andere wagens is er geen apart pad en volgt de
+ * elektriciteit gewoon de wagen.
+ */
+export function aftrekPctElektriciteit(
+  ctx: FiscaleContext,
+  vehicle: Vehicle,
+  gebruiksjaar: number,
+): number {
+  if (vehicle.voertuigtype !== "PHEV") return aftrekPct(ctx, vehicle, gebruiksjaar);
+  const periode = bestelperiodeVoorDatum(ctx, vehicle.besteldatum);
+  if (periode.code === "voor_07_2023") return aftrekPct(ctx, vehicle, gebruiksjaar);
+  return plafondUitKalender(ctx, { ...vehicle, voertuigtype: "BEV" }, periode, gebruiksjaar);
+}
+
+/**
+ * Aftrekbaarheid van het brandstofdeel van een plug-inhybride. Afgetopt op 50%
+ * en vanaf gebruiksjaar 2028 nul, ook voor PHEV's die vóór 2026 besteld zijn.
+ * De regeling is aangekondigd maar nog niet volledig uitgeklaard; ze is daarom
+ * apart gehouden en niet in de gramformule verwerkt.
+ */
+export function aftrekPctBrandstofPhev(basisPct: number, gebruiksjaar: number): number {
+  if (gebruiksjaar >= PHEV_BRANDSTOF_NUL_VANAF) return 0;
+  return Math.min(PHEV_BRANDSTOF_PLAFOND, basisPct);
 }
 
 /** Leeftijdscorrectie VAA: 100% in het eerste jaar, −6% per jaar, minimum 70%. */
@@ -120,11 +250,15 @@ export function voordeelAlleAard(
 ): number {
   const params = parametersVoorJaar(ctx, gebruiksjaar);
   const jaarIngebruikname = new Date(vehicle.eerste_ingebruikname).getFullYear();
+  // Een valse hybride wordt ook hier met zijn gecorrigeerde uitstoot gewogen.
+  // Ontbreekt de uitstoot volledig, dan blijft de waarde uit het dossier staan:
+  // voor het VAA bestaat geen forfait, de waarde is verplicht op te zoeken.
+  const co2 = fiscaleCo2(vehicle).co2 ?? vehicle.co2;
   const vaa =
     vehicle.cataloguswaarde *
     (6 / 7) *
     leeftijdscorrectie(gebruiksjaar, jaarIngebruikname) *
-    (co2Percentage(params, vehicle.brandstof, vehicle.co2) / 100);
+    (co2Percentage(params, vehicle.brandstof, co2) / 100);
   return Math.max(params.vaa_minimum, vaa);
 }
 
@@ -148,8 +282,12 @@ export function rszBijdrageMaand(
     vehicle.voertuigtype !== "BEV" && vehicle.besteldatum >= RSZ_VERHOGING_VANAF;
   const multiplicator = verhoogdRegime ? params.rsz_multiplicator : 1;
   const minimum = verhoogdRegime ? params.rsz_min_maand : params.rsz_min_basis;
+  // Zonder CO2-waarde legt de RSZ een forfait op. Dat forfait vervangt de
+  // uitstoot in de formule; de valse-hybridecorrectie speelt hier niet, de RSZ
+  // rekent met de waarde van het gelijkvormigheidsattest.
+  const co2 = vehicle.co2_onbekend ? RSZ_CO2_FORFAIT[vehicle.brandstof] : vehicle.co2;
   const basis =
-    ((vehicle.co2 * 9 - RSZ_CONSTANTE[vehicle.brandstof]) / 12) * params.rsz_index * multiplicator;
+    ((co2 * 9 - RSZ_CONSTANTE[vehicle.brandstof]) / 12) * params.rsz_index * multiplicator;
   return Math.max(minimum, basis);
 }
 
@@ -173,21 +311,21 @@ export function btwAftrekPct(vehicle: Vehicle): number {
 }
 
 /**
- * Splitst de jaarlijkse kosten op in wat wél en wat niet onder de
- * aftrekbeperking voor autokosten valt.
+ * Splitst de jaarlijkse kosten op naar het aftrekregime dat erop van toepassing
+ * is. Niet elke autokost volgt hetzelfde percentage, en dat verschil loopt op.
  *
  * `jaarlijkse_autokosten` is inclusief BTW. Wat teruggevorderd wordt is geen
- * kost meer en gaat er dus eerst af. Van wat overblijft vallen twee posten
- * buiten de beperking van artikel 66 WIB92 en blijven ze volledig aftrekbaar:
- * de financieringskosten (de intrest) en de kosten van een laadpunt. De rest,
- * inclusief de terugbetaalde laadstroom, volgt de aftrekbaarheid van de wagen.
+ * kost meer en gaat er dus eerst af. Van wat overblijft:
+ *
+ * - **intrest en laadpaal** vallen buiten de beperking van artikel 66 WIB92 en
+ *   blijven volledig aftrekbaar;
+ * - **laadstroom** volgt het afbouwpad van de elektrische wagens, niet de
+ *   gramformule;
+ * - het **brandstofdeel van een plug-inhybride** heeft een eigen plafond;
+ * - **verkeersboetes** zijn nooit aftrekbaar (art. 53 WIB92);
+ * - de rest volgt het aftrekpercentage van de wagen zelf.
  */
-export function kostenBasis(vehicle: Vehicle): {
-  btwTeruggevorderd: number;
-  kostenOnderworpen: number;
-  kostenVolledigAftrekbaar: number;
-  kostenTotaal: number;
-} {
+export function kostenBasis(vehicle: Vehicle): Kostenverdeling {
   const tarief = vehicle.btw_tarief ?? BTW_TARIEF_STANDAARD;
   const aftrek = btwAftrekPct(vehicle) / 100;
   // De autokosten zijn inclusief BTW, dus het BTW-deel is kosten × t/(100+t).
@@ -197,18 +335,27 @@ export function kostenBasis(vehicle: Vehicle): {
   const financiering = Math.max(0, vehicle.kosten_financiering ?? 0);
   const laadpaal = Math.max(0, vehicle.laadpaal_jaarkost ?? 0);
   const laadstroom = Math.max(0, vehicle.laadstroom_jaar ?? 0);
+  const boetes = Math.max(0, vehicle.kosten_boetes ?? 0);
+  const brandstofPhev =
+    vehicle.voertuigtype === "PHEV" ? Math.max(0, vehicle.kosten_brandstof ?? 0) : 0;
 
   const naBtw = vehicle.jaarlijkse_autokosten - btwTeruggevorderd;
-  // De financieringskosten zitten in jaarlijkse_autokosten en worden er hier
-  // uit gelicht; de laadpaal en de laadstroom komen erbovenop.
-  const kostenOnderworpen = Math.max(0, naBtw - financiering) + laadstroom;
+  // De financierings- en brandstofkosten zitten in jaarlijkse_autokosten en
+  // worden er hier uit gelicht; laadpaal, laadstroom en boetes komen erbovenop.
   const kostenVolledigAftrekbaar = Math.min(naBtw, financiering) + laadpaal;
+  const rest = Math.max(0, naBtw - financiering);
+  const kostenBrandstofPhev = Math.min(rest, brandstofPhev);
+  const kostenWagen = rest - kostenBrandstofPhev;
 
   return {
     btwTeruggevorderd,
-    kostenOnderworpen,
+    kostenWagen,
+    kostenElektriciteit: laadstroom,
+    kostenBrandstofPhev,
     kostenVolledigAftrekbaar,
-    kostenTotaal: kostenOnderworpen + kostenVolledigAftrekbaar,
+    kostenNietAftrekbaar: boetes,
+    kostenOnderworpen: kostenWagen + laadstroom + kostenBrandstofPhev,
+    kostenTotaal: kostenWagen + laadstroom + kostenBrandstofPhev + kostenVolledigAftrekbaar + boetes,
   };
 }
 
@@ -229,10 +376,18 @@ export function berekenJaar(
   const eigenBijdrageJaar = Math.max(0, vehicle.eigen_bijdrage_maand ?? 0) * 12;
   const vaa = Math.max(0, vaaBruto - eigenBijdrageJaar);
 
-  const { btwTeruggevorderd, kostenOnderworpen, kostenVolledigAftrekbaar, kostenTotaal } =
-    kostenBasis(vehicle);
+  const verdeling = kostenBasis(vehicle);
+  const { btwTeruggevorderd, kostenOnderworpen, kostenVolledigAftrekbaar, kostenTotaal } = verdeling;
 
-  const nietAftrekbaar = (1 - aftrek / 100) * kostenOnderworpen;
+  // Elke kostensoort met haar eigen percentage. Boetes tellen voor honderd
+  // procent mee: ze zijn geen beperkte autokost maar een verworpen uitgave.
+  const pctElektriciteit = aftrekPctElektriciteit(ctx, vehicle, gebruiksjaar);
+  const pctBrandstofPhev = aftrekPctBrandstofPhev(aftrek, gebruiksjaar);
+  const nietAftrekbaar =
+    (1 - aftrek / 100) * verdeling.kostenWagen +
+    (1 - pctElektriciteit / 100) * verdeling.kostenElektriciteit +
+    (1 - pctBrandstofPhev / 100) * verdeling.kostenBrandstofPhev +
+    verdeling.kostenNietAftrekbaar;
   const vuPct = vehicle.tankkaart ? params.vu_pct_met_kaart : params.vu_pct_zonder_kaart;
   const vuUitVaa = (vuPct / 100) * vaa;
   const verworpenUitgaven = nietAftrekbaar + vuUitVaa;
@@ -260,6 +415,9 @@ export function berekenJaar(
     btwTeruggevorderd,
     kostenOnderworpen,
     kostenVolledigAftrekbaar,
+    kostenverdeling: verdeling,
+    aftrekPctElektriciteit: pctElektriciteit,
+    aftrekPctBrandstof: pctBrandstofPhev,
   };
 }
 

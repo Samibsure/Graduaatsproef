@@ -6,7 +6,7 @@ import type {
   CatalogCar,
   Onderhoudsklasse,
   Voertuigtype,
-  Zekerheid,
+  Modelzekerheid,
 } from "./types";
 
 /**
@@ -101,7 +101,7 @@ function basis(
   brandstof: Brandstof,
 ): Omit<CatalogCar, "voertuigtype" | "brandstof" | "co2"> {
   volgnummer += 1;
-  const zekerheid: Zekerheid = g.bron ? "geverifieerd" : "raming";
+  const zekerheid: Modelzekerheid = g.bron ? "geverifieerd" : "raming";
   return {
     id: volgnummer,
     slug: g.slug,

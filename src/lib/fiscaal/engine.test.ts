@@ -72,12 +72,29 @@ describe("aftrekbaarheid (Tabel 1 en Bijlage 3)", () => {
     expect(aftrekPct(ctx, bev2027, 2030)).toBe(95);
   });
 
-  it("diesel besteld 2024 volgt de uitdoofkalender 75 → 50 → 25 → 0", () => {
-    expect(aftrekPct(ctx, diesel, 2025)).toBe(75);
+  it("diesel besteld 2024: de gramformule, afgetopt op het plafond van het jaar", () => {
+    // In het overgangsregime blijft de gramformule gelden; het plafond uit de
+    // uitdoofkalender is een bovengrens, geen vast percentage. Deze diesel van
+    // 135 g komt op 52,5% uit en zit daarmee in 2025 onder het plafond van 75%.
+    expect(aftrekPct(ctx, diesel, 2025)).toBe(52.5);
     expect(aftrekPct(ctx, diesel, 2026)).toBe(50);
     expect(aftrekPct(ctx, diesel, 2027)).toBe(25);
     expect(aftrekPct(ctx, diesel, 2028)).toBe(0);
     expect(aftrekPct(ctx, diesel, 2029)).toBe(0);
+  });
+
+  it("een vuile wagen in het overgangsregime zakt onder het plafond", () => {
+    // 250 g diesel: de formule geeft 120 − 125 = −5%. Tot en met gebruiksjaar
+    // 2024 tilt de minimumaftrek dat naar de 40% voor hoge uitstoot; vanaf 2025
+    // bestaat die ondergrens niet meer en blijft er niets over.
+    const vuil = { ...diesel, co2: 250 };
+    expect(aftrekPct(ctx, vuil, 2024)).toBe(40);
+    expect(aftrekPct(ctx, vuil, 2025)).toBe(0);
+  });
+
+  it("zonder CO2-waarde op het attest geldt het forfait van 40%", () => {
+    const onbekend = { ...diesel, besteldatum: "2023-03-01", co2_onbekend: true };
+    expect(aftrekPct(ctx, onbekend, 2026)).toBe(40);
   });
 
   it("verbrandingswagen besteld vanaf 2026 is meteen 0% aftrekbaar", () => {
@@ -88,8 +105,10 @@ describe("aftrekbaarheid (Tabel 1 en Bijlage 3)", () => {
   it("gramformule voor bestellingen vóór 1/7/2023, begrensd 50-100%", () => {
     expect(gramformule("diesel", 100)).toBe(70); // 120 − 0,5 × 1 × 100
     expect(gramformule("benzine", 120)).toBe(63); // 120 − 0,5 × 0,95 × 120
-    expect(gramformule("diesel", 200)).toBe(50); // ondergrens
+    expect(gramformule("diesel", 200)).toBe(40); // aftopping vanaf 200 g/km
+    expect(gramformule("diesel", 199)).toBe(50); // ondergrens, net eronder
     expect(gramformule("elektrisch", 0)).toBe(100); // bovengrens
+    expect(gramformule("diesel", null)).toBe(40); // onbekende uitstoot
     const oudeDiesel = { ...diesel, besteldatum: "2023-03-01" };
     expect(aftrekPct(ctx, oudeDiesel, 2026)).toBe(120 - 0.5 * 135);
   });

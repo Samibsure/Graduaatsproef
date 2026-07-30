@@ -13,6 +13,21 @@ import { z } from "zod";
  * Wijzigt een grens hier, wijzig ze dan ook in de migratie.
  */
 
+const EURONORMEN = [
+  "euro0",
+  "euro1",
+  "euro2",
+  "euro3",
+  "euro4",
+  "euro5",
+  "euro6",
+  "euro6d",
+  "euro6e",
+  "euro6e-bis",
+  "euro6e-ter",
+  "euro7",
+] as const;
+
 const VOERTUIGTYPES = ["BEV", "PHEV", "HEV", "fossiel"] as const;
 const BRANDSTOFFEN = ["elektrisch", "diesel", "benzine", "lpg", "cng"] as const;
 const CATEGORIEEN = ["vloot", "kandidaat"] as const;
@@ -55,6 +70,18 @@ export const wagenSchema = z.object({
   laadstroom_jaar: z.number().min(0).max(1_000_000).optional(),
   start_contract: datum.nullable().optional(),
   einde_contract: datum.nullable().optional(),
+
+  // De uitbreidingen uit migratie 0012, met dezelfde grenzen als de constraint
+  // vehicles_kostensoorten_geldig.
+  kosten_boetes: z.number().min(0).max(1_000_000).optional(),
+  kosten_brandstof: z.number().min(0).max(1_000_000).optional(),
+  co2_onbekend: z.boolean().optional(),
+  batterij_kwh: z.number().min(0).max(500).nullable().optional(),
+  wagengewicht: z.number().min(0).max(10_000).nullable().optional(),
+  euronorm: z.enum(EURONORMEN).nullable().optional(),
+  co2_equivalent: z.number().min(0).max(1000).nullable().optional(),
+  gewest: z.enum(["vlaanderen", "wallonie", "brussel"]).nullable().optional(),
+  fiscale_pk: z.number().min(0).max(100).nullable().optional(),
 })
   .refine(
     (w) => !w.start_contract || !w.einde_contract || w.einde_contract >= w.start_contract,
@@ -65,6 +92,13 @@ export const wagenSchema = z.object({
     {
       message: "de financieringskosten kunnen niet groter zijn dan de jaarlijkse autokosten",
       path: ["kosten_financiering"],
+    },
+  )
+  .refine(
+    (w) => (w.kosten_brandstof ?? 0) <= w.jaarlijkse_autokosten,
+    {
+      message: "de brandstofkosten kunnen niet groter zijn dan de jaarlijkse autokosten",
+      path: ["kosten_brandstof"],
     },
   );
 

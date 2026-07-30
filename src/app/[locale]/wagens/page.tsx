@@ -16,6 +16,8 @@ import {
 } from "@/lib/data";
 import { catalogNaarWagen, perZekerheid } from "@/lib/fiscaal/catalog";
 import { berekenJaar } from "@/lib/fiscaal/engine";
+import { MIN_KWH_PER_100KG, beoordeelValseHybride } from "@/lib/fiscaal/hybride";
+import { EURONORMEN } from "@/lib/fiscaal/types";
 import type {
   Brandstof,
   CatalogCar,
@@ -61,6 +63,14 @@ const leegFormulier: Formulier = {
   laadpaal_jaarkost: 0,
   laadstroom_jaar: 0,
   einde_contract: null,
+  kosten_boetes: 0,
+  kosten_brandstof: 0,
+  co2_onbekend: false,
+  batterij_kwh: null,
+  wagengewicht: null,
+  euronorm: null,
+  co2_equivalent: null,
+  gewest: null,
 };
 
 export default function WagensPagina() {
@@ -141,6 +151,14 @@ export default function WagensPagina() {
     ctx && formulier
       ? berekenJaar(ctx, { ...(formulier as Vehicle), id: formulier.id ?? "preview" }, EVALUATIEJAAR)
       : null;
+
+  // Het oordeel over de valse hybride wordt meteen onder de invoervelden
+  // getoond. Zonder die terugkoppeling ziet de gebruiker alleen dat het
+  // aftrekpercentage verspringt, zonder te weten waarom.
+  const hybrideOordeel = beoordeelValseHybride({
+    ...(formulier ?? leegFormulier),
+    id: "preview",
+  } as Vehicle);
 
   return (
     <Container className="py-[52px]">
@@ -359,7 +377,105 @@ export default function WagensPagina() {
                       onChange={(e) => zet("einde_contract", e.target.value || null)}
                     />
                   </Veld>
+                  <Veld label={t("kostenBoetes")} hint={t("kostenBoetesHint")}>
+                    <input
+                      type="number" min={0} className={invoer}
+                      value={formulier.kosten_boetes ?? 0}
+                      onChange={(e) => zet("kosten_boetes", Number(e.target.value))}
+                    />
+                  </Veld>
+                  <Veld label={t("euronorm")} hint={t("euronormHint")}>
+                    <select
+                      className={invoer}
+                      value={formulier.euronorm ?? ""}
+                      onChange={(e) =>
+                        zet("euronorm", (e.target.value || null) as Formulier["euronorm"])
+                      }
+                    >
+                      <option value="">{t("euronormOnbekend")}</option>
+                      {EURONORMEN.map((n) => (
+                        <option key={n} value={n}>
+                          {n}
+                        </option>
+                      ))}
+                    </select>
+                  </Veld>
+                  <Veld label={t("gewest")} hint={t("gewestHint")}>
+                    <select
+                      className={invoer}
+                      value={formulier.gewest ?? ""}
+                      onChange={(e) =>
+                        zet("gewest", (e.target.value || null) as Formulier["gewest"])
+                      }
+                    >
+                      <option value="">{t("gewestOnbekend")}</option>
+                      <option value="vlaanderen">{t("gewestVlaanderen")}</option>
+                      <option value="wallonie">{t("gewestWallonie")}</option>
+                      <option value="brussel">{t("gewestBrussel")}</option>
+                    </select>
+                  </Veld>
                 </div>
+
+                {/* De valse-hybridetoets. Enkel zichtbaar voor een plug-in
+                    hybride, want daar en alleen daar verandert ze het resultaat:
+                    te weinig batterij per 100 kg of te veel uitstoot, en de
+                    wagen rekent met de CO2 van het niet-plug-in model. */}
+                {formulier.voertuigtype === "PHEV" && (
+                  <div className="mt-5 rounded-[10px] border border-line bg-paper p-4">
+                    <div className="text-[14px] font-bold text-ink">{t("phevTitel")}</div>
+                    <p className="mb-4 mt-1 text-[13.5px] leading-relaxed text-ink-700">
+                      {t("phevIntro")}
+                    </p>
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <Veld label={t("batterijKwh")} hint={t("batterijKwhHint")}>
+                        <input
+                          type="number" min={0} step="0.1" className={invoer}
+                          value={formulier.batterij_kwh ?? ""}
+                          onChange={(e) =>
+                            zet("batterij_kwh", e.target.value === "" ? null : Number(e.target.value))
+                          }
+                        />
+                      </Veld>
+                      <Veld label={t("wagengewicht")} hint={t("wagengewichtHint")}>
+                        <input
+                          type="number" min={0} className={invoer}
+                          value={formulier.wagengewicht ?? ""}
+                          onChange={(e) =>
+                            zet("wagengewicht", e.target.value === "" ? null : Number(e.target.value))
+                          }
+                        />
+                      </Veld>
+                      <Veld label={t("co2Equivalent")} hint={t("co2EquivalentHint")}>
+                        <input
+                          type="number" min={0} className={invoer}
+                          value={formulier.co2_equivalent ?? ""}
+                          onChange={(e) =>
+                            zet("co2_equivalent", e.target.value === "" ? null : Number(e.target.value))
+                          }
+                        />
+                      </Veld>
+                      <Veld label={t("kostenBrandstof")} hint={t("kostenBrandstofHint")}>
+                        <input
+                          type="number" min={0} className={invoer}
+                          value={formulier.kosten_brandstof ?? 0}
+                          onChange={(e) => zet("kosten_brandstof", Number(e.target.value))}
+                        />
+                      </Veld>
+                    </div>
+                    <p
+                      className={`mt-4 text-[13.5px] leading-relaxed ${
+                        hybrideOordeel.isValseHybride ? "font-bold text-danger" : "text-ink-700"
+                      }`}
+                    >
+                      {t(`hybrideReden_${hybrideOordeel.redenCode}`, {
+                        drempel: hybrideOordeel.drempel,
+                        co2: formulier.co2,
+                        minimum: MIN_KWH_PER_100KG,
+                        kwh: (hybrideOordeel.kwhPer100kg ?? 0).toFixed(2),
+                      })}
+                    </p>
+                  </div>
+                )}
               </div>
             </details>
 
