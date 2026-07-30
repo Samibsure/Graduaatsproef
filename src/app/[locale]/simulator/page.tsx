@@ -10,7 +10,7 @@ import Uitfaseringstijdlijn from "@/components/Uitfaseringstijdlijn";
 import { Card, Container, PageHead, StatCard, knopKlassen } from "@/components/ui";
 import { Link } from "@/i18n/navigation";
 import { laadCatalogus, laadFiscaleContext } from "@/lib/data";
-import { catalogPreview, geschatteAutokosten } from "@/lib/fiscaal/catalog";
+import { catalogPreview, geschatteAutokosten, perZekerheid } from "@/lib/fiscaal/catalog";
 import { berekenProjectie } from "@/lib/fiscaal/engine";
 import { berekenUitfasering } from "@/lib/fiscaal/uitfasering";
 import { standaardBesteljaren, vergelijkBesteljaren } from "@/lib/fiscaal/besteljaar";
@@ -34,6 +34,7 @@ const JAREN = 4;
 export default function SimulatorPagina() {
   const t = useTranslations("simulator");
   const tJaar = useTranslations("besteljaar");
+  const tCat = useTranslations("catalogus");
   const locale = useLocale();
   const { euro, pct } = formatters(locale);
   const sessie = useSessie();
@@ -123,11 +124,27 @@ export default function SimulatorPagina() {
                   setAutokosten(null);
                 }}
               >
-                {catalogus.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.merk} {c.model} · {c.voertuigtype}
-                  </option>
-                ))}
+                {/*
+                  Nagekeken modellen en ramingen apart, met een kop erboven. Wie
+                  hier kiest, hoort te weten of het cijfer waarop de simulatie
+                  straks rekent, tegen een bron gelegd is.
+                */}
+                {(["nagekeken", "ramingen"] as const).map((groep) => {
+                  const lijst = perZekerheid(catalogus)[groep];
+                  if (lijst.length === 0) return null;
+                  return (
+                    <optgroup
+                      key={groep}
+                      label={tCat(groep === "nagekeken" ? "badgeGeverifieerd" : "badgeRaming")}
+                    >
+                      {lijst.map((c) => (
+                        <option key={c.id} value={c.id}>
+                          {c.merk} {c.model} · {c.voertuigtype}
+                        </option>
+                      ))}
+                    </optgroup>
+                  );
+                })}
               </select>
             </label>
 

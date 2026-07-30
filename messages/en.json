@@ -540,7 +540,27 @@
     "specTrek": "Towing capacity",
     "specVermogen": "Power",
     "bronAlle": "All models",
-    "bronEigen": "Own models"
+    "bronEigen": "Own models",
+    "zekerheidTitel": "Verified models only",
+    "zekerheidUitleg": "For {geverifieerd} of the {totaal} models, the figures that drive the tax result were checked against a named source: the catalogue value for an electric car, the CO₂ for a plug-in hybrid. The rest are estimates: the right order of magnitude, but checked by no one.",
+    "zekerheidToonRamingen": "Also show the {aantal} estimates",
+    "zekerheidVerbergRamingen": "Only the {aantal} verified models",
+    "badgeGeverifieerd": "Verified",
+    "badgeRaming": "Estimate",
+    "bronLabel": "Source",
+    "voorbehoudLabel": "Caveat",
+    "voorbehoud_teslaModelY": "The WLTP consumption and range do not add up (629 km at 15.9 kWh/100 km implies roughly 100 kWh, against 75 kWh usable). The Belgian configurator also offers a Standard Long Range RWD. Use the certificate of conformity of the exact version.",
+    "voorbehoud_audiQ4Facelift": "After the 2026 facelift this version is called \"45 performance\" and the battery pack changed. The price is that of the 82 kWh version.",
+    "voorbehoud_bmwI4Btw": "The price is derived from the fiscal price list excluding VAT (€50,247.93 × 1.21) and should be confirmed.",
+    "voorbehoud_buitenlandseBron": "The figures come from a foreign manufacturer site. CO₂, consumption and price differ per Belgian version; have them replaced by a Belgian source.",
+    "voorbehoud_valseHybrideGrensgeval": "Borderline case for the false-hybrid test: the CO₂ sits around the threshold of 75 g/km (Euro 6e-bis) or 50 g/km (older homologation). Which regime applies turns on the exact value in the certificate of conformity.",
+    "voorbehoud_bmw530eGeneratie": "The figures come from the Belgian fiscal price list and describe the older G30 generation, not the current G60.",
+    "voorbehoud_prijsNietGesourcet": "The specifications were checked, the catalogue value was not. For an electric car the entire tax calculation hangs on that value.",
+    "voorbehoud_bmwIx1Uitvoering": "Only xDrive30 data was found; the eDrive20 is unconfirmed.",
+    "voorbehoud_bmwIx3Generatie": "The Belgian price list shows the old G08; the Neue Klasse figures are unconfirmed.",
+    "voorbehoud_bmwX5Ontbreekt": "The xDrive50e does not appear in the Belgian price list consulted, only the older xDrive45e.",
+    "voorbehoud_co2NietGevonden": "No homologated CO₂ figure found for the Belgian version. For a plug-in hybrid that figure is exactly what determines the benefit in kind and the contribution.",
+    "restwaardeSchatting": "The residual value is an estimate per drivetrain, not per model: a recognised Belgian per-model figure does not exist."
   },
   "parameters": {
     "titel": "Tax parameters",
@@ -965,7 +985,7 @@
     "actieradius": "Range (km)",
     "laadvermogen": "Fast charging (kW)",
     "restwaarde": "Residual value after 4 years (%)",
-    "restwaardeHint": "Determines depreciation in the cost calculation.",
+    "restwaardeHint": "Determines depreciation in the cost calculation. The catalogue uses ranges per drivetrain (hybrid 39.5%, petrol 38.8%, diesel 37.6%, plug-in 34.6%, electric 27.1%); a figure from your own quotation is better.",
     "zitplaatsen": "Seats",
     "koffer": "Boot (litres)",
     "trekgewicht": "Towing capacity (kg)",
@@ -991,5 +1011,10 @@
     "importKlaar": "{gelukt} models imported, {mislukt} skipped.",
     "regel": "Row",
     "nogNietBeschikbaar": "The own model library has not been set up in the database yet. Run migration 0010 on the Supabase project; this page then appears by itself. Until then, everything here stays hidden rather than failing."
+  },
+  "kosten": {
+    "voorbehoudTitel": "Caveat on the road tax",
+    "voorbehoud_bevVlaanderen": "Flanders: the exemption for new electric cars ended for registrations from 1 January 2026. The published range is €69.72 to €87.24 per year depending on fiscal horsepower (for an electric car: 0.013 × kW + 0.5, rounded, at most 5), plus a registration tax of €61.50. The calculation uses €87.24, the upper bound.",
+    "voorbehoud_bevWallonieBrussel": "Wallonia and Brussels: the sources contradict each other. carvex.be states that electric cars pay no road tax there; FLEET.be explicitly mentions the minimum rate of €102.96 per year (rate 1 July 2025 – 30 June 2026). The calculation uses €102.96, the higher amount. Over four years that is more than €400 of difference: have it confirmed by SPW Finances or Brussels Fiscality before relying on it."
   }
 }

@@ -272,7 +272,7 @@ export function modelSjabloon(): string {
     zitplaatsen: 5,
     koffer_liter: 532,
     trekgewicht_kg: 1200,
-    restwaarde_pct_4j: 45,
+    restwaarde_pct_4j: 27.1,
     onderhoudsklasse: "laag",
     uitrusting: "warmtepomp|trekhaak",
     bron: "Offerte leasingmaatschappij, maart 2026",

@@ -14,7 +14,7 @@ import {
   laadWagens,
   verwijderWagen,
 } from "@/lib/data";
-import { catalogNaarWagen } from "@/lib/fiscaal/catalog";
+import { catalogNaarWagen, perZekerheid } from "@/lib/fiscaal/catalog";
 import { berekenJaar } from "@/lib/fiscaal/engine";
 import type {
   Brandstof,
@@ -65,6 +65,7 @@ const leegFormulier: Formulier = {
 
 export default function WagensPagina() {
   const t = useTranslations("wagens");
+  const tCat = useTranslations("catalogus");
   const { euro, pct } = formatters(useLocale());
   // Een lezer mag de vloot bekijken maar niets wijzigen. De policies in de
   // database weigeren zijn schrijfacties sowieso; dit voorkomt dat hij knoppen
@@ -177,11 +178,22 @@ export default function WagensPagina() {
                     <option value="" disabled>
                       {t("selecteerModel")}
                     </option>
-                    {catalogus.map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.merk} {c.model} · {c.voertuigtype} · {euro(c.cataloguswaarde)}
-                      </option>
-                    ))}
+                    {(["nagekeken", "ramingen"] as const).map((groep) => {
+                      const lijst = perZekerheid(catalogus)[groep];
+                      if (lijst.length === 0) return null;
+                      return (
+                        <optgroup
+                          key={groep}
+                          label={tCat(groep === "nagekeken" ? "badgeGeverifieerd" : "badgeRaming")}
+                        >
+                          {lijst.map((c) => (
+                            <option key={c.id} value={c.id}>
+                              {c.merk} {c.model} · {c.voertuigtype} · {euro(c.cataloguswaarde)}
+                            </option>
+                          ))}
+                        </optgroup>
+                      );
+                    })}
                   </select>
                 </Veld>
               </div>

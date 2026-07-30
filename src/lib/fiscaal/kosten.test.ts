@@ -3,10 +3,14 @@ import { catalogusPerSlug } from "./catalogusdata";
 import { autokostenVoorModel, flexScore, geschatteAutokosten, nutScore, restwaardeScore } from "./catalog";
 import {
   KOSTENPARAMETERS,
+  RESTWAARDE_36M,
   STANDAARD_GEBRUIK,
   afschrijving,
   berekenKosten,
   energiekost,
+  restwaarde48,
+  restwaardeVoor,
+  verkeersbelastingVoorbehoud,
   type Gebruiksprofiel,
 } from "./kosten";
 import type { CatalogCar } from "./types";
@@ -77,6 +81,41 @@ describe("afschrijving", () => {
   });
 });
 
+describe("restwaarde uit de gesourcete ranges", () => {
+  it("rekent 36 maanden meetkundig door naar 48", () => {
+    // 37,6% na drie jaar betekent 0,376^(4/3) na vier jaar. Het cijfer in de
+    // bron blijft zo letterlijk in de broncode staan en de omrekening is één
+    // regel, in plaats van een vierjarencijfer dat niemand kan narekenen.
+    expect(restwaarde48(RESTWAARDE_36M.BEV)).toBeCloseTo(27.1, 1);
+    expect(restwaarde48(100)).toBe(100);
+    // Meer waardebehoud na drie jaar betekent meer waardebehoud na vier.
+    expect(restwaarde48(49.8)).toBeGreaterThan(restwaarde48(37.6));
+  });
+
+  it("houdt de rangorde van het rapport aan", () => {
+    const hev = restwaardeVoor("HEV", "benzine");
+    const benzine = restwaardeVoor("fossiel", "benzine");
+    const diesel = restwaardeVoor("fossiel", "diesel");
+    const phev = restwaardeVoor("PHEV", "benzine");
+    const bev = restwaardeVoor("BEV", "elektrisch");
+
+    expect(hev).toBeGreaterThan(benzine);
+    expect(benzine).toBeGreaterThan(diesel);
+    expect(diesel).toBeGreaterThan(phev);
+    expect(phev).toBeGreaterThan(bev);
+  });
+
+  it("maakt een elektrische wagen duurder in de afschrijving dan een diesel", () => {
+    // Dit is het gevolg dat het rapport voorspelt, en het gaat de andere kant op
+    // dan de oude geraden cijfers: die gaven een BEV 45% en een diesel 44%.
+    const zelfdePrijs = { ...diesel, cataloguswaarde: 50_000 };
+    const alsBev = { ...bev, cataloguswaarde: 50_000 };
+    expect(afschrijving(alsBev, STANDAARD_GEBRUIK)).toBeGreaterThan(
+      afschrijving(zelfdePrijs, STANDAARD_GEBRUIK),
+    );
+  });
+});
+
 describe("berekenKosten", () => {
   it("telt de zes bestanddelen op tot het totaal", () => {
     const k = berekenKosten(diesel);
@@ -96,6 +135,22 @@ describe("berekenKosten", () => {
     const wa = berekenKosten(diesel, { ...STANDAARD_GEBRUIK, gewest: "wallonie" });
     expect(wa.verkeersbelasting).not.toBe(vl.verkeersbelasting);
     expect(wa.totaal - vl.totaal).toBe(wa.verkeersbelasting - vl.verkeersbelasting);
+  });
+
+  it("rekent de elektrische verkeersbelasting van 2026, met voorbehoud", () => {
+    // De Vlaamse vrijstelling verviel per 1/1/2026, en over het Waalse en
+    // Brusselse tarief spreken de bronnen elkaar tegen (€0 tegenover €102,96).
+    // De tabel neemt het hoogste bedrag; het voorbehoud hoort dan te bestaan,
+    // want een bedrag in een totaal kan zelf niet zeggen dat het betwist is.
+    expect(KOSTENPARAMETERS.verkeersbelasting.vlaanderen.BEV).toBe(87.24);
+    expect(KOSTENPARAMETERS.verkeersbelasting.wallonie.BEV).toBe(102.96);
+    expect(KOSTENPARAMETERS.verkeersbelasting.brussel.BEV).toBe(102.96);
+
+    expect(verkeersbelastingVoorbehoud("vlaanderen", "BEV")).toBe("bevVlaanderen");
+    expect(verkeersbelastingVoorbehoud("wallonie", "BEV")).toBe("bevWallonieBrussel");
+    expect(verkeersbelastingVoorbehoud("brussel", "BEV")).toBe("bevWallonieBrussel");
+    // Waar geen tegenspraak is, hoort er ook geen waarschuwing te staan.
+    expect(verkeersbelastingVoorbehoud("vlaanderen", "fossiel")).toBeNull();
   });
 
   it("levert voor elk model in de catalogus een plausibel bedrag op", () => {
@@ -142,10 +197,27 @@ describe("afgeleide scores", () => {
     expect(groot).toBeGreaterThan(klein);
   });
 
-  it("volgt de restwaardescore het waardebehoud", () => {
-    const sterk = restwaardeScore(model("mini-cooper-e"));
-    const zwak = restwaardeScore(model("leapmotor-t03"));
-    expect(sterk).toBeGreaterThan(zwak);
+  it("volgt de restwaardescore de gesourcete rangorde per aandrijving", () => {
+    // De restwaarde komt sinds het onderzoeksrapport niet meer per model uit een
+    // gok maar uit de ranges per aandrijftype. Twee elektrische wagens scoren
+    // daarom gelijk; het verschil zit tussen de aandrijvingen, en de rangorde
+    // HEV ≈ benzine ≈ diesel > PHEV > BEV is wat de bron robuust noemt.
+    const hybride = restwaardeScore(model("toyota-corolla"));
+    const benzine = restwaardeScore(model("vw-golf"));
+    const plugin = restwaardeScore(model("bmw-330e"));
+    const elektrisch = restwaardeScore(model("mini-cooper-e"));
+
+    expect(hybride).toBeGreaterThan(plugin);
+    expect(benzine).toBeGreaterThan(plugin);
+    expect(plugin).toBeGreaterThan(elektrisch);
+    expect(restwaardeScore(model("leapmotor-t03"))).toBe(elektrisch);
+  });
+
+  it("houdt de restwaardescore ook zonder cijfer op de aandrijving", () => {
+    // Een eigen model dat de restwaarde leeg laat, hoort de gesourcete range van
+    // zijn aandrijving te krijgen en niet een vast getal uit de broncode.
+    const zonder: CatalogCar = { ...model("bmw-320d"), restwaarde_pct_4j: null };
+    expect(restwaardeScore(zonder)).toBe(restwaardeScore(model("bmw-320d")));
   });
 
   it("beloont ruimte en trekvermogen in het praktisch nut", () => {

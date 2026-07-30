@@ -6,7 +6,7 @@ import CarImage from "@/components/CarImage";
 import { Laadskelet } from "@/components/ui";
 import { Link } from "@/i18n/navigation";
 import { laadCatalogus, laadFiscaleContext } from "@/lib/data";
-import { catalogPreview } from "@/lib/fiscaal/catalog";
+import { catalogPreview, perZekerheid } from "@/lib/fiscaal/catalog";
 import { berekenJaar } from "@/lib/fiscaal/engine";
 import type { CatalogCar, FiscaleContext } from "@/lib/fiscaal/types";
 import { formatters } from "@/lib/format";
@@ -29,7 +29,16 @@ export default function UitgelichteWagens() {
       .catch(() => setCatalogus([]));
   }, []);
 
-  const uitgelicht = useMemo(() => (catalogus ?? []).slice(0, 3), [catalogus]);
+  /*
+   * Drie modellen, en dan wel drie waarvan de cijfers nagekeken zijn. Dit is het
+   * eerste dat een bezoeker van deze app te zien krijgt; een raming zonder bron
+   * hoort daar niet als visitekaartje te staan. Zijn er minder dan drie
+   * geverifieerd, dan vult de lijst gewoon aan.
+   */
+  const uitgelicht = useMemo(() => {
+    const { nagekeken, ramingen } = perZekerheid(catalogus ?? []);
+    return [...nagekeken, ...ramingen].slice(0, 3);
+  }, [catalogus]);
 
   if (catalogus === null) return <Laadskelet aantal={3} hoogte={310} className="grid gap-6 md:grid-cols-3" />;
   if (uitgelicht.length === 0) return null;

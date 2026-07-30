@@ -540,7 +540,27 @@
     "specTrek": "Trekgewicht",
     "specVermogen": "Vermogen",
     "bronAlle": "Alle modellen",
-    "bronEigen": "Eigen modellen"
+    "bronEigen": "Eigen modellen",
+    "zekerheidTitel": "Alleen nagekeken modellen",
+    "zekerheidUitleg": "Van {geverifieerd} van de {totaal} modellen zijn de fiscaal beslissende cijfers tegen een genoemde bron gelegd: de cataloguswaarde bij een elektrische wagen, de CO₂ bij een plug-in hybride. De overige zijn ramingen: de goede orde van grootte, maar door niemand nagekeken.",
+    "zekerheidToonRamingen": "Ook de {aantal} ramingen tonen",
+    "zekerheidVerbergRamingen": "Alleen de {aantal} nagekeken modellen",
+    "badgeGeverifieerd": "Nagekeken",
+    "badgeRaming": "Raming",
+    "bronLabel": "Bron",
+    "voorbehoudLabel": "Voorbehoud",
+    "voorbehoud_teslaModelY": "Het WLTP-verbruik en de actieradius passen niet op elkaar (629 km aan 15,9 kWh/100 km veronderstelt zowat 100 kWh, tegenover 75 kWh bruikbaar). De Belgische configurator biedt hiernaast ook een Standard Long Range RWD aan. Neem het gelijkvormigheidsattest van de exacte uitvoering.",
+    "voorbehoud_audiQ4Facelift": "Na de facelift van 2026 heet deze uitvoering \"45 performance\" en wijzigde het accupakket. De prijs is die van de 82 kWh-versie.",
+    "voorbehoud_bmwI4Btw": "De prijs is afgeleid uit de fiscale prijslijst exclusief btw (€ 50.247,93 × 1,21) en hoort bevestigd te worden.",
+    "voorbehoud_buitenlandseBron": "De cijfers komen van een buitenlandse fabrikantssite. CO₂, verbruik en prijs verschillen per Belgische uitvoering; laat ze vervangen door een Belgische bron.",
+    "voorbehoud_valseHybrideGrensgeval": "Grensgeval voor de valse-hybridetoets: de CO₂ ligt rond de drempel van 75 g/km (Euro 6e-bis) of 50 g/km (oudere homologatie). Welk regime geldt, kantelt op de exacte waarde uit het gelijkvormigheidsattest.",
+    "voorbehoud_bmw530eGeneratie": "De cijfers komen uit de Belgische fiscale prijslijst en beschrijven de oudere G30-generatie, niet de huidige G60.",
+    "voorbehoud_prijsNietGesourcet": "De specificaties zijn nagekeken, de cataloguswaarde niet. Bij een elektrische wagen hangt de hele fiscale berekening aan die waarde.",
+    "voorbehoud_bmwIx1Uitvoering": "Alleen gegevens van de xDrive30 teruggevonden; de eDrive20 is niet bevestigd.",
+    "voorbehoud_bmwIx3Generatie": "De Belgische prijslijst toont de oude G08; de cijfers van de Neue Klasse zijn niet bevestigd.",
+    "voorbehoud_bmwX5Ontbreekt": "De xDrive50e staat niet in de geraadpleegde Belgische prijslijst, alleen de oudere xDrive45e.",
+    "voorbehoud_co2NietGevonden": "Geen gehomologeerd CO₂-cijfer teruggevonden voor de Belgische uitvoering. Bij een plug-in hybride bepaalt juist dat cijfer het VAA en de bijdrage.",
+    "restwaardeSchatting": "De restwaarde is een schatting per aandrijftype, niet per model: een erkend Belgisch cijfer per model bestaat niet."
   },
   "parameters": {
     "titel": "Fiscale parameters",
@@ -965,7 +985,7 @@
     "actieradius": "Actieradius (km)",
     "laadvermogen": "Snelladen (kW)",
     "restwaarde": "Restwaarde na 4 jaar (%)",
-    "restwaardeHint": "Bepaalt de afschrijving in de kostenberekening.",
+    "restwaardeHint": "Bepaalt de afschrijving in de kostenberekening. De catalogus rekent met ranges per aandrijftype (hybride 39,5%, benzine 38,8%, diesel 37,6%, plug-in 34,6%, elektrisch 27,1%); een cijfer uit uw eigen offerte is beter.",
     "zitplaatsen": "Zitplaatsen",
     "koffer": "Koffer (liter)",
     "trekgewicht": "Trekgewicht (kg)",
@@ -991,5 +1011,10 @@
     "importKlaar": "{gelukt} modellen ingevoerd, {mislukt} overgeslagen.",
     "regel": "Regel",
     "nogNietBeschikbaar": "De eigen modellenbibliotheek is nog niet klaargezet in de databank. Voer migratie 0010 uit op het Supabase-project; daarna verschijnt deze pagina vanzelf. Zolang dat niet gebeurd is, blijft alles hier verborgen in plaats van fout te lopen."
+  },
+  "kosten": {
+    "voorbehoudTitel": "Voorbehoud bij de verkeersbelasting",
+    "voorbehoud_bevVlaanderen": "Vlaanderen: de vrijstelling voor nieuwe elektrische wagens verviel voor inschrijvingen vanaf 1 januari 2026. De gepubliceerde vork is € 69,72 tot € 87,24 per jaar naargelang de fiscale pk (voor een elektrische wagen: 0,013 × kW + 0,5, afgerond, hoogstens 5), plus een BIV-forfait van € 61,50. De berekening neemt € 87,24, de bovengrens.",
+    "voorbehoud_bevWallonieBrussel": "Wallonië en Brussel: de bronnen spreken elkaar tegen. Volgens carvex.be betalen elektrische wagens er geen verkeersbelasting; FLEET.be noemt uitdrukkelijk het minimumtarief van € 102,96 per jaar (tarief 1 juli 2025 – 30 juni 2026). De berekening neemt € 102,96, het hoogste bedrag. Over vier jaar is dat meer dan € 400 verschil: laat dit bevestigen door SPW Finances of Brussel Fiscaliteit vóór u erop rekent."
   }
 }
