@@ -15,6 +15,8 @@ Het volledige schema van Autofiscaliteit staat in `migrations/`, in volgorde uit
 | `0009_profielrechten_afdwingen.sql` | Kolomrechten en een trigger op `profiles`: geen zelfpromotie meer tot beheerder of platformbeheerder |
 | `0010_feedback_en_eigen_modellen.sql` | Tabel `feedback` (iedereen mag melden, alleen een platformbeheerder leest), tabel `eigen_modellen` per bedrijf, en de vreemde sleutel `vehicles.catalog_id` losgekoppeld |
 | `0011_overbodige_tabelrechten_intrekken.sql` | `TRUNCATE`, `TRIGGER` en `REFERENCES` weg bij `anon` en `authenticated`, op elke tabel en voor toekomstige tabellen |
+| `0012_kostensoorten_en_gewesten.sql` | Negen kolommen op `vehicles` voor de kostensoorten met een eigen aftrekregime, de valse-hybridetoets en de gewestelijke belastingen |
+| `0013_kolomrechten_voor_de_nieuwe_wagenvelden.sql` | Het `UPDATE`-recht op die negen kolommen, dat `0012` vergat |
 
 `0005` en `0006` horen bij elkaar maar staan bewust apart: PostgreSQL weigert een nieuwe
 enumwaarde te gebruiken in dezelfde transactie waarin ze is aangemaakt.
@@ -104,9 +106,9 @@ bestaande database kunnen draaien.
    Voor **anon** zijn die meldingen weg sinds `0008`. `handle_new_user()` is en blijft
    afgeschermd: die hoort alleen door de trigger aangeroepen te worden.
 
-### Status na `0011`
+### Status na `0013`
 
-De migraties `0010` en `0011` zijn uitgevoerd op het project `fkmulfdpuphedfakmmsd`.
+De migraties `0010` tot en met `0013` zijn uitgevoerd op het project `fkmulfdpuphedfakmmsd`.
 Gecontroleerd met testgebruikers in een teruggedraaide transactie:
 
 | Poging | Uitkomst |
@@ -118,6 +120,8 @@ Gecontroleerd met testgebruikers in een teruggedraaide transactie:
 | Elektrische wagen met uitstoot als eigen model | geweigerd door de CHECK |
 | Verbrandingswagen zonder uitstoot als eigen model | geweigerd door de CHECK |
 | Wagen toevoegen zonder `catalog_id`, en daarna bewerken | werkt |
+| Wagen bewerken met euronorm, gewest, boetes, batterij en gewicht (`0012` + `0013`) | werkt |
+| `company_id` van een wagen wijzigen | nog steeds geweigerd |
 
 Verder: elke tabel in `public` heeft RLS aan, en de enige policy die `anon` laat schrijven is
 `feedback_insert`. Dat is bedoeld: de simulator en de catalogus zijn publiek, dus de fouten die
@@ -147,3 +151,21 @@ Reden: de vorige 25 rijen bestonden uitsluitend in het productieproject, dus uit
 met de hand, een fout was niet terug te draaien, en viel de databank weg dan viel de hele catalogus
 mee weg. Sinds `0010` verwijst `vehicles.catalog_id` er ook niet meer met een vreemde sleutel naar;
 de koppeling tussen een wagen en een catalogusmodel gebeurt op merk en model.
+
+### Waarom `0013`
+
+`0012` zette negen kolommen bij op `vehicles` en vergat het recht om ze te schrijven. Dat is de
+valstrik die `0009` inbouwt: die migratie trekt het tabelbrede `UPDATE`-recht op `vehicles` in en
+geeft het per kolom terug. Een nieuwe kolom die niet in die lijst staat, is voor `authenticated`
+niet te wijzigen.
+
+Het gevolg was scheef en daarom lastig te vinden. Een `INSERT` slaagt, want daar staat geen
+kolomrecht op; alleen de `UPDATE` faalt. Een nieuwe wagen bewaren met een euronorm en een gewest
+werkte dus, en diezelfde wagen daarna bijwerken niet. `bewaarWagen()` in `src/lib/data.ts` stuurt bij
+een wijziging alle velden van het formulier mee, en het wagenformulier vraagt sinds het bronrapport
+net om deze negen: elke bewerking van een bestaande wagen zou een rechtenfout uit PostgREST
+opgeleverd hebben.
+
+**Regel voor de volgende keer:** een `add column` op `vehicles`, `companies`, `profiles`,
+`evaluations`, `uitnodigingen` of `eigen_modellen` hoort in dezelfde migratie een `grant update` te
+krijgen. Die zes tabellen hebben kolomrechten; ze staan in `0009` en `0010`.
