@@ -163,7 +163,6 @@ export default function WagensPagina() {
   return (
     <Container className="py-[52px]">
       <PageHead
-        eyebrow={t("eyebrow")}
         title={t("titel")}
         sub={t("intro")}
         action={

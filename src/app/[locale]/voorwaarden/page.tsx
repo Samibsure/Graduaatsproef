@@ -31,7 +31,6 @@ function VoorwaardenInhoud() {
 
   return (
     <JuridischePagina
-      eyebrow={t("eyebrow")}
       titel={t("titel")}
       intro={t("intro")}
       bijgewerkt={tPrivacy("bijgewerktLabel", { datum: t("bijgewerkt") })}

@@ -140,7 +140,6 @@ export default function VlootPagina() {
   return (
     <Container className="py-12">
       <PageHead
-        eyebrow={t("eyebrow")}
         title={t("titel")}
         sub={t("intro")}
         action={
@@ -192,7 +191,7 @@ export default function VlootPagina() {
       {!geladen ? (
         <div className="grid gap-4 sm:grid-cols-3">
           {[0, 1, 2].map((i) => (
-            <div key={i} className="h-[132px] animate-pulse rounded-[13px] bg-paper" />
+            <div key={i} className="h-[132px] animate-pulse rounded-[13px] bg-line" />
           ))}
         </div>
       ) : wagens === null ? null : wagens.length === 0 ? (

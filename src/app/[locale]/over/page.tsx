@@ -157,10 +157,7 @@ function OverInhoud() {
       {/* WIE BOUWT EN ONDERHOUDT DIT */}
       <Card className="overflow-hidden">
         <div className="border-b border-line bg-paper px-6 py-5 sm:px-8">
-          <p className="m-0 text-[12px] font-bold uppercase tracking-[0.14em] text-accent">
-            {t("ekoonEyebrow")}
-          </p>
-          <h2 className="m-0 mt-1.5 text-[22px] font-bold tracking-[-0.01em] text-ink">
+          <h2 className="m-0 text-[22px] font-bold tracking-[-0.01em] text-ink">
             {t("ekoonTitel")}
           </h2>
           <p className="m-0 mt-1.5 max-w-[52em] text-[15px] leading-relaxed text-ink-700">

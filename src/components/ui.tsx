@@ -151,7 +151,14 @@ export function LegeStaat({
   );
 }
 
-/** Grijze blokken tijdens het laden, zodat de pagina niet verspringt. */
+/**
+ * Grijze blokken tijdens het laden, zodat de pagina niet verspringt.
+ *
+ * De blokken zijn `bg-line` en niet `bg-paper`. Dat laatste is exact de
+ * achtergrondkleur van elke `bg-paper`-sectie, waardoor het skelet daar
+ * onzichtbaar was: de bezoeker zag een kop met een leeg gat eronder in plaats
+ * van iets dat aan het laden is.
+ */
 export function Laadskelet({
   aantal = 3,
   hoogte = 132,
@@ -166,7 +173,7 @@ export function Laadskelet({
       {Array.from({ length: aantal }, (_, i) => (
         <div
           key={i}
-          className="animate-pulse rounded-[13px] bg-paper"
+          className="animate-pulse rounded-[13px] bg-line"
           style={{ height: hoogte }}
         />
       ))}
@@ -210,24 +217,19 @@ export function Container({
   return <div className={`mx-auto max-w-[1200px] px-6 ${className}`}>{children}</div>;
 }
 
-/** Gouden bovenliggend label met streepje, zoals in de huisstijl. */
-export function Eyebrow({ children, dash = false }: { children: ReactNode; dash?: boolean }) {
-  return (
-    <div className="mb-3 flex items-center gap-2.5">
-      {dash && <span className="h-[1.5px] w-[26px] bg-gold" />}
-      <span className="text-[12px] font-bold uppercase tracking-[0.16em] text-gold">{children}</span>
-    </div>
-  );
-}
-
-/** Paginakop: eyebrow + titel + optionele subtekst en actie. */
+/**
+ * Paginakop: titel met optionele subtekst en actie.
+ *
+ * Er stond hier tot voor kort een "eyebrow" boven de titel: een klein
+ * kapitalenlabel in de accentkleur. Dat label herhaalde in de praktijk de titel
+ * of de menunaam, kostte een regel hoogte en duwde de eigenlijke kop naar
+ * beneden. De titel doet dat werk zelf.
+ */
 export function PageHead({
-  eyebrow,
   title,
   sub,
   action,
 }: {
-  eyebrow: string;
   title: ReactNode;
   sub?: ReactNode;
   action?: ReactNode;
@@ -235,7 +237,6 @@ export function PageHead({
   return (
     <div className="mb-8 flex flex-wrap items-end justify-between gap-6">
       <div>
-        <Eyebrow>{eyebrow}</Eyebrow>
         <h1 className="m-0 text-[clamp(28px,4vw,44px)] font-bold tracking-[-0.02em] text-ink">
           {title}
         </h1>

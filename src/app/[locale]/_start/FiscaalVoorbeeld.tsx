@@ -54,9 +54,7 @@ export default function FiscaalVoorbeeld() {
   return (
     <div className="overflow-hidden rounded-[16px] border border-line bg-white shadow-zwevend">
       <div className="flex items-center justify-between bg-ink px-[22px] py-[18px]">
-        <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-white/[0.72]">
-          {t("voorbeeld")}
-        </span>
+        <span className="text-[13.5px] font-bold text-white/[0.78]">{t("voorbeeld")}</span>
         <span className="inline-flex items-center gap-1.5 text-[12.5px] font-bold text-white">
           <Icon name="award" size={15} /> {t("meestAftrekbaar")}
         </span>

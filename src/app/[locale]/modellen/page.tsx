@@ -220,7 +220,6 @@ export default function ModellenPagina() {
   return (
     <Container className="py-12">
       <PageHead
-        eyebrow={t("eyebrow")}
         title={t("titel")}
         sub={t("intro")}
         action={

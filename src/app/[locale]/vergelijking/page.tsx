@@ -10,7 +10,7 @@ import Icon from "@/components/Icon";
 import { useSessie } from "@/components/SessieProvider";
 import { SteunNoot } from "@/components/Steun";
 import Uitfaseringstijdlijn from "@/components/Uitfaseringstijdlijn";
-import { Container, Eyebrow, TypeDot } from "@/components/ui";
+import { Container, TypeDot } from "@/components/ui";
 import {
   bewaarEvaluatie,
   laadCatalogus,
@@ -228,7 +228,6 @@ export default function VergelijkingPagina() {
       {/* Kop */}
       <div className="mb-8 flex flex-wrap items-end justify-between gap-6">
         <div>
-          <Eyebrow>{t("eyebrow", { aantal: cmp.length })}</Eyebrow>
           <h1 className="m-0 mb-2.5 text-[clamp(30px,4vw,46px)] font-bold tracking-[-0.02em]">
             {t("kop")}
           </h1>
@@ -286,7 +285,7 @@ export default function VergelijkingPagina() {
                     })}
                   </p>
                 ) : (
-                  <span className="inline-block h-[30px] w-[160px] animate-pulse rounded-full bg-paper" />
+                  <span className="inline-block h-[30px] w-[160px] animate-pulse rounded-full bg-line" />
                 ))}
             </div>
           </div>

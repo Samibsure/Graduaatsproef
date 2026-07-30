@@ -3,7 +3,7 @@
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useMemo, useState } from "react";
 import CarImage from "@/components/CarImage";
-import { Laadskelet } from "@/components/ui";
+import { Laadskelet, LegeStaat, knopKlassen } from "@/components/ui";
 import { Link } from "@/i18n/navigation";
 import { laadCatalogus, laadFiscaleContext } from "@/lib/data";
 import { catalogPreview, perZekerheid } from "@/lib/fiscaal/catalog";
@@ -41,7 +41,27 @@ export default function UitgelichteWagens() {
   }, [catalogus]);
 
   if (catalogus === null) return <Laadskelet aantal={3} hoogte={310} className="grid gap-6 md:grid-cols-3" />;
-  if (uitgelicht.length === 0) return null;
+
+  /*
+   * Niets teruggeven was hier de verkeerde keuze: de kop van deze sectie staat
+   * in de servercomponent en blijft dus staan, waardoor de startpagina een
+   * titel toonde met een gat eronder. Lukt het ophalen niet, dan hoort daar te
+   * staan dat het niet lukte, met een weg vooruit.
+   */
+  if (uitgelicht.length === 0) {
+    return (
+      <LegeStaat
+        icoon="car"
+        titel={t("uitgelichtLeegTitel")}
+        tekst={t("uitgelichtLeegTekst")}
+        actie={
+          <Link href="/catalogus" className={knopKlassen("stil", "md")}>
+            {t("bekijkCatalogus")}
+          </Link>
+        }
+      />
+    );
+  }
 
   return (
     <div className="grid gap-6 md:grid-cols-3">

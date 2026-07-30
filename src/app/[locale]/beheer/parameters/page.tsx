@@ -123,7 +123,6 @@ export default function BeheerParametersPagina() {
     return (
       <Container className="py-16">
         <PageHead
-          eyebrow={t("beheerEyebrow")}
           title={t("geenToegangTitel")}
           sub={t("geenToegangTekst")}
         />
@@ -137,13 +136,13 @@ export default function BeheerParametersPagina() {
   if (!ctx) {
     return (
       <Container className="py-16">
-        <PageHead eyebrow={t("beheerEyebrow")} title={t("beheerTitel")} />
+        <PageHead title={t("beheerTitel")} />
         {geladen ? (
           <p role="alert" className="rounded-lg bg-rose-50 px-4 py-3 text-sm text-rose-700">
             {fout ?? t("beheerNietGeladen")}
           </p>
         ) : (
-          <div className="h-32 animate-pulse rounded-[13px] bg-paper" />
+          <div className="h-32 animate-pulse rounded-[13px] bg-line" />
         )}
       </Container>
     );
@@ -152,7 +151,6 @@ export default function BeheerParametersPagina() {
   return (
     <Container className="space-y-6 py-[52px]">
       <PageHead
-        eyebrow={t("beheerEyebrow")}
         title={t("beheerTitel")}
         sub={t("beheerIntro")}
         action={

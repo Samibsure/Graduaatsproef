@@ -143,7 +143,6 @@ export default function ParametersPagina() {
   return (
     <Container className="space-y-6 py-[52px]">
       <PageHead
-        eyebrow={t("eyebrow")}
         title={t("titel")}
         sub={t("intro")}
       />

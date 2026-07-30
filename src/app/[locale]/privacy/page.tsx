@@ -29,7 +29,6 @@ function PrivacyInhoud() {
 
   return (
     <JuridischePagina
-      eyebrow={t("eyebrow")}
       titel={t("titel")}
       intro={t("intro")}
       bijgewerkt={t("bijgewerktLabel", { datum: t("bijgewerkt") })}
