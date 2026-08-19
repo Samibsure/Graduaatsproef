@@ -367,8 +367,13 @@ allemaal gezet te zijn vóór het adres rondgaat.
 10. De twee Supabase-variabelen expliciet zetten, op Production **én** Preview. Zonder die
     laatste praat elke preview-deployment met de productiedatabank; de build zegt dat sinds
     kort in zijn logboek, maar zeggen is geen tegenhouden.
-11. Na de eerste deploy het volledige registratiepad doorlopen: formulier → bevestigingsmail
-    → `/auth/callback` → `/welkom` → `/wagens`, en daarna afmelden.
+11. Controleren dat de **functieregio** werkelijk op Frankfurt staat. `vercel.json` vraagt
+    `fra1`, maar een instelling in het dashboard gaat daarvoor, en op het gratis plan is er
+    maar één regio beschikbaar. De privacyverklaring belooft opslag binnen de EU.
+12. Na de eerste deploy het volledige registratiepad doorlopen: formulier → bevestigingsmail
+    → `/auth/callback` → `/welkom` → `/wagens`, en daarna afmelden. En op de
+    preview-deployment van de pull request: `/robots.txt`, `/sitemap.xml`,
+    `/nl/opengraph-image` en `/fotobronnen` moeten alle vier antwoorden.
 
 **Over `npm audit`**
 
