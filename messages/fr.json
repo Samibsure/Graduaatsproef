@@ -607,9 +607,6 @@
     "slotTekst": "Calculez entièrement un candidat dans le simulateur. Pour comparer plusieurs véhicules, suivre votre flotte et conserver votre décision, créez un compte gratuit.",
     "slotRegistreren": "Créer un compte",
     "introTwee": "Vous encodez un véhicule ou vous en choisissez un parmi les 163 modèles du catalogue. Vous voyez immédiatement son coût annuel, son évolution jusqu'en 2031 et sa position face aux alternatives.",
-    "troefGratis": "Entièrement gratuit",
-    "troefGeenAccount": "Calculer sans compte",
-    "troefBronnen": "Chaque chiffre avec sa source",
     "watKop": "Ce que vous pouvez faire avec Autofiscaliteit",
     "watIntro": "Six volets, du calcul rapide pour un véhicule à la gestion d'un parc complet. Vous commencez où vous voulez.",
     "featSimulatorTitel": "Calculer un véhicule",
@@ -668,7 +665,8 @@
     "uitgelichtLeegTitel": "Le catalogue est momentanément indisponible",
     "uitgelichtLeegTekst": "Les modèles mis en avant n'ont pas pu être chargés. Réessayez plus tard ou ouvrez directement le catalogue.",
     "omslagNaarKader": "Comment ces pourcentages sont établis",
-    "omslagNaarSimulator": "Calculer mon véhicule"
+    "omslagNaarSimulator": "Calculer mon véhicule",
+    "ctaGeruststelling": "Gratuit, et le calcul fonctionne sans compte. L'inscription sert à enregistrer."
   },
   "catalogus": {
     "kop": "La flotte, pesée fiscalement",

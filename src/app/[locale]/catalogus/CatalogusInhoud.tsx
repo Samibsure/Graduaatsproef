@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import Besteljaartabel from "@/components/Besteljaartabel";
 import CarImage from "@/components/CarImage";
 import Icon from "@/components/Icon";
+import Zekerheidsregel from "@/components/Zekerheidsregel";
 import { useSessie } from "@/components/SessieProvider";
 import { magSchrijven } from "@/lib/rollen";
 import {
@@ -493,7 +494,7 @@ export default function CatalogusInhoud() {
                       </div>
                     )}
 
-                    <Zekerheidsregel car={car} labels={t} />
+                    <Zekerheidsregel car={car} />
 
                     <div className="mb-4 mt-[16px] grid grid-cols-2 gap-px overflow-hidden rounded-[10px] border border-line bg-line">
                       <Cel label={t("cellAftrek")} waarde={j ? pct(j.aftrekPct) : "—"} />
@@ -615,49 +616,6 @@ function Cel({ label, waarde }: { label: string; waarde: string }) {
   );
 }
 
-/**
- * Of de cijfers van deze wagen nagekeken zijn, en waar ze vandaan komen.
- *
- * Een raming zonder label is een bewering. Dit maakt er een raming van, met de
- * bron erbij en met het voorbehoud dat het onderzoek erover maakte: dat de
- * cijfers van deze BMW de oude generatie beschrijven, dat die CO₂ vlak bij de
- * drempel van de valse-hybridetoets ligt. Dat hoort op de kaart en niet in een
- * document dat niemand opent.
- */
-function Zekerheidsregel({
-  car,
-  labels,
-}: {
-  car: CatalogCar;
-  labels: (sleutel: string, waarden?: Record<string, string | number>) => string;
-}) {
-  const nagekeken = car.zekerheid === "geverifieerd";
-  const voorbehoud = car.voorbehoud
-    ? labels(`voorbehoud_${car.voorbehoud}`, {})
-    : null;
-  if (!car.bron && !voorbehoud) return null;
-
-  return (
-    <div className="mt-2.5 border-t border-line pt-2.5 text-[12px] leading-relaxed">
-      <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-        <span
-          className={`inline-flex items-center gap-1 rounded-full px-2 py-[3px] text-[11px] font-bold ${
-            nagekeken ? "bg-accent-soft text-ink" : "bg-line text-ink-700"
-          }`}
-        >
-          <Icon name={nagekeken ? "check" : "info"} size={12} />
-          {labels(nagekeken ? "badgeGeverifieerd" : "badgeRaming", {})}
-        </span>
-        {car.bron && <span className="min-w-0 text-ink-500">{car.bron}</span>}
-      </div>
-      {voorbehoud && (
-        <p className="m-0 mt-1.5 text-ink-700">
-          <span className="font-bold">{labels("voorbehoudLabel", {})}:</span> {voorbehoud}
-        </p>
-      )}
-    </div>
-  );
-}
 
 /**
  * De praktische kant van de wagen, naast de fiscale.

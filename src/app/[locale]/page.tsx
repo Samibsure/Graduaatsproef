@@ -91,18 +91,22 @@ export default async function Startpagina({
               </Link>
             </div>
 
-            {/* De drie zinnen die de drempel wegnemen die "Gratis starten" juist
-                opwierp: geen prijs, geen registratie, en cijfers met een bron. */}
-            {/* Op een telefoon onder elkaar: naast elkaar liepen deze drie tegen
-                de schermrand en tegen de meldknop rechtsonder aan. */}
-            <ul className="m-0 mt-6 flex list-none flex-col gap-2 p-0 text-[14.5px] text-ink-500 sm:flex-row sm:flex-wrap sm:gap-x-6">
-              {["troefGratis", "troefGeenAccount", "troefBronnen"].map((s) => (
-                <li key={s} className="flex items-center gap-2">
-                  <Icon name="check" size={16} className="text-accent" />
-                  {t(s)}
-                </li>
-              ))}
-            </ul>
+            {/*
+              Hier stonden drie vinkjes: gratis, geen account, elk cijfer met zijn
+              bron. Ze zijn weg om twee redenen. Ze stonden er dubbel -- het zijn
+              woordelijk de koppen van drie van de vijf vragen in de FAQ onderaan
+              deze pagina -- en het waren beweringen op een pagina die verder
+              bewijst: de regimematrix leest de aftrekkalender uit, de kaart
+              hiernaast rekent met de echte rekenkern.
+
+              Wat overblijft is de ene zin die op dit moment telt, vlak bij de
+              knop. "Elk cijfer met zijn bron" is verhuisd naar de plek waar het
+              te zien is in plaats van te beloven: de bronregel onder de
+              voorbeeldkaart hiernaast.
+            */}
+            <p className="m-0 mt-5 max-w-[26em] text-[14.5px] leading-relaxed text-ink-500">
+              {t("ctaGeruststelling")}
+            </p>
           </div>
 
           <div className="bs-rise" style={{ animationDelay: ".08s" }}>

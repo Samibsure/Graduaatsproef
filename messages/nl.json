@@ -607,9 +607,6 @@
     "slotTekst": "Reken een kandidaat volledig door in de simulator. Wil u meerdere wagens naast elkaar leggen, uw vloot opvolgen en uw beslissing bewaren, maak dan een gratis account.",
     "slotRegistreren": "Account aanmaken",
     "introTwee": "U vult een wagen in of kiest er een uit de catalogus van 163 modellen. U ziet meteen wat hij per jaar kost, hoe dat evolueert tot 2031, en hoe hij zich verhoudt tot de alternatieven.",
-    "troefGratis": "Volledig gratis",
-    "troefGeenAccount": "Rekenen zonder account",
-    "troefBronnen": "Elk cijfer met zijn bron",
     "watKop": "Wat u met Autofiscaliteit kan doen",
     "watIntro": "Zes onderdelen, van een snelle berekening voor één wagen tot het beheer van een volledig wagenpark. U begint waar u wil.",
     "featSimulatorTitel": "Eén wagen doorrekenen",
@@ -668,7 +665,8 @@
     "uitgelichtLeegTitel": "De catalogus is even niet bereikbaar",
     "uitgelichtLeegTekst": "De uitgelichte modellen konden niet geladen worden. Probeer het straks opnieuw, of open de catalogus rechtstreeks.",
     "omslagNaarKader": "Hoe deze percentages tot stand komen",
-    "omslagNaarSimulator": "Mijn wagen doorrekenen"
+    "omslagNaarSimulator": "Mijn wagen doorrekenen",
+    "ctaGeruststelling": "Gratis, en rekenen kan zonder account. Registreren is pas nodig om te bewaren."
   },
   "catalogus": {
     "kop": "Het wagenpark, fiscaal gewogen",
