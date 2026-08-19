@@ -607,9 +607,6 @@
     "slotTekst": "Work a candidate through in full in the simulator. To put several cars side by side, track your fleet and keep your decision, create a free account.",
     "slotRegistreren": "Create an account",
     "introTwee": "Enter a car or pick one from the catalogue of 163 models. You immediately see what it costs per year, how that develops up to 2031, and how it stacks up against the alternatives.",
-    "troefGratis": "Completely free",
-    "troefGeenAccount": "Calculate without an account",
-    "troefBronnen": "Every figure with its source",
     "watKop": "What you can do with Autofiscaliteit",
     "watIntro": "Six parts, from a quick calculation for a single car to managing an entire fleet. Start wherever you like.",
     "featSimulatorTitel": "Work out one car",
@@ -668,7 +665,8 @@
     "uitgelichtLeegTitel": "The catalogue is briefly unavailable",
     "uitgelichtLeegTekst": "The highlighted models could not be loaded. Try again shortly, or open the catalogue directly.",
     "omslagNaarKader": "How these percentages are arrived at",
-    "omslagNaarSimulator": "Work out my own car"
+    "omslagNaarSimulator": "Work out my own car",
+    "ctaGeruststelling": "Free, and calculating works without an account. Registering is only for saving."
   },
   "catalogus": {
     "kop": "The fleet, weighed up for tax",

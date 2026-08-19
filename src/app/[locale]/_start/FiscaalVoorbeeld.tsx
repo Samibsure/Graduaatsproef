@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import CarImage from "@/components/CarImage";
 import Icon from "@/components/Icon";
 import { StatCard } from "@/components/ui";
+import Zekerheidsregel from "@/components/Zekerheidsregel";
 import { laadCatalogus, laadFiscaleContext } from "@/lib/data";
 import { catalogPreview, perZekerheid } from "@/lib/fiscaal/catalog";
 import { berekenJaar } from "@/lib/fiscaal/engine";
@@ -106,6 +107,16 @@ export default function FiscaalVoorbeeld() {
             </div>
           ))}
         </div>
+
+        {/*
+          De bron van dit model, onder de cijfers die eruit volgen.
+
+          In de hero stond hiernaast een vinkje "elk cijfer met zijn bron", naast
+          een kaart die die bron niet toonde. De kaart kiest hierboven al bewust
+          een nagekeken wagen; nu staat er ook wát er nagekeken is. Een raming
+          zegt dat dan even eerlijk.
+        */}
+        {wagen && <Zekerheidsregel car={wagen} compact />}
       </div>
     </div>
   );
