@@ -98,7 +98,16 @@ export default function BeheerParametersPagina() {
   async function bewaarAlles() {
     if (!ctx || !params) return;
     await doe(async () => {
-      await bewaarParameters(params);
+      /*
+       * Alle jaren, niet alleen het jaar dat toevallig in de keuzelijst staat.
+       * `zetParam` schrijft in ctx.parameters, dus wie 2026 corrigeert, naar
+       * 2027 schakelt en dan bewaart, had zijn correctie van 2026 zien
+       * verdwijnen -- met "Bewaard" in het groen erboven en de aangepaste waarde
+       * nog op het scherm. De twee lussen hieronder deden het al goed.
+       */
+      for (const p of ctx.parameters) {
+        await bewaarParameters(p);
+      }
       for (const p of ctx.periodes) {
         await bewaarMultiplicator(p.code, p.rsz_multiplicator);
       }

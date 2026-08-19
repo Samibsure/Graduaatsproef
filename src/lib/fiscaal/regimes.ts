@@ -113,12 +113,20 @@ function verbrandingsregime(
   }
 
   const jaren = gebruiksjarenUitKalender(ctx, periode.code);
+  /*
+   * De kalender geeft `null` terug voor een gebruiksjaar waarover ze niets zegt.
+   * De vragen hieronder komen allemaal uit de kalender zelf, dus dat gebeurt hier
+   * niet; blijft ze toch stil, dan is er geen plafond en is 100% het eerlijke
+   * antwoord voor de tabel.
+   */
+  const plafond = (type: Voertuigtype, jaar: number) =>
+    plafondUitKalender(ctx, type, periode, jaar).pct ?? 100;
   if (isOvergangsregime(periode) && jaren.length > 0) {
     return {
       soort: "plafondPerJaar",
       stappen: jaren.map((gebruiksjaar) => ({
         gebruiksjaar,
-        plafond: plafondUitKalender(ctx, voertuigtype, periode, gebruiksjaar).pct,
+        plafond: plafond(voertuigtype, gebruiksjaar),
       })),
     };
   }
@@ -128,7 +136,7 @@ function verbrandingsregime(
   // is dan een even goede vraag als elk ander.
   return {
     soort: "vast",
-    pct: plafondUitKalender(ctx, voertuigtype, periode, jaren[0] ?? 2026).pct,
+    pct: plafond(voertuigtype, jaren[0] ?? 2026),
   };
 }
 
@@ -150,10 +158,12 @@ export function regimebanden(ctx: FiscaleContext, vandaag: string): Regimeband[]
       tot: periode.tot,
       // Een elektrische wagen heeft geen gramformule nodig: bij 0 g/km loopt die
       // tegen het plafond van 100% aan, dus de kalender is het hele antwoord.
+      // Voor BEV draagt elke periode een regel voor de hele gebruiksduur, dus de
+      // kalender zwijgt hier niet.
       bev:
         periode.code === "voor_07_2023"
           ? gramformule("elektrisch", 0)
-          : plafondUitKalender(ctx, "BEV", periode, 2026).pct,
+          : (plafondUitKalender(ctx, "BEV", periode, 2026).pct ?? 0),
       verbranding: verbrandingsregime(ctx, periode, "fossiel"),
       isVandaag: periode.code === huidige.code,
     }));

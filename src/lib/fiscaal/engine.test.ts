@@ -103,6 +103,46 @@ describe("aftrekbaarheid (Tabel 1 en Bijlage 3)", () => {
     expect(aftrekPct(ctx, nieuweDiesel, 2026)).toBe(0);
   });
 
+  /*
+   * De aftopping van het overgangsregime geldt pas vanaf aanslagjaar 2026, dus
+   * vanaf inkomstenjaar 2025. Daarom begint de uitdoofkalender bij 2025.
+   *
+   * Voor gebruiksjaar 2023 en 2024 vulde plafondUitKalender de hoogste trap in
+   * (75%), en dat kostte 25 procentpunten op een pad dat elke bezoeker ziet:
+   * standaardBesteljaren zet 2024 altijd in de besteljaartabel van de simulator.
+   * De wagen hieronder is bewust een schone plug-inhybride: bij 135 g/km ligt de
+   * gramformule toch al onder 75% en blijft de fout onzichtbaar.
+   */
+  const schonePhev: Vehicle = {
+    ...diesel,
+    voertuigtype: "PHEV",
+    brandstof: "benzine",
+    co2: 30,
+    batterij_kwh: 15,
+    wagengewicht: 1800,
+  };
+
+  it.each([2023, 2024])(
+    "kent in het overgangsregime geen plafond in gebruiksjaar %i",
+    (gebruiksjaar) => {
+      const opbouw = aftrekOpbouw(ctx, schonePhev, gebruiksjaar);
+      expect(opbouw.plafondPct).toBeNull();
+      expect(opbouw.herkomst).toBe("gramformule");
+      expect(opbouw.pct).toBe(100);
+    },
+  );
+
+  it.each([
+    [2025, 75],
+    [2026, 50],
+    [2027, 25],
+    [2028, 0],
+  ])("topt vanaf gebruiksjaar %i af op %i%%", (gebruiksjaar, verwacht) => {
+    const opbouw = aftrekOpbouw(ctx, schonePhev, gebruiksjaar);
+    expect(opbouw.plafondPct).toBe(verwacht);
+    expect(opbouw.pct).toBe(verwacht);
+  });
+
   it("gramformule voor bestellingen vóór 1/7/2023, begrensd 50-100%", () => {
     expect(gramformule("diesel", 100)).toBe(70); // 120 − 0,5 × 1 × 100
     expect(gramformule("benzine", 120)).toBe(63); // 120 − 0,5 × 0,95 × 120

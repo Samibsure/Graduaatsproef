@@ -1,3 +1,4 @@
+import { jaarUit } from "./datum";
 import { fiscaleCo2 } from "./hybride";
 import type {
   Bestelperiode,
@@ -148,7 +149,15 @@ export function isOvergangsregime(periode: Bestelperiode): boolean {
 
 /** Een plafond uit de aftrekkalender, met de herkomst van dat getal erbij. */
 interface Kalenderplafond {
-  pct: number;
+  /**
+   * Het plafond, of `null` wanneer de kalender voor dit gebruiksjaar niets zegt.
+   *
+   * Dat tweede is geen randgeval maar de regel voor de eerste jaren van het
+   * overgangsregime: de aftopping geldt pas vanaf aanslagjaar 2026, dus vanaf
+   * inkomstenjaar 2025, en de kalender begint daarom bij 2025. Voor 2023 en
+   * 2024 is er dus geen plafond en telt alleen de gramformule.
+   */
+  pct: number | null;
   /**
    * True wanneer dit percentage niet van het gebruiksjaar afhangt: een regel voor
    * de hele gebruiksduur, of geen regel (en dan levenslang nul). Dat verschil is
@@ -181,14 +190,21 @@ export function plafondUitKalender(
   if (exact) return { pct: exact.aftrek_pct, levenslang: false };
   const levenslang = regels.find((r) => r.gebruiksjaar === null);
   if (levenslang) return { pct: levenslang.aftrek_pct, levenslang: true };
-  // Uitdoofkalender: vóór het eerste kalenderjaar geldt de hoogste trap,
-  // na het laatste kalenderjaar de laagste (0%).
+  // Uitdoofkalender. Vóór het eerste kalenderjaar geldt géén plafond, na het
+  // laatste de laagste trap (0%).
+  //
+  // Die eerste tak vulde hier de hoogste trap in, en dat was een fout die geld
+  // kostte: de aftopping van 75% geldt pas vanaf aanslagjaar 2026, dus vanaf
+  // inkomstenjaar 2025, en daarom begint de kalender bij 2025. Voor gebruiksjaar
+  // 2023 en 2024 is er niets om af te toppen. Een plug-inhybride van 30 g/km
+  // besteld in 2024 kwam zo op 75% terecht terwijl de gramformule 100% geeft --
+  // en 2024 staat altijd in de besteljaartabel van de simulator.
   const perJaar = regels
     .filter((r) => r.gebruiksjaar !== null)
     .sort((a, b) => (a.gebruiksjaar as number) - (b.gebruiksjaar as number));
   if (perJaar.length === 0) return { pct: 0, levenslang: true };
   if (gebruiksjaar < (perJaar[0].gebruiksjaar as number)) {
-    return { pct: perJaar[0].aftrek_pct, levenslang: false };
+    return { pct: null, levenslang: false };
   }
   return { pct: perJaar[perJaar.length - 1].aftrek_pct, levenslang: false };
 }
@@ -264,12 +280,16 @@ export function aftrekOpbouw(
   const plafond = plafondUitKalender(ctx, vehicle.voertuigtype, periode, gebruiksjaar);
 
   if (vehicle.voertuigtype === "BEV" || !isOvergangsregime(periode)) {
+    // Buiten het overgangsregime draagt elke bestelperiode een regel voor de
+    // hele gebruiksduur, dus de kalender zegt hier altijd iets. Blijft ze toch
+    // stil, dan is er geen aftrek om te verlenen.
+    const pct = plafond.pct ?? 0;
     return {
-      pct: plafond.pct,
-      herkomst: plafond.pct === 0 && plafond.levenslang ? "levenslang_nul" : "kalenderplafond",
+      pct,
+      herkomst: pct === 0 && plafond.levenslang ? "levenslang_nul" : "kalenderplafond",
       periode,
       gramformulePct: null,
-      plafondPct: plafond.pct,
+      plafondPct: pct,
       gerekendeCo2,
       gramCoefficient,
       metMinimum: false,
@@ -278,6 +298,21 @@ export function aftrekOpbouw(
 
   const metMinimum = gebruiksjaar <= LAATSTE_JAAR_MET_MINIMUMAFTREK;
   const gramformulePct = gramformule(vehicle.brandstof, gerekendeCo2, { metMinimum });
+
+  // Zegt de kalender niets over dit gebruiksjaar, dan is er niets af te toppen
+  // en is de formule het hele antwoord.
+  if (plafond.pct === null) {
+    return {
+      pct: gramformulePct,
+      herkomst: "gramformule",
+      periode,
+      gramformulePct,
+      plafondPct: null,
+      gerekendeCo2,
+      gramCoefficient,
+      metMinimum,
+    };
+  }
 
   return {
     pct: Math.min(plafond.pct, gramformulePct),
@@ -315,7 +350,9 @@ export function aftrekPctElektriciteit(
   if (vehicle.voertuigtype !== "PHEV") return aftrekPct(ctx, vehicle, gebruiksjaar);
   const periode = bestelperiodeVoorDatum(ctx, vehicle.besteldatum);
   if (periode.code === "voor_07_2023") return aftrekPct(ctx, vehicle, gebruiksjaar);
-  return plafondUitKalender(ctx, "BEV", periode, gebruiksjaar).pct;
+  // Voor BEV draagt elke bestelperiode een regel voor de hele gebruiksduur, dus
+  // de kalender zegt hier altijd iets.
+  return plafondUitKalender(ctx, "BEV", periode, gebruiksjaar).pct ?? 0;
 }
 
 /**
@@ -352,7 +389,7 @@ export function voordeelAlleAard(
   gebruiksjaar: number,
 ): number {
   const params = parametersVoorJaar(ctx, gebruiksjaar);
-  const jaarIngebruikname = new Date(vehicle.eerste_ingebruikname).getFullYear();
+  const jaarIngebruikname = jaarUit(vehicle.eerste_ingebruikname);
   // Een valse hybride wordt ook hier met zijn gecorrigeerde uitstoot gewogen.
   // Ontbreekt de uitstoot volledig, dan blijft de waarde uit het dossier staan:
   // voor het VAA bestaat geen forfait, de waarde is verplicht op te zoeken.
@@ -532,7 +569,7 @@ export function berekenProjectie(
   aantalJaren = 4,
   opties?: { kmoTarief?: boolean },
 ): Projectie {
-  const eersteJaar = Math.max(startjaar, new Date(vehicle.eerste_ingebruikname).getFullYear());
+  const eersteJaar = Math.max(startjaar, jaarUit(vehicle.eerste_ingebruikname));
   const jaren: JaarResultaat[] = [];
   for (let i = 0; i < aantalJaren; i++) {
     jaren.push(berekenJaar(ctx, vehicle, eersteJaar + i, opties));
