@@ -8,9 +8,25 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     /*
-     * Alles behalve statische bestanden en afbeeldingen. De sessie moet bij
-     * elke paginaverzoek ververst worden, anders verloopt ze tijdens gebruik.
+     * Alles behalve statische bestanden, afbeeldingen en de routes die buiten
+     * `src/app/[locale]/` leven.
+     *
+     * Die laatste uitzondering is geen verfijning maar een reparatie.
+     * `updateSession()` roept de taalmiddleware onvoorwaardelijk aan, en die
+     * herschrijft bij `localePrefix: "as-needed"` elk pad zonder
+     * taalvoorvoegsel naar `/nl/<pad>`. Voor `/auth/callback`, `/afmelden`,
+     * `/robots.txt` en `/sitemap.xml` bestaat dat doel niet: die zitten niet
+     * onder `[locale]`. Het gevolg was een 404 op de bevestigingsmail, op de
+     * herstellink, op de inloglink, op het afmelden — de sessiecookie bleef
+     * daar gewoon geldig — en op alles wat een zoekmachine van de site wil
+     * weten. Aanmelden met een wachtwoord bleef wél werken, want dat loopt
+     * volledig client-side; daardoor was er met de hand vrijwel niets van te
+     * merken.
+     *
+     * De routehandlers maken hun eigen Supabase-client (zie
+     * src/lib/supabase/server.ts) en hebben de sessieverversing hier dus niet
+     * nodig. `src/middleware.test.ts` bewaakt deze lijst.
      */
-    "/((?!_next/static|_next/image|favicon.ico|cars/|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
+    "/((?!auth/|afmelden|robots.txt|sitemap.xml|_next/static|_next/image|favicon.ico|cars/|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
   ],
 };
