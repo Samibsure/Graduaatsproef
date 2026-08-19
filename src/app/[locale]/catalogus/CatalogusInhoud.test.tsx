@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import CatalogusPagina from "./page";
+import CatalogusPagina from "./CatalogusInhoud";
 import { rendermetIntl } from "@/test/render";
 import { DEFAULT_CONTEXT } from "@/lib/fiscaal/defaults";
 import { catalogusPerSlug } from "@/lib/fiscaal/catalogusdata";

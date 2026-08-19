@@ -1,4 +1,5 @@
 import { bundelBronnen, laagsteZekerheid } from "./bronnen";
+import { jaarUit } from "./datum";
 import type { Bron, GemarkeerdBedrag } from "./bronnen";
 import type { Brandstof, Euronorm, Gewest } from "./types";
 
@@ -149,7 +150,7 @@ function bivVlaanderen(invoer: BivInvoer): GemarkeerdBedrag {
     };
   }
 
-  const aanslagjaar = invoer.aanslagjaar ?? new Date(invoer.inschrijvingsdatum).getFullYear();
+  const aanslagjaar = invoer.aanslagjaar ?? jaarUit(invoer.inschrijvingsdatum);
   const q = VLAANDEREN_CORRECTIEFACTOR[aanslagjaar];
   if (q === undefined) {
     return leeg(

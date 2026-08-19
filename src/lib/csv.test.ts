@@ -6,8 +6,10 @@ import {
   leesBoolean,
   leesCsv,
   leesGetal,
+  herstelFormule,
   leesUitrusting,
   modelSjabloon,
+  ontsnapFormule,
   modellenNaarCsv,
   splitsRegel,
   wagensNaarCsv,
@@ -175,5 +177,41 @@ describe("eigen modellen: CSV", () => {
     expect(leesUitrusting(" warmtepomp | | trekhaak ")).toEqual(["warmtepomp", "trekhaak"]);
     expect(leesUitrusting("")).toEqual([]);
     expect(leesUitrusting(undefined)).toEqual([]);
+  });
+});
+
+/**
+ * Een export is geen dood bestand: hij gaat in Excel open. Een cel die met =, +,
+ * - of @ begint, wordt daar als formule uitgevoerd. De velden die dat kunnen
+ * dragen (omschrijving, werknemer, kenteken, merk, model, opmerking) worden vrij
+ * ingetypt, dus een collega met schrijfrechten kan een payload in de vloot
+ * zetten en wachten tot de beheerder exporteert.
+ */
+describe("formules in een export", () => {
+  it.each(["=1+1", "=HYPERLINK(\"http://kwaad.be\")", "+A1", "-2+3", "@SUM(A1)"])(
+    "neutraliseert %s met een apostrof",
+    (waarde) => {
+      expect(ontsnapFormule(waarde)).toBe(`'${waarde}`);
+    },
+  );
+
+  it.each(["Wagen Jansen", "1-ABC-123", "BMW i4", ""])("laat %s ongemoeid", (waarde) => {
+    expect(ontsnapFormule(waarde)).toBe(waarde);
+  });
+
+  it("zet de formule in de geëxporteerde regel om", () => {
+    const csv = wagensNaarCsv([{ ...wagen, omschrijving: "=1+1" } as Vehicle]);
+    const regel = csv.split("\n")[1];
+    expect(regel.startsWith("'=1+1")).toBe(true);
+  });
+
+  it("levert na exporteren en opnieuw inlezen dezelfde waarde op", () => {
+    const csv = wagensNaarCsv([{ ...wagen, omschrijving: "=1+1" } as Vehicle]);
+    const { regels } = leesCsv(csv);
+    expect(regels[0].waarden.omschrijving).toBe("=1+1");
+  });
+
+  it("laat een gewone apostrof staan", () => {
+    expect(herstelFormule("'s Hertogenbosch")).toBe("'s Hertogenbosch");
   });
 });

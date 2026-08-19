@@ -81,6 +81,7 @@ export default function CarImage({
   imageUrl,
   alt,
   className = "",
+  eager = false,
 }: {
   type: Voertuigtype;
   segment: string | null;
@@ -88,6 +89,12 @@ export default function CarImage({
   imageUrl?: string | null;
   alt?: string;
   className?: string;
+  /**
+   * Voor de enkele foto die meteen in beeld staat, zoals de kaart bovenaan de
+   * startpagina. Die is de grootste afbeelding boven de vouw en dus wat Google
+   * als LCP meet; luie lading zou hem juist vertragen.
+   */
+  eager?: boolean;
 }) {
   // Eén id-voorvoegsel per instantie. De verlopen hadden een id dat alleen van
   // het type en de vorm afhing, dus stonden er op een catalogusraster tientallen
@@ -106,6 +113,20 @@ export default function CarImage({
         // Zonder alt is dit een gat voor een schermlezer; de aanroeper geeft de
         // wagennaam mee. De vorige terugval was hardgecodeerd Nederlands.
         alt={alt ?? ""}
+        /*
+         * De catalogus toont er vierentwintig in één keer, en elke "Toon meer"
+         * legt er vierentwintig bij. Zonder `loading` haalde de browser die
+         * allemaal meteen op: ongeveer 3 MB waarvan een bezoeker er twee ziet.
+         *
+         * `width` en `height` zijn de verhouding van het bronbestand (960x600).
+         * Ze staan er niet voor de afmeting op het scherm -- dat doet de CSS --
+         * maar zodat de browser de ruimte kent voordat de foto binnen is. Zonder
+         * die twee sprong het raster bij elke foto die aankwam.
+         */
+        loading={eager ? "eager" : "lazy"}
+        decoding="async"
+        width={960}
+        height={600}
         className={`h-full w-full object-cover ${className}`}
       />
     );

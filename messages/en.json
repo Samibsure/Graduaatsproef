@@ -31,7 +31,8 @@
     "over": "About",
     "naarStart": "Autofiscaliteit, to the home page",
     "hoofdmenu": "Main menu",
-    "modellen": "Own models"
+    "modellen": "Own models",
+    "fotobronnen": "Photo credits"
   },
   "footer": {
     "intro": "A free calculator for the tax and financial impact of company cars in Belgium. For every business, from sole trader to full fleet.",
@@ -54,7 +55,8 @@
     "simulator": "Simulator",
     "steunen": "Support",
     "steunSub": "Voluntary. The tool stays free either way.",
-    "modellen": "Own models"
+    "modellen": "Own models",
+    "naarInhoud": "Skip to content"
   },
   "auth": {
     "terugNaarSite": "← Back to the site",
@@ -100,7 +102,11 @@
     "herhaalWachtwoord": "Repeat password",
     "wachtwoordenVerschillen": "The two passwords do not match.",
     "wachtwoordOpslaan": "Save password",
-    "gratisStartenKnop": "Start for free"
+    "gratisStartenKnop": "Start for free",
+    "uitnodigingHerkend": "A company has invited you. Register with the address where you received the invitation and you will join that company straight away.",
+    "linkVerlopen": "This link no longer works. It has expired or was already used, sometimes because a spam filter opened it beforehand. <nieuwe>Request a new link</nieuwe> and try again.",
+    "geenHerstelsessie": "This page only works through the link in the recovery email, and that link works once. Request a new one and click it straight away.",
+    "nieuweLinkVragen": "Request a new recovery link"
   },
   "instellingen": {
     "intro": "Manage your company details, your colleagues and your data.",
@@ -119,7 +125,7 @@
     "verwijderen": "Remove",
     "collegaVerwijderd": "Colleague removed from the company.",
     "uitnodigen": "Invite a colleague",
-    "uitnodigenHint": "No email is sent: let your colleague know yourself. If they register with this address, they automatically join your company.",
+    "uitnodigenHint": "No email is sent. Add the address, then copy the link that appears below and send it yourself: that link is the only way for your colleague to join your company.",
     "uitnodigenPlaceholder": "colleague@company.be",
     "uitnodigenKnop": "Invite",
     "uitnodigingGenoteerd": "Invitation recorded.",
@@ -162,7 +168,11 @@
     "maand12": "December",
     "annuleer": "Cancel",
     "collegaVerwijderTitel": "Remove colleague",
-    "collegaVerwijderTekst": "{naam} loses access to this company's vehicles and decisions. The account itself stays active."
+    "collegaVerwijderTekst": "{naam} loses access to this company's vehicles and decisions. The account itself stays active.",
+    "linkKopieer": "Copy link",
+    "linkGekopieerd": "Copied",
+    "linkKopieerLabel": "Copy the invitation link to the clipboard",
+    "linkUitleg": "Only share this link with the person above. Anyone who has it and registers with that address joins your company."
   },
   "fouten": {
     "nietGevondenTitel": "This page does not exist",
@@ -333,7 +343,13 @@
     "rechten3": "If you disagree with how we handle your data, you can lodge a complaint with the Belgian Data Protection Authority, Drukpersstraat 35, 1000 Brussels.",
     "beveiligingTitel": "Security",
     "beveiliging1": "Each company sees only its own data. That separation does not live in the website but in the database itself: every query there is constrained to the company from your session. Traffic runs exclusively over HTTPS and passwords are stored hashed.",
-    "beveiliging2": "If you do spot a security problem, please let us know before making it public. We will be grateful."
+    "beveiliging2": "If you do spot a security problem, please let us know before making it public. We will be grateful.",
+    "grondslagTitel": "The legal basis for processing",
+    "grondslag1": "We process your account details and your fleet data to perform the agreement you enter into by registering (article 6.1.b GDPR). Without that data there is no account and nothing to calculate.",
+    "grondslag2": "The session cookie, the server logs and the reports you send us are processed on the basis of our legitimate interest (article 6.1.f GDPR): securing the service, finding outages and fixing errors in the calculation. You can object via the address above.",
+    "welkeMeldingen": "<b>Reports</b>: whatever you write in the report form and, if you fill it in, your email address, plus the page you were on, your language, your screen width and your browser version. That last part is needed to reproduce an error.",
+    "waar3": "Supabase Inc. and Vercel Inc. are US companies. Storage and processing take place in a European region, but access from the United States for maintenance and support cannot be ruled out. That transfer is covered by the European Commission's standard contractual clauses and, where applicable, by the EU-US Data Privacy Framework.",
+    "bewaartermijn2": "Reports sit outside your account: they belong to no company and so they do not disappear when you delete yours. We keep them until the report has been dealt with and remove them afterwards. If you want a report erased sooner, let us know via the address above."
   },
   "voorwaarden": {
     "titel": "Terms of use",
@@ -726,7 +742,8 @@
     "voorbehoud_bmwIx3Generatie": "The Belgian price list shows the old G08; the Neue Klasse figures are unconfirmed.",
     "voorbehoud_bmwX5Ontbreekt": "The xDrive50e does not appear in the Belgian price list consulted, only the older xDrive45e.",
     "voorbehoud_co2NietGevonden": "No homologated CO₂ figure found for the Belgian version. For a plug-in hybrid that figure is exactly what determines the benefit in kind and the contribution.",
-    "restwaardeSchatting": "The residual value is an estimate per drivetrain, not per model: a recognised Belgian per-model figure does not exist."
+    "restwaardeSchatting": "The residual value is an estimate per drivetrain, not per model: a recognised Belgian per-model figure does not exist.",
+    "geenRechten": "No write access"
   },
   "parameters": {
     "titel": "Tax parameters",
@@ -974,7 +991,8 @@
     "hybrideReden_bovenDrempel": "Fake hybrid: {co2} g/km is above the threshold of {drempel} g/km.",
     "hybrideReden_teKleineBatterij": "Fake hybrid: the battery delivers {kwh} kWh per 100 kg, less than the required {minimum}.",
     "hybrideReden_geenBatterijgegevens": "Emissions stay below {drempel} g/km. The battery test was not run: fill in capacity and weight to be sure.",
-    "hybrideReden_echteHybride": "Genuine plug-in hybrid: below {drempel} g/km and at least {minimum} kWh per 100 kg."
+    "hybrideReden_echteHybride": "Genuine plug-in hybrid: below {drempel} g/km and at least {minimum} kWh per 100 kg.",
+    "nietGeladen": "The cars could not be loaded. Refresh the page; if it keeps failing, let us know."
   },
   "vergelijking": {
     "titel": "Comparison",
@@ -1044,7 +1062,8 @@
     "critCo2Uitleg": "Score based on the vehicle's CO₂ emissions.",
     "critRest": "Residual value",
     "critRestUitleg": "Expected residual value after four years; manual score per vehicle.",
-    "critNut": "Practical usefulness"
+    "critNut": "Practical usefulness",
+    "geenRechten": "Your role cannot save decisions. Ask your administrator for write access."
   },
   "welkom": {
     "titel": "Welcome to Autofiscaliteit",
@@ -1287,7 +1306,8 @@
     "deelTekst": "All your choices sit in the link. Whoever opens it sees exactly this result.",
     "deelKopieer": "Copy link",
     "deelGekopieerd": "Copied",
-    "deelLabel": "Copy the link to this calculation"
+    "deelLabel": "Copy the link to this calculation",
+    "metaBeschrijving": "Work out one company car in full: deductibility, benefit in kind, disallowed expenses, social security contribution and total cost of use. Free and without registration."
   },
   "besteljaar": {
     "titel": "What the order year changes",
@@ -1338,7 +1358,7 @@
     "omschrijvingPlaceholder": "For a BMW 330e ordered in 2025, the simulator shows…",
     "email": "Your email address",
     "emailHint": "Optional. Only needed if you want a reply.",
-    "privacy": "Sent along: the page you were on, your language, your screen width and your browser. Never data from your fleet or your company profile.",
+    "privacy": "Sent along: the page you were on, your language, your screen width and your browser. Never data from your fleet or your company profile. See the <beleid>privacy policy</beleid>.",
     "verstuur": "Send report",
     "bezig": "Working…",
     "dank": "Thank you. Your report has arrived.",
@@ -1347,7 +1367,8 @@
     "sluit": "Close",
     "onderwerpBug": "Autofiscaliteit: error reported",
     "onderwerpIdee": "Autofiscaliteit: improvement suggested",
-    "onderwerpVraag": "Autofiscaliteit: question"
+    "onderwerpVraag": "Autofiscaliteit: question",
+    "emailPlaceholder": "you@company.be"
   },
   "modellen": {
     "titel": "Your own model library",
@@ -1441,5 +1462,18 @@
     "voorwaarden": "Free, with no limit on the number of cars, and there will be no paid version. Your fleet and your saved decisions are visible only to your own company.",
     "alAccount": "Already have an account?",
     "meldAan": "Sign in"
+  },
+  "fotobronnen": {
+    "titel": "Where the model photos come from",
+    "metaBeschrijving": "Author, licence and source of every model photo in the Autofiscaliteit catalogue.",
+    "intro": "The {aantal} photos in the catalogue come from Wikimedia Commons. For each one you will find here who took it, under which licence it is published and where it comes from.",
+    "uitleg": "Almost all photos are under a Creative Commons licence that requires attribution. This page is that attribution. Each photo keeps the licence its photographer chose; Autofiscaliteit claims no rights over them.",
+    "bewerking": "The photos are cropped to 960 by 600 pixels so the grid does not jump from one aspect ratio to another. That is a modification: where the licence requires ShareAlike, the cropped version falls under that same licence.",
+    "kolomModel": "Model",
+    "kolomAuteur": "Author",
+    "kolomLicentie": "Licence",
+    "kolomBron": "File on Wikimedia Commons",
+    "terug": "Back to the <catalogus>catalogue</catalogus>.",
+    "voetnoot": "Photos from Wikimedia Commons"
   }
 }

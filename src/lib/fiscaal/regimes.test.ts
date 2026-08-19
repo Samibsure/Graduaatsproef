@@ -228,6 +228,11 @@ describe("de datumgrenzen zelf", () => {
     { datum: "2023-07-01", periode: "2023H2_2025" },
     { datum: "2025-12-31", periode: "2023H2_2025" },
     { datum: "2026-01-01", periode: "2026" },
+    // Voor een elektrische wagen is dit vandaag de duurste beslissing die de
+    // tool ondersteunt: tot en met 31/12/2026 levenslang 100%, vanaf 01/01/2027
+    // levenslang 95%.
+    { datum: "2026-12-31", periode: "2026" },
+    { datum: "2027-01-01", periode: "2027" },
   ];
 
   it.each(grenzen)("legt $datum in periode $periode", ({ datum, periode }) => {

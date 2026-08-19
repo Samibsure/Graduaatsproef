@@ -10,7 +10,8 @@ import Nav from "@/components/Nav";
 import { SessieProvider } from "@/components/SessieProvider";
 import { SteunKnop } from "@/components/Steun";
 import { Link } from "@/i18n/navigation";
-import { INTL_LOCALE, routing } from "@/i18n/routing";
+import { TAALTAG, routing, type Locale } from "@/i18n/routing";
+import { paginaAlternates } from "@/lib/metadata";
 import { VOETTEKST_KOLOMMEN } from "@/lib/navigatie";
 import { laadSessie } from "@/lib/sessie";
 
@@ -47,19 +48,19 @@ export async function generateMetadata({
     metadataBase: new URL(SITE_URL),
     title: { default: t("titel"), template: t("sjabloon", { pagina: "%s" }) },
     description: t("beschrijving"),
-    alternates: {
-      // hreflang, zodat Google de Franstalige versie aan Waalse bezoekers toont
-      // in plaats van drie versies als duplicaten te behandelen.
-      languages: Object.fromEntries(
-        routing.locales.map((l) => [
-          INTL_LOCALE[l],
-          l === routing.defaultLocale ? "/" : `/${l}`,
-        ]),
-      ),
-    },
+    /*
+     * De startpagina. Elke andere pagina zet haar eigen alternates via
+     * paginaAlternates(); zonder dat erfde ze deze, en verklaarde ze dus dat
+     * haar Franse en Engelse tegenhanger de startpagina was.
+     *
+     * De canonical hoort er ook bij: campagnelinks hangen er graag
+     * queryparameters aan, en zonder canonical is elke variant voor een
+     * zoekmachine een aparte pagina met dezelfde inhoud.
+     */
+    alternates: paginaAlternates(locale as Locale, ""),
     openGraph: {
       type: "website",
-      locale: INTL_LOCALE[locale as keyof typeof INTL_LOCALE]?.replace("-", "_"),
+      locale: TAALTAG[locale as keyof typeof TAALTAG]?.replace("-", "_"),
       siteName: "Autofiscaliteit",
       title: t("titel"),
       description: t("ogBeschrijving"),
@@ -92,12 +93,26 @@ export default async function RootLayout({
   }));
 
   return (
-    <html lang={INTL_LOCALE[locale]} className={inter.variable}>
+    <html lang={TAALTAG[locale]} className={inter.variable}>
       <body className="antialiased flex min-h-screen flex-col">
         <NextIntlClientProvider>
           <SessieProvider sessie={sessie}>
+            {/*
+              De eerste tab op elke pagina. Zonder skiplink moet wie met het
+              toetsenbord navigeert eerst door de volledige navigatie, en dat is
+              op elke pagina opnieuw (WCAG 2.4.1). Hij is onzichtbaar tot hij
+              focus krijgt.
+            */}
+            <a
+              href="#inhoud"
+              className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-[10px] focus:bg-ink focus:px-4 focus:py-2.5 focus:text-[14px] focus:font-bold focus:text-white"
+            >
+              {t("naarInhoud")}
+            </a>
             <Nav />
-            <main className="flex-1">{children}</main>
+            <main id="inhoud" className="flex-1">
+              {children}
+            </main>
             {/* Op elke pagina bereikbaar. Voor een rekentool is "dit cijfer
                 klopt niet" het waardevolste signaal dat er bestaat, en dat mag
                 niet afhangen van een e-mailadres in een alinea op /over. */}

@@ -61,10 +61,21 @@ describe("wagenSchema", () => {
     expect(() => valideer(wagenSchema, { ...geldigeWagen, besteldatum: "15-01-2026" })).toThrow();
   });
 
-  it("noemt het veld waarover het misgaat", () => {
+  it("noemt het veld waarover het misgaat, met het label uit het formulier", () => {
     const resultaat = wagenSchema.safeParse({ ...geldigeWagen, co2: -5 });
     expect(resultaat.success).toBe(false);
-    if (!resultaat.success) expect(leesbareFout(resultaat.error)).toContain("co2");
+    // "CO2: mag niet negatief zijn" en niet "co2: Too small: expected number..."
+    if (!resultaat.success) expect(leesbareFout(resultaat.error)).toMatch(/^CO2: /);
+  });
+
+  it("schrijft de meldingen in het Nederlands, niet in de standaardtaal van Zod", () => {
+    const resultaat = wagenSchema.safeParse({ ...geldigeWagen, beroepsgebruik_pct: 150 });
+    expect(resultaat.success).toBe(false);
+    if (!resultaat.success) {
+      const tekst = leesbareFout(resultaat.error);
+      expect(tekst).toBe("Beroepsgebruik: mag niet groter zijn dan 100");
+      expect(tekst).not.toMatch(/Too (small|big)|expected/i);
+    }
   });
 });
 
@@ -145,7 +156,7 @@ describe("eigenModelSchema", () => {
     // tot in de vergelijking, waar hij een kandidaat onterecht laat verliezen.
     const r = eigenModelSchema.safeParse({ ...geldig, co2: 120 });
     expect(r.success).toBe(false);
-    expect(leesbareFout(r.error!)).toContain("co2");
+    expect(leesbareFout(r.error!)).toContain("CO2");
   });
 
   it("weigert een verbrandingswagen zonder uitstoot", () => {
@@ -161,7 +172,7 @@ describe("eigenModelSchema", () => {
   it("weigert een elektrische wagen op diesel", () => {
     const r = eigenModelSchema.safeParse({ ...geldig, brandstof: "diesel" });
     expect(r.success).toBe(false);
-    expect(leesbareFout(r.error!)).toContain("brandstof");
+    expect(leesbareFout(r.error!)).toContain("Brandstof");
   });
 
   it("bewaakt dezelfde grenzen als de CHECK-constraints van migratie 0010", () => {
@@ -179,6 +190,6 @@ describe("eigenModelSchema", () => {
     // protesteerde met een constraintnaam. Hier komt de veldnaam mee.
     const r = eigenModelSchema.safeParse({ ...geldig, carrosserie: "cabrio" });
     expect(r.success).toBe(false);
-    expect(leesbareFout(r.error!)).toContain("carrosserie");
+    expect(leesbareFout(r.error!)).toContain("Carrosserie");
   });
 });

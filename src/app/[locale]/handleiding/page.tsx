@@ -4,12 +4,17 @@ import Icon from "@/components/Icon";
 import { SteunKnop } from "@/components/Steun";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
+import { paginaAlternates } from "@/lib/metadata";
 import { CONTACT } from "@/lib/contact";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: Locale }> }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "handleiding" });
-  return { title: t("titel"), description: t("metaBeschrijving") };
+  return {
+    title: t("titel"),
+    description: t("metaBeschrijving"),
+    alternates: paginaAlternates(locale, "/handleiding"),
+  };
 }
 
 export default async function HandleidingPagina({

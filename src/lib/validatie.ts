@@ -1,6 +1,51 @@
 import { z } from "zod";
 
 /**
+ * De ingebouwde meldingen van Zod zijn Engels ("Too small: expected number to
+ * be >0"), en die kwamen letterlijk op het scherm terecht. Alleen de eigen
+ * `.refine()`-regels hieronder waren Nederlands, dus de gebruiker kreeg een
+ * mengeling van twee talen te zien op het moment dat hij een fout moest
+ * herstellen.
+ *
+ * Deze error map vervangt de standaardteksten in één keer. Ze zijn Nederlands,
+ * net als de rest van deze laag; de meldingen vertalen naar Frans en Engels
+ * vraagt foutcodes in plaats van zinnen en een vertaalslag bij elke aanroeper,
+ * en dat is een aparte ingreep.
+ */
+const TYPENAAM: Record<string, string> = {
+  number: "een getal",
+  string: "tekst",
+  boolean: "ja of nee",
+  array: "een lijst",
+};
+
+z.config({
+  customError: (issue) => {
+    switch (issue.code) {
+      case "too_small":
+        if (issue.inclusive === false) return `moet groter zijn dan ${issue.minimum}`;
+        return issue.minimum === 0
+          ? "mag niet negatief zijn"
+          : `mag niet kleiner zijn dan ${issue.minimum}`;
+      case "too_big":
+        return issue.inclusive === false
+          ? `moet kleiner zijn dan ${issue.maximum}`
+          : `mag niet groter zijn dan ${issue.maximum}`;
+      case "invalid_type":
+        return issue.input === undefined || issue.input === null
+          ? "is verplicht"
+          : `moet ${TYPENAAM[String(issue.expected)] ?? String(issue.expected)} zijn`;
+      case "invalid_value":
+        return "is geen toegelaten waarde";
+      case "invalid_format":
+        return "heeft niet de juiste vorm";
+      default:
+        return undefined;
+    }
+  },
+});
+
+/**
  * Invoervalidatie.
  *
  * Deze schema's zijn een bewuste kopie van de CHECK-constraints in
@@ -184,7 +229,62 @@ export const bedrijfSchema = z.object({
  * meer dan aan een geneste foutenstructuur.
  */
 export function leesbareFout(fout: z.ZodError): string {
-  return fout.issues.map((i) => `${i.path.join(".") || "veld"}: ${i.message}`).join("; ");
+  return fout.issues
+    .map((i) => `${veldnaam(i.path.map(String).join(".")) || "veld"}: ${i.message}`)
+    .join("; ");
+}
+
+/**
+ * Het pad uit Zod is een databankkolom (`cataloguswaarde`, `beroepsgebruik_pct`).
+ * Dat is precies wat de gebruiker niet ziet staan op zijn scherm. Deze tabel zet
+ * er het label bij dat wél in het formulier staat; wat er niet in staat, valt
+ * terug op de kolomnaam.
+ */
+const VELDNAMEN: Record<string, string> = {
+  omschrijving: "Omschrijving",
+  werknemer: "Werknemer",
+  kenteken: "Kenteken",
+  merk: "Merk",
+  model: "Model",
+  uitvoering: "Uitvoering",
+  voertuigtype: "Voertuigtype",
+  brandstof: "Brandstof",
+  carrosserie: "Carrosserie",
+  besteldatum: "Besteldatum",
+  eerste_ingebruikname: "Eerste ingebruikname",
+  einde_contract: "Einde contract",
+  co2: "CO2",
+  cataloguswaarde: "Cataloguswaarde",
+  aankoopprijs: "Aankoopprijs",
+  jaarlijkse_autokosten: "Jaarlijkse autokosten",
+  beroepsgebruik_pct: "Beroepsgebruik",
+  km_per_jaar: "Kilometers per jaar",
+  flex_score: "Flexibiliteitsscore",
+  restwaarde_score: "Restwaardescore",
+  vermogen_kw: "Vermogen",
+  verbruik: "Verbruik",
+  batterij_kwh: "Batterijcapaciteit",
+  actieradius_km: "Actieradius",
+  laadvermogen_dc_kw: "Laadvermogen",
+  zitplaatsen: "Zitplaatsen",
+  koffer_liter: "Koffervolume",
+  trekgewicht_kg: "Trekgewicht",
+  wagengewicht: "Wagengewicht",
+  restwaarde_pct_4j: "Restwaarde na 4 jaar",
+  onderhoudsklasse: "Onderhoudsklasse",
+  modeljaar: "Modeljaar",
+  euronorm: "Euronorm",
+  gewest: "Gewest",
+  naam: "Bedrijfsnaam",
+  ondernemingsnummer: "Ondernemingsnummer",
+  btw_nummer: "Btw-nummer",
+  postcode: "Postcode",
+  gemeente: "Gemeente",
+  boekjaar_start_maand: "Startmaand boekjaar",
+};
+
+function veldnaam(pad: string): string {
+  return VELDNAMEN[pad] ?? pad;
 }
 
 /**

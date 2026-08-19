@@ -31,7 +31,8 @@
     "over": "Over",
     "naarStart": "Autofiscaliteit, naar de startpagina",
     "hoofdmenu": "Hoofdmenu",
-    "modellen": "Eigen modellen"
+    "modellen": "Eigen modellen",
+    "fotobronnen": "Fotobronnen"
   },
   "footer": {
     "intro": "Een gratis rekeninstrument voor de fiscale en financiële impact van bedrijfswagens in België. Voor elke onderneming, van eenmanszaak tot vloot.",
@@ -54,7 +55,8 @@
     "simulator": "Simulator",
     "steunen": "Steunen",
     "steunSub": "Vrijwillig. De tool blijft hoe dan ook gratis.",
-    "modellen": "Eigen modellen"
+    "modellen": "Eigen modellen",
+    "naarInhoud": "Naar de inhoud"
   },
   "auth": {
     "terugNaarSite": "← Terug naar de site",
@@ -100,7 +102,11 @@
     "herhaalWachtwoord": "Herhaal wachtwoord",
     "wachtwoordenVerschillen": "De twee wachtwoorden komen niet overeen.",
     "wachtwoordOpslaan": "Wachtwoord opslaan",
-    "gratisStartenKnop": "Gratis starten"
+    "gratisStartenKnop": "Gratis starten",
+    "uitnodigingHerkend": "Je bent uitgenodigd door een bedrijf. Registreer je met het adres waarop je de uitnodiging kreeg, dan kom je meteen in dat bedrijf terecht.",
+    "linkVerlopen": "Deze link werkt niet meer. Hij is verlopen of al gebruikt, soms doordat een spamfilter hem vooraf opende. <nieuwe>Vraag een nieuwe link aan</nieuwe> en probeer opnieuw.",
+    "geenHerstelsessie": "Deze pagina werkt alleen via de link uit de herstelmail, en die link is eenmalig. Vraag een nieuwe aan en klik hem meteen aan.",
+    "nieuweLinkVragen": "Nieuwe herstellink aanvragen"
   },
   "instellingen": {
     "intro": "Beheer je bedrijfsgegevens, je collega's en je gegevens.",
@@ -119,7 +125,7 @@
     "verwijderen": "Verwijderen",
     "collegaVerwijderd": "Collega verwijderd uit het bedrijf.",
     "uitnodigen": "Collega uitnodigen",
-    "uitnodigenHint": "Er vertrekt geen e-mail: verwittig je collega zelf. Registreert die zich met dit adres, dan komt hij automatisch in je bedrijf terecht.",
+    "uitnodigenHint": "Er vertrekt geen e-mail. Voeg het adres toe, kopieer daarna de link die eronder verschijnt en stuur die zelf door: alleen met die link komt je collega in je bedrijf terecht.",
     "uitnodigenPlaceholder": "collega@bedrijf.be",
     "uitnodigenKnop": "Uitnodigen",
     "uitnodigingGenoteerd": "Uitnodiging genoteerd.",
@@ -162,7 +168,11 @@
     "maand12": "December",
     "annuleer": "Annuleren",
     "collegaVerwijderTitel": "Collega verwijderen",
-    "collegaVerwijderTekst": "{naam} verliest de toegang tot de wagens en de beslissingen van dit bedrijf. Het account zelf blijft bestaan."
+    "collegaVerwijderTekst": "{naam} verliest de toegang tot de wagens en de beslissingen van dit bedrijf. Het account zelf blijft bestaan.",
+    "linkKopieer": "Kopieer link",
+    "linkGekopieerd": "Gekopieerd",
+    "linkKopieerLabel": "Kopieer de uitnodigingslink naar het klembord",
+    "linkUitleg": "Deel deze link alleen met de persoon hierboven. Wie hem heeft en zich met dat adres registreert, komt in je bedrijf."
   },
   "fouten": {
     "nietGevondenTitel": "Deze pagina bestaat niet",
@@ -333,7 +343,13 @@
     "rechten3": "Ben je het oneens met hoe wij met je gegevens omgaan, dan kan je klacht indienen bij de Gegevensbeschermingsautoriteit, Drukpersstraat 35, 1000 Brussel.",
     "beveiligingTitel": "Beveiliging",
     "beveiliging1": "Elk bedrijf ziet uitsluitend zijn eigen gegevens. Die scheiding zit niet in de website maar in de database zelf: elke opvraging wordt daar afgedwongen op het bedrijf uit je sessie. Verkeer verloopt uitsluitend over HTTPS en wachtwoorden worden gehasht opgeslagen.",
-    "beveiliging2": "Merk je toch een beveiligingsprobleem op, laat het ons dan weten voordat je het publiek maakt. We zijn je dankbaar."
+    "beveiliging2": "Merk je toch een beveiligingsprobleem op, laat het ons dan weten voordat je het publiek maakt. We zijn je dankbaar.",
+    "grondslagTitel": "Op welke grond we verwerken",
+    "grondslag1": "Je accountgegevens en de gegevens van je wagenpark verwerken we om de overeenkomst uit te voeren die je aangaat door je te registreren (artikel 6.1.b AVG). Zonder die gegevens is er geen account en valt er niets te berekenen.",
+    "grondslag2": "De sessiecookie, de serverlogs en de meldingen die je ons stuurt, verwerken we op grond van ons gerechtvaardigd belang (artikel 6.1.f AVG): de dienst beveiligen, storingen vinden en fouten in de berekening herstellen. Je kan daartegen bezwaar maken via het adres hierboven.",
+    "welkeMeldingen": "<b>Meldingen</b>: wat je in het meldformulier schrijft, en als je die invult je e-mailadres, plus de pagina waarop je stond, je taal, je schermbreedte en je browserversie. Dat laatste is nodig om een fout te kunnen nabootsen.",
+    "waar3": "Supabase Inc. en Vercel Inc. zijn Amerikaanse vennootschappen. De opslag en de verwerking gebeuren in een Europese regio, maar toegang vanuit de Verenigde Staten voor onderhoud en ondersteuning valt niet uit te sluiten. Die doorgifte is gedekt door de standaardcontractbepalingen van de Europese Commissie en, waar van toepassing, door het EU-US Data Privacy Framework.",
+    "bewaartermijn2": "Meldingen staan los van je account: ze horen bij geen enkel bedrijf en verdwijnen dus niet mee wanneer je je bedrijf verwijdert. We bewaren ze tot de melding afgehandeld is en ruimen ze daarna op. Wil je een melding eerder gewist zien, laat het weten via het adres hierboven."
   },
   "voorwaarden": {
     "titel": "Gebruiksvoorwaarden",
@@ -726,7 +742,8 @@
     "voorbehoud_bmwIx3Generatie": "De Belgische prijslijst toont de oude G08; de cijfers van de Neue Klasse zijn niet bevestigd.",
     "voorbehoud_bmwX5Ontbreekt": "De xDrive50e staat niet in de geraadpleegde Belgische prijslijst, alleen de oudere xDrive45e.",
     "voorbehoud_co2NietGevonden": "Geen gehomologeerd CO₂-cijfer teruggevonden voor de Belgische uitvoering. Bij een plug-in hybride bepaalt juist dat cijfer het VAA en de bijdrage.",
-    "restwaardeSchatting": "De restwaarde is een schatting per aandrijftype, niet per model: een erkend Belgisch cijfer per model bestaat niet."
+    "restwaardeSchatting": "De restwaarde is een schatting per aandrijftype, niet per model: een erkend Belgisch cijfer per model bestaat niet.",
+    "geenRechten": "Geen schrijfrechten"
   },
   "parameters": {
     "titel": "Fiscale parameters",
@@ -974,7 +991,8 @@
     "hybrideReden_bovenDrempel": "Valse hybride: {co2} g/km ligt boven de drempel van {drempel} g/km.",
     "hybrideReden_teKleineBatterij": "Valse hybride: de batterij levert {kwh} kWh per 100 kg, minder dan de vereiste {minimum}.",
     "hybrideReden_geenBatterijgegevens": "De uitstoot blijft onder {drempel} g/km. De batterijtoets is niet uitgevoerd: vul batterijcapaciteit en gewicht in om zeker te zijn.",
-    "hybrideReden_echteHybride": "Echte plug-inhybride: onder {drempel} g/km en minstens {minimum} kWh per 100 kg."
+    "hybrideReden_echteHybride": "Echte plug-inhybride: onder {drempel} g/km en minstens {minimum} kWh per 100 kg.",
+    "nietGeladen": "De wagens konden niet geladen worden. Ververs de pagina; blijft het misgaan, meld het ons."
   },
   "vergelijking": {
     "titel": "Vergelijking",
@@ -1044,7 +1062,8 @@
     "critCo2Uitleg": "Score op basis van de CO₂-uitstoot van de wagen.",
     "critRest": "Restwaarde",
     "critRestUitleg": "Verwachte restwaarde na vier jaar; handmatige score per wagen.",
-    "critNut": "Praktisch nut"
+    "critNut": "Praktisch nut",
+    "geenRechten": "Je rol mag geen beslissingen bewaren. Vraag je beheerder om schrijfrechten."
   },
   "welkom": {
     "titel": "Welkom bij Autofiscaliteit",
@@ -1287,7 +1306,8 @@
     "deelTekst": "Al je keuzes staan in de link. Wie hem opent, ziet exact dit resultaat.",
     "deelKopieer": "Link kopiëren",
     "deelGekopieerd": "Gekopieerd",
-    "deelLabel": "Link naar deze berekening kopiëren"
+    "deelLabel": "Link naar deze berekening kopiëren",
+    "metaBeschrijving": "Reken één bedrijfswagen volledig door: aftrekbaarheid, voordeel van alle aard, verworpen uitgaven, RSZ-bijdrage en totale gebruikskost. Gratis en zonder registratie."
   },
   "besteljaar": {
     "titel": "Wat het besteljaar verandert",
@@ -1338,7 +1358,7 @@
     "omschrijvingPlaceholder": "Bij een BMW 330e besteld in 2025 toont de simulator …",
     "email": "Je e-mailadres",
     "emailHint": "Optioneel. Alleen nodig als je een antwoord wil.",
-    "privacy": "Meegestuurd: de pagina waarop je stond, je taal, je schermbreedte en je browser. Nooit gegevens uit je vloot of je bedrijfsprofiel.",
+    "privacy": "Meegestuurd: de pagina waarop je stond, je taal, je schermbreedte en je browser. Nooit gegevens uit je vloot of je bedrijfsprofiel. Zie het <beleid>privacybeleid</beleid>.",
     "verstuur": "Melding versturen",
     "bezig": "Bezig…",
     "dank": "Bedankt. Je melding is aangekomen.",
@@ -1347,7 +1367,8 @@
     "sluit": "Sluiten",
     "onderwerpBug": "Autofiscaliteit: fout gemeld",
     "onderwerpIdee": "Autofiscaliteit: verbetering voorgesteld",
-    "onderwerpVraag": "Autofiscaliteit: vraag"
+    "onderwerpVraag": "Autofiscaliteit: vraag",
+    "emailPlaceholder": "jij@bedrijf.be"
   },
   "modellen": {
     "titel": "Je eigen modellenbibliotheek",
@@ -1441,5 +1462,18 @@
     "voorwaarden": "Gratis, zonder limiet op het aantal wagens, en er komt geen betaalde versie. Je wagenpark en je bewaarde beslissingen zijn alleen zichtbaar voor je eigen bedrijf.",
     "alAccount": "Heb je al een account?",
     "meldAan": "Aanmelden"
+  },
+  "fotobronnen": {
+    "titel": "Herkomst van de modelfoto's",
+    "metaBeschrijving": "Auteur, licentie en bron van elke modelfoto in de catalogus van Autofiscaliteit.",
+    "intro": "De {aantal} foto's in de catalogus komen van Wikimedia Commons. Hier staat per foto wie ze maakte, onder welke licentie ze staat en waar ze vandaan komt.",
+    "uitleg": "Bijna alle foto's staan onder een Creative Commons-licentie die naamsvermelding vraagt. Deze pagina is die vermelding. De licentie van elke foto blijft die van de fotograaf; Autofiscaliteit claimt er geen rechten op.",
+    "bewerking": "De foto's zijn bijgesneden op 960 bij 600 pixels zodat het raster niet schokt van de ene verhouding naar de andere. Dat is een bewerking: waar de licentie ShareAlike vraagt, valt de bijgesneden versie onder diezelfde licentie.",
+    "kolomModel": "Model",
+    "kolomAuteur": "Auteur",
+    "kolomLicentie": "Licentie",
+    "kolomBron": "Bestand op Wikimedia Commons",
+    "terug": "Terug naar de <catalogus>catalogus</catalogus>.",
+    "voetnoot": "Foto's van Wikimedia Commons"
   }
 }

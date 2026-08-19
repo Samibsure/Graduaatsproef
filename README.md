@@ -180,7 +180,11 @@ besteljaar vasthoudt en het gebruiksjaar laat lopen.
   formule gelden, maar afgetopt op een plafond dat per aanslagjaar zakt van 75% naar 0%; de
   minimumaftrek van 50% verdwijnt daar vanaf aanslagjaar 2026. Vanaf 1 januari 2026 vallen
   verbrandingswagens op 0% en houden elektrische wagens levenslang het percentage van hun
-  besteljaar. Bij een uitstoot vanaf 200 g/km of een onbekende uitstoot geldt 40%.
+  besteljaar. Bij een uitstoot vanaf 200 g/km of een onbekende uitstoot geldt 40%, maar
+  alleen zolang de wettelijke ondergrens bestaat: die 40% en het minimum van 50% zijn samen
+  afgeschaft vanaf aanslagjaar 2026. In het overgangsregime valt een wagen van 250 g/km
+  vanaf gebruiksjaar 2025 dus op 0%, niet op 40%. Een onbekende uitstoot houdt het forfait
+  wél, want zonder waarde op het attest is er geen formule om toe te passen.
 - **VAA**: `cataloguswaarde × 6/7 × leeftijdscorrectie × CO₂-percentage`, met wettelijk minimum.
 - **RSZ CO₂-bijdrage**: `((CO₂ × 9 − 600) / 12) × indexcoëfficiënt × multiplicator`, met minimum.
   Zonder CO₂-waarde legt de RSZ een forfait op van 182 g/km (benzine) of 165 g/km (diesel).
@@ -324,8 +328,61 @@ De standaardwaarden staan in `src/lib/supabase/envnamen.ts`. Ze zijn er zodat ee
 struikelt over een ontbrekende variabele — de site plat leggen weegt zwaarder dan een publieke
 sleutel in de broncode, want die sleutel gaat sowieso naar elke bezoeker.
 
-Voor publiek gebruik moet in Supabase daarnaast eigen SMTP geconfigureerd zijn (de ingebouwde
-mailserver is te beperkt en levert slecht af), met de redirect-URL's op het productiedomein.
+`vercel.json` zet de serverfuncties in `fra1` (Frankfurt). Dat is geen detail: elke
+paginaweergave rendert server-side en leest daarbij het profiel en het bedrijf van de
+gebruiker, en de privacyverklaring belooft opslag binnen de Europese Unie. De standaardregio
+van Vercel is `iad1`, in de Verenigde Staten.
+
+## Vóór de eerste publieke lancering
+
+Deze stappen staan buiten de code en kan geen enkele migratie of test garanderen. Ze horen
+allemaal gezet te zijn vóór het adres rondgaat.
+
+**Supabase → Authentication**
+
+1. **Providers → Email → Confirm email: aan.** Zonder e-mailbevestiging kan iemand die een
+   uitgenodigd adres kent zich als die persoon registreren.
+2. **Eigen SMTP** instellen met een geverifieerd afzenderdomein en SPF/DKIM. De ingebouwde
+   mailserver is niet voor productie bedoeld: hij is beperkt tot enkele mails per uur en
+   levert alleen af aan adressen van projectleden. De hele registratieflow hangt aan die mail.
+3. **URL Configuration**: Site URL op `https://autofiscaliteit.com`, en
+   `https://autofiscaliteit.com/**` bij de Redirect URLs. De code bouwt de terugkeer-URL uit
+   `window.location.origin`, maar GoTrue vervangt die stilzwijgend door de Site URL wanneer
+   ze niet in de allowlist staat.
+4. **Leaked password protection** aan, minimumlengte 8 (het formulier vraagt dat al).
+5. **Bot-bescherming** (CAPTCHA) op registratie, en de rate limits nakijken.
+
+**Supabase → Database**
+
+6. Migraties `0001` tot en met `0014` uitvoeren, in volgorde. Zie `supabase/README.md` voor de
+   controlestappen; `0014` is nieuw en dicht de uitnodigingsflow.
+7. **Security Advisor** draaien en een **back-up** nemen.
+8. Een **platformbeheerder** aanmaken, anders is `/beheer/parameters` voor niemand bereikbaar
+   en zijn de meldingen onleesbaar.
+
+**Vercel**
+
+9. `NEXT_PUBLIC_SITE_URL=https://autofiscaliteit.com` zetten. Zonder die variabele staan de
+   sitemap, robots.txt en alle canonical-links op de standaardwaarde.
+10. De twee Supabase-variabelen expliciet zetten, op Production **én** Preview. Zonder die
+    laatste praat elke preview-deployment met de productiedatabank; de build zegt dat sinds
+    kort in zijn logboek, maar zeggen is geen tegenhouden.
+11. Controleren dat de **functieregio** werkelijk op Frankfurt staat. `vercel.json` vraagt
+    `fra1`, maar een instelling in het dashboard gaat daarvoor, en op het gratis plan is er
+    maar één regio beschikbaar. De privacyverklaring belooft opslag binnen de EU.
+12. Na de eerste deploy het volledige registratiepad doorlopen: formulier → bevestigingsmail
+    → `/auth/callback` → `/welkom` → `/wagens`, en daarna afmelden. En op de
+    preview-deployment van de pull request: `/robots.txt`, `/sitemap.xml`,
+    `/nl/opengraph-image` en `/fotobronnen` moeten alle vier antwoorden.
+
+**Over `npm audit`**
+
+`npm audit --omit=dev` meldt vier `high`-adviezen: `postcss`, `nanoid` en `sharp`. Alle drie
+zitten in de eigen afhankelijkheidsboom van `next` en zijn alleen op te lossen met `next@16`,
+een major bump. Voor deze applicatie zijn ze niet uitbuitbaar: `postcss` en `nanoid` draaien
+tijdens de build op onze eigen CSS en komen niet in de browserbundel, en `sharp` hoort bij
+`next/image`, dat hier nergens gebruikt wordt (`CarImage` zet bewust een gewone `<img>` neer).
+De overstap naar Next 16 hoort na de lancering, niet ervoor.
 
 ## Jaarlijkse parameter-update
 

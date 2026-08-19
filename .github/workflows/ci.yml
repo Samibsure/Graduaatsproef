@@ -35,3 +35,9 @@ jobs:
         env:
           NEXT_PUBLIC_SUPABASE_URL: https://ci.supabase.co
           NEXT_PUBLIC_SUPABASE_ANON_KEY: sb_publishable_ci
+
+      # En dezelfde build zónder omgeving. De README belooft dat die slaagt op de
+      # standaardwaarden uit envnamen.ts, en dat is het pad dat op Vercel gebruikt
+      # wordt zodra iemand vergeet de variabelen te zetten. Het werd nooit
+      # gedraaid, dus de belofte werd nooit gecontroleerd.
+      - run: npm run build

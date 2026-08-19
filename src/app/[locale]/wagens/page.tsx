@@ -30,6 +30,12 @@ import { formatters } from "@/lib/format";
 
 const EVALUATIEJAAR = 2026;
 
+/**
+ * Een volledig ingevulde datum uit `<input type="date">`. Half ingetikt of
+ * leeggemaakt levert de lege string, en daar mag de rekenkern niets mee doen.
+ */
+const ISO_DATUM = /^\d{4}-\d{2}-\d{2}$/;
+
 type Formulier = Omit<Vehicle, "id"> & { id?: string };
 
 const leegFormulier: Formulier = {
@@ -146,9 +152,23 @@ export default function WagensPagina() {
     }
   }
 
-  // Live fiscale inschatting voor het huidige formulier.
+  /*
+   * Live fiscale inschatting voor het huidige formulier.
+   *
+   * De twee datums moeten volledig ingevuld zijn voordat er iets te rekenen
+   * valt. Een leeggemaakt `<input type="date">` geeft de lege string, en die
+   * matcht in bestelperiodeVoorDatum de eerste periode (`van: null`): de wagen
+   * viel dan stil terug op het regime van vóór juli 2023 en het percentage
+   * sprong van 0% naar 52,5%. Een lege eerste ingebruikname leverde `NaN`, dat
+   * als "€ NaN" bij het VAA en de verworpen uitgaven op het scherm kwam. Beide
+   * lezen als een uitkomst, niet als een ontbrekend veld.
+   */
+  const datumsCompleet =
+    !!formulier &&
+    ISO_DATUM.test(formulier.besteldatum ?? "") &&
+    ISO_DATUM.test(formulier.eerste_ingebruikname ?? "");
   const formPreview =
-    ctx && formulier
+    ctx && formulier && datumsCompleet
       ? berekenJaar(ctx, { ...(formulier as Vehicle), id: formulier.id ?? "preview" }, EVALUATIEJAAR)
       : null;
 
@@ -582,7 +602,13 @@ export default function WagensPagina() {
             {wagens.length === 0 && (
               <tr>
                 <td colSpan={10} className="px-4 py-10 text-center text-ink-500">
-                  {geladen ? t("leeg") : t("laden")}
+                  {/*
+                    Drie toestanden, geen twee. Bij een mislukte laadpoging bleef
+                    `wagens` leeg en stond hier "nog geen wagens" terwijl de
+                    gebruiker er twintig heeft: de tabel sprak de foutbalk erboven
+                    actief tegen.
+                  */}
+                  {fout ? t("nietGeladen") : geladen ? t("leeg") : t("laden")}
                 </td>
               </tr>
             )}

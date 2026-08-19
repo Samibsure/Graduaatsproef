@@ -17,6 +17,7 @@ Het volledige schema van Autofiscaliteit staat in `migrations/`, in volgorde uit
 | `0011_overbodige_tabelrechten_intrekken.sql` | `TRUNCATE`, `TRIGGER` en `REFERENCES` weg bij `anon` en `authenticated`, op elke tabel en voor toekomstige tabellen |
 | `0012_kostensoorten_en_gewesten.sql` | Negen kolommen op `vehicles` voor de kostensoorten met een eigen aftrekregime, de valse-hybridetoets en de gewestelijke belastingen |
 | `0013_kolomrechten_voor_de_nieuwe_wagenvelden.sql` | Het `UPDATE`-recht op die negen kolommen, dat `0012` vergat |
+| `0014_uitnodigingstoken_en_meldlimiet.sql` | Een token op `uitnodigingen`, zodat koppelen niet meer op e-mailadres alleen gebeurt, plus een bovengrens op het aantal meldingen per uur |
 
 `0005` en `0006` horen bij elkaar maar staan bewust apart: PostgreSQL weigert een nieuwe
 enumwaarde te gebruiken in dezelfde transactie waarin ze is aangemaakt.
@@ -52,6 +53,47 @@ persoon registreren en het bedrijf binnenwandelen.
 Die instelling staat buiten de database (GoTrue), dus geen enkele migratie kan ze garanderen.
 Controleer ze in het dashboard onder Authentication → Providers → Email, samen met de
 bot-bescherming op registratie.
+
+**Bijstelling sinds `0014`.** De alinea hierboven schat het risico te laag in: ze beschrijft
+alleen de richting waarin iemand zich voordoet als een uitgenodigd adres. De omgekeerde
+richting -- een aanvaller die uitnodigingen plant voor adressen die hij niet bezit -- werd
+door e-mailbevestiging niet gedekt. Zie "Status na `0014`" hieronder.
+
+### Status na `0014`
+
+`0014` is **nog niet uitgevoerd** op `fkmulfdpuphedfakmmsd`. Ze hoort bij de eerste publieke
+lancering en moet vóór die lancering draaien.
+
+De migratie dicht een gat dat de tekst hierboven verkeerd inschatte. Er stond dat
+e-mailbevestiging de uitnodigingsflow afdekt, maar dat geldt maar in één richting. De andere
+richting was open: `uitnodigingen_beheer` begrenst alleen `company_id`, niet `email`, en elke
+zelf-geregistreerde gebruiker is beheerder van zijn eigen bedrijf. Iedereen kon dus vanuit de
+browserconsole uitnodigingen planten voor adressen die hij niet bezat:
+
+```js
+await supabase.from('uitnodigingen').insert([{ email: 'x@doelbedrijf.be' }])
+```
+
+Er vertrekt geen mail, dus het slachtoffer merkt niets. Registreerde iemand van die lijst zich
+later zelf, dan kreeg hij geen eigen bedrijf maar landde zijn profiel in dat van de aanvaller,
+die vanaf dan de volledige vloot las en wijzigde. E-mailbevestiging helpt daar niet: het
+slachtoffer bezít het adres, en `on_auth_user_created` staat op `after insert on auth.users`
+en draait dus vóór de bevestiging.
+
+Vanaf `0014` koppelt de trigger alleen wanneer de registratie zowel het token als het adres
+van de uitnodiging meebrengt. Zonder geldig token volgt het gewone pad met een eigen bedrijf.
+Omdat er nog steeds geen mail vertrekt, toont `/instellingen` de uitnodigingslink met een
+kopieerknop; het token zit in die link.
+
+Te controleren na het uitvoeren, met testgebruikers in een teruggedraaide transactie:
+
+| Poging | Verwacht |
+| --- | --- |
+| Registreren met een uitgenodigd adres **zonder** token | eigen bedrijf, niet dat van de uitnodiger |
+| Registreren met token **en** het juiste adres | het bedrijf van de uitnodiger, met de rol uit de uitnodiging |
+| Registreren met een geldig token maar een **ander** adres | eigen bedrijf |
+| Een tweede keer registreren met hetzelfde token | eigen bedrijf (`aanvaard_op` staat gezet) |
+| Meer dan 200 meldingen in een uur | geweigerd met errorcode 53400 |
 
 ## Uitvoeren
 

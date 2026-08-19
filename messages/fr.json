@@ -31,7 +31,8 @@
     "over": "À propos",
     "naarStart": "Autofiscaliteit, vers la page d'accueil",
     "hoofdmenu": "Menu principal",
-    "modellen": "Modèles propres"
+    "modellen": "Modèles propres",
+    "fotobronnen": "Sources des photos"
   },
   "footer": {
     "intro": "Un outil de calcul gratuit pour l'impact fiscal et financier des voitures de société en Belgique. Pour toute entreprise, de l'indépendant à la flotte complète.",
@@ -54,7 +55,8 @@
     "simulator": "Simulateur",
     "steunen": "Soutenir",
     "steunSub": "Volontaire. L'outil reste gratuit dans tous les cas.",
-    "modellen": "Modèles propres"
+    "modellen": "Modèles propres",
+    "naarInhoud": "Aller au contenu"
   },
   "auth": {
     "terugNaarSite": "← Retour au site",
@@ -100,7 +102,11 @@
     "herhaalWachtwoord": "Confirmez le mot de passe",
     "wachtwoordenVerschillen": "Les deux mots de passe ne correspondent pas.",
     "wachtwoordOpslaan": "Enregistrer le mot de passe",
-    "gratisStartenKnop": "Commencer gratuitement"
+    "gratisStartenKnop": "Commencer gratuitement",
+    "uitnodigingHerkend": "Une entreprise vous a invité. Inscrivez-vous avec l'adresse à laquelle vous avez reçu l'invitation et vous rejoindrez directement cette entreprise.",
+    "linkVerlopen": "Ce lien ne fonctionne plus. Il a expiré ou a déjà été utilisé, parfois parce qu'un filtre antispam l'a ouvert au préalable. <nieuwe>Demandez un nouveau lien</nieuwe> et réessayez.",
+    "geenHerstelsessie": "Cette page ne fonctionne qu'avec le lien de l'e-mail de récupération, et ce lien est à usage unique. Demandez-en un nouveau et cliquez dessus directement.",
+    "nieuweLinkVragen": "Demander un nouveau lien"
   },
   "instellingen": {
     "intro": "Gérez les données de votre entreprise, vos collègues et vos données.",
@@ -119,7 +125,7 @@
     "verwijderen": "Supprimer",
     "collegaVerwijderd": "Collègue retiré de l'entreprise.",
     "uitnodigen": "Inviter un collègue",
-    "uitnodigenHint": "Aucun e-mail n'est envoyé : prévenez vous-même votre collègue. S'il s'inscrit avec cette adresse, il rejoint automatiquement votre entreprise.",
+    "uitnodigenHint": "Aucun e-mail n'est envoyé. Ajoutez l'adresse, copiez ensuite le lien qui apparaît en dessous et transmettez-le vous-même : ce lien est le seul moyen pour votre collègue de rejoindre votre entreprise.",
     "uitnodigenPlaceholder": "collegue@entreprise.be",
     "uitnodigenKnop": "Inviter",
     "uitnodigingGenoteerd": "Invitation enregistrée.",
@@ -162,7 +168,11 @@
     "maand12": "Décembre",
     "annuleer": "Annuler",
     "collegaVerwijderTitel": "Retirer le collègue",
-    "collegaVerwijderTekst": "{naam} perd l'accès aux véhicules et aux décisions de cette entreprise. Le compte lui-même reste actif."
+    "collegaVerwijderTekst": "{naam} perd l'accès aux véhicules et aux décisions de cette entreprise. Le compte lui-même reste actif.",
+    "linkKopieer": "Copier le lien",
+    "linkGekopieerd": "Copié",
+    "linkKopieerLabel": "Copier le lien d'invitation dans le presse-papiers",
+    "linkUitleg": "Ne partagez ce lien qu'avec la personne ci-dessus. Quiconque le possède et s'inscrit avec cette adresse rejoint votre entreprise."
   },
   "fouten": {
     "nietGevondenTitel": "Cette page n'existe pas",
@@ -333,7 +343,13 @@
     "rechten3": "Si vous n'êtes pas d'accord avec la manière dont nous traitons vos données, vous pouvez introduire une plainte auprès de l'Autorité de protection des données, Rue de la Presse 35, 1000 Bruxelles.",
     "beveiligingTitel": "Sécurité",
     "beveiliging1": "Chaque entreprise ne voit que ses propres données. Cette séparation ne se situe pas dans le site web mais dans la base de données elle-même : chaque requête y est restreinte à l'entreprise de votre session. Le trafic passe exclusivement par HTTPS et les mots de passe sont stockés hachés.",
-    "beveiliging2": "Si vous constatez malgré tout un problème de sécurité, faites-le nous savoir avant de le rendre public. Nous vous en serons reconnaissants."
+    "beveiliging2": "Si vous constatez malgré tout un problème de sécurité, faites-le nous savoir avant de le rendre public. Nous vous en serons reconnaissants.",
+    "grondslagTitel": "Sur quelle base nous traitons",
+    "grondslag1": "Nous traitons les données de votre compte et celles de votre parc automobile pour exécuter le contrat que vous concluez en vous inscrivant (article 6.1.b RGPD). Sans ces données, il n'y a pas de compte et rien à calculer.",
+    "grondslag2": "Le cookie de session, les journaux du serveur et les signalements que vous nous envoyez sont traités sur la base de notre intérêt légitime (article 6.1.f RGPD) : sécuriser le service, détecter les pannes et corriger les erreurs de calcul. Vous pouvez vous y opposer via l'adresse ci-dessus.",
+    "welkeMeldingen": "<b>Signalements</b> : ce que vous écrivez dans le formulaire de signalement et, si vous la renseignez, votre adresse e-mail, ainsi que la page où vous vous trouviez, votre langue, la largeur de votre écran et la version de votre navigateur. Ce dernier point est nécessaire pour reproduire une erreur.",
+    "waar3": "Supabase Inc. et Vercel Inc. sont des sociétés américaines. Le stockage et le traitement ont lieu dans une région européenne, mais un accès depuis les États-Unis pour la maintenance et le support ne peut être exclu. Ce transfert est couvert par les clauses contractuelles types de la Commission européenne et, le cas échéant, par le EU-US Data Privacy Framework.",
+    "bewaartermijn2": "Les signalements sont indépendants de votre compte : ils n'appartiennent à aucune entreprise et ne disparaissent donc pas lorsque vous supprimez la vôtre. Nous les conservons jusqu'à leur traitement, puis nous les supprimons. Si vous souhaitez qu'un signalement soit effacé plus tôt, faites-le savoir via l'adresse ci-dessus."
   },
   "voorwaarden": {
     "titel": "Conditions d'utilisation",
@@ -726,7 +742,8 @@
     "voorbehoud_bmwIx3Generatie": "La liste belge montre l'ancienne G08 ; les chiffres de la Neue Klasse ne sont pas confirmés.",
     "voorbehoud_bmwX5Ontbreekt": "La xDrive50e ne figure pas dans la liste de prix belge consultée, seule la xDrive45e plus ancienne y apparaît.",
     "voorbehoud_co2NietGevonden": "Aucun chiffre CO₂ homologué retrouvé pour la version belge. Pour une hybride rechargeable, c'est précisément ce chiffre qui détermine l'ATN et la cotisation.",
-    "restwaardeSchatting": "La valeur résiduelle est une estimation par type de motorisation, pas par modèle : un chiffre belge reconnu par modèle n'existe pas."
+    "restwaardeSchatting": "La valeur résiduelle est une estimation par type de motorisation, pas par modèle : un chiffre belge reconnu par modèle n'existe pas.",
+    "geenRechten": "Pas de droits d'écriture"
   },
   "parameters": {
     "titel": "Paramètres fiscaux",
@@ -974,7 +991,8 @@
     "hybrideReden_bovenDrempel": "Hybride factice : {co2} g/km dépasse le seuil de {drempel} g/km.",
     "hybrideReden_teKleineBatterij": "Hybride factice : la batterie fournit {kwh} kWh par 100 kg, moins que les {minimum} requis.",
     "hybrideReden_geenBatterijgegevens": "Les émissions restent sous {drempel} g/km. Le test de la batterie n'a pas été effectué : renseignez la capacité et le poids pour en avoir le coeur net.",
-    "hybrideReden_echteHybride": "Véritable hybride rechargeable : sous {drempel} g/km et au moins {minimum} kWh par 100 kg."
+    "hybrideReden_echteHybride": "Véritable hybride rechargeable : sous {drempel} g/km et au moins {minimum} kWh par 100 kg.",
+    "nietGeladen": "Les voitures n'ont pas pu être chargées. Actualisez la page ; si le problème persiste, signalez-le nous."
   },
   "vergelijking": {
     "titel": "Comparaison",
@@ -1044,7 +1062,8 @@
     "critCo2Uitleg": "Score basé sur les émissions de CO₂ du véhicule.",
     "critRest": "Valeur résiduelle",
     "critRestUitleg": "Valeur résiduelle attendue après quatre ans ; score manuel par véhicule.",
-    "critNut": "Utilité pratique"
+    "critNut": "Utilité pratique",
+    "geenRechten": "Votre rôle ne permet pas d'enregistrer des décisions. Demandez des droits d'écriture à votre administrateur."
   },
   "welkom": {
     "titel": "Bienvenue sur Autofiscaliteit",
@@ -1287,7 +1306,8 @@
     "deelTekst": "Tous vos choix figurent dans le lien. Qui l'ouvre voit exactement ce résultat.",
     "deelKopieer": "Copier le lien",
     "deelGekopieerd": "Copié",
-    "deelLabel": "Copier le lien vers ce calcul"
+    "deelLabel": "Copier le lien vers ce calcul",
+    "metaBeschrijving": "Calculez entièrement une voiture de société : déductibilité, avantage de toute nature, dépenses non admises, cotisation ONSS et coût d'usage total. Gratuit et sans inscription."
   },
   "besteljaar": {
     "titel": "Ce que change l'année de commande",
@@ -1338,7 +1358,7 @@
     "omschrijvingPlaceholder": "Pour une BMW 330e commandée en 2025, le simulateur affiche…",
     "email": "Votre adresse e-mail",
     "emailHint": "Facultatif. Nécessaire uniquement si vous souhaitez une réponse.",
-    "privacy": "Sont transmis : la page consultée, votre langue, la largeur de votre écran et votre navigateur. Jamais de données de votre flotte ni de votre profil d'entreprise.",
+    "privacy": "Sont transmis : la page où vous vous trouviez, votre langue, la largeur de votre écran et votre navigateur. Jamais de données de votre flotte ou de votre profil d'entreprise. Voir la <beleid>politique de confidentialité</beleid>.",
     "verstuur": "Envoyer le signalement",
     "bezig": "En cours…",
     "dank": "Merci. Votre signalement est bien arrivé.",
@@ -1347,7 +1367,8 @@
     "sluit": "Fermer",
     "onderwerpBug": "Autofiscaliteit : erreur signalée",
     "onderwerpIdee": "Autofiscaliteit : amélioration proposée",
-    "onderwerpVraag": "Autofiscaliteit : question"
+    "onderwerpVraag": "Autofiscaliteit : question",
+    "emailPlaceholder": "vous@entreprise.be"
   },
   "modellen": {
     "titel": "Votre bibliothèque de modèles",
@@ -1441,5 +1462,18 @@
     "voorwaarden": "Gratuit, sans limite sur le nombre de véhicules, et il n'y aura pas de version payante. Votre parc et vos décisions enregistrées ne sont visibles que par votre propre entreprise.",
     "alAccount": "Vous avez déjà un compte ?",
     "meldAan": "Se connecter"
+  },
+  "fotobronnen": {
+    "titel": "Origine des photos des modèles",
+    "metaBeschrijving": "Auteur, licence et source de chaque photo de modèle du catalogue d'Autofiscaliteit.",
+    "intro": "Les {aantal} photos du catalogue proviennent de Wikimedia Commons. Vous trouverez ici, pour chaque photo, qui l'a prise, sous quelle licence elle est publiée et d'où elle vient.",
+    "uitleg": "Presque toutes les photos sont sous une licence Creative Commons qui exige la mention de l'auteur. Cette page est cette mention. La licence de chaque photo reste celle du photographe ; Autofiscaliteit ne revendique aucun droit dessus.",
+    "bewerking": "Les photos sont recadrées en 960 sur 600 pixels afin que la grille ne saute pas d'un format à l'autre. Il s'agit d'une modification : là où la licence exige le partage dans les mêmes conditions, la version recadrée est soumise à cette même licence.",
+    "kolomModel": "Modèle",
+    "kolomAuteur": "Auteur",
+    "kolomLicentie": "Licence",
+    "kolomBron": "Fichier sur Wikimedia Commons",
+    "terug": "Retour au <catalogus>catalogue</catalogus>.",
+    "voetnoot": "Photos de Wikimedia Commons"
   }
 }

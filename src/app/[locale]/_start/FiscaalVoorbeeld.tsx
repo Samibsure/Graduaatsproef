@@ -67,10 +67,13 @@ export default function FiscaalVoorbeeld() {
               <CarImage
                 type={wagen.voertuigtype}
                 segment={wagen.segment}
-                        carrosserie={wagen.carrosserie}
+                carrosserie={wagen.carrosserie}
                 imageUrl={wagen.image_url}
                 alt={`${wagen.merk} ${wagen.model}`}
                 className="h-full w-full object-cover"
+                // De enige foto boven de vouw op de startpagina; luie lading zou
+                // juist die vertragen.
+                eager
               />
             )}
           </div>

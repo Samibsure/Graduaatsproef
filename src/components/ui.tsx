@@ -340,10 +340,20 @@ export function TypeDot({ type }: { type: string }) {
     fossiel: "#ef4444",
   };
   return (
-    <span
-      className="inline-block h-2.5 w-2.5 rounded-full"
-      style={{ background: kleur[type] ?? "#94a3b8" }}
-      aria-hidden="true"
-    />
+    <>
+      <span
+        className="inline-block h-2.5 w-2.5 rounded-full"
+        style={{ background: kleur[type] ?? "#94a3b8" }}
+        aria-hidden="true"
+      />
+      {/*
+        In de vloottabellen is dit bolletje de énige aanduiding van de
+        aandrijving, en dat is fiscaal de zwaarste eigenschap van de wagen: het
+        verschil tussen 100% en 0% aftrek. Kleur als enige betekenisdrager gaat
+        voorbij aan wie kleurenblind is (WCAG 1.4.1) en aan elke schermlezer.
+        De code zelf is taalneutraal (BEV, PHEV, HEV) en hoeft niet vertaald.
+      */}
+      <span className="sr-only">{type}</span>
+    </>
   );
 }

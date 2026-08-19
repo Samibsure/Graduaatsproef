@@ -30,6 +30,27 @@ if (isGeheimeSleutel(supabaseSleutel)) {
   );
 }
 
+/*
+ * De terugval bestaat zodat een build nooit struikelt over een ontbrekende
+ * variabele, en dat blijft zo: de site plat leggen weegt zwaarder dan een
+ * publieke sleutel in de broncode. Maar ze wijst naar het productieproject.
+ * Draait een preview-deployment of een lokale build erop, dan schrijft die
+ * rechtstreeks in de échte databank, tussen de gegevens van echte bedrijven,
+ * zonder dat iets dat verraadt.
+ *
+ * Vandaar deze regel in het buildlogboek. Weigeren zou betekenen dat een
+ * vergeten variabele op Vercel de site plat legt, en dat is precies waar de
+ * terugval voor bedoeld is.
+ */
+if (!eersteWaarde(URL_NAMEN, process.env) || !eersteWaarde(SLEUTEL_NAMEN, process.env)) {
+  console.warn(
+    "\n  Let op: geen Supabase-configuratie in de omgeving gevonden.\n" +
+      `  Deze build praat met het standaardproject (${supabaseUrl}).\n` +
+      "  Zet NEXT_PUBLIC_SUPABASE_URL en NEXT_PUBLIC_SUPABASE_ANON_KEY om een\n" +
+      "  eigen project te gebruiken; zie .env.example.\n",
+  );
+}
+
 /**
  * De enige externe bestemming die de applicatie nodig heeft, is het eigen
  * Supabase-project. Door die expliciet te benoemen kan een ingespoten script
@@ -91,8 +112,23 @@ const nextConfig: NextConfig = {
           { key: "X-Frame-Options", value: "DENY" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           {
+            /*
+             * Eén jaar, en zonder `preload`.
+             *
+             * Het sleutelwoord `preload` zet op zichzelf niets in gang -- daarvoor
+             * moet het domein op hstspreload.org ingediend worden -- maar het is
+             * wel de verklaring dat je dat wil, en die stap is in de praktijk niet
+             * terug te draaien: eruit geraken duurt maanden en tot dan weigert
+             * elke browser elk subdomein over HTTP. Voor een domein dat vandaag
+             * voor het eerst live gaat, is dat een belofte die je pas hoort te
+             * doen als alles staat. Zet het er gerust bij zodra het draait.
+             *
+             * Twee jaar naar één jaar om dezelfde reden: even effectief tegen een
+             * downgrade-aanval, en een fout in de HTTPS-configuratie is de helft
+             * van de tijd bindend in plaats van het dubbele.
+             */
             key: "Strict-Transport-Security",
-            value: "max-age=63072000; includeSubDomains; preload",
+            value: "max-age=31536000; includeSubDomains",
           },
           {
             key: "Permissions-Policy",

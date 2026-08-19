@@ -1,7 +1,7 @@
 "use client";
 
 import { useLocale } from "next-intl";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { useTransition } from "react";
 import { usePathname, useRouter } from "@/i18n/navigation";
 import { TAALNAAM, routing, type Locale } from "@/i18n/routing";
@@ -10,6 +10,11 @@ import { TAALNAAM, routing, type Locale } from "@/i18n/routing";
  * Taalkeuze NL / FR / EN. Houdt de huidige pagina vast: wie op /fr/catalogus
  * naar Engels overschakelt, komt op /en/catalogus terecht en niet op de
  * startpagina.
+ *
+ * De queryreeks gaat mee. Zonder dat bouwde `router.replace` alleen het pad, en
+ * de simulator spiegelt haar volledige toestand bewust naar de URL zodat een
+ * resultaat te delen is: wie halverwege naar het Frans schakelde, stond terug op
+ * stap één met standaardwaarden. Precies daar is taal wisselen het waarschijnlijkst.
  */
 export default function Taalkiezer({
   variant = "licht",
@@ -19,6 +24,7 @@ export default function Taalkiezer({
   const locale = useLocale() as Locale;
   const pathname = usePathname();
   const params = useParams();
+  const zoek = useSearchParams();
   const router = useRouter();
   const [bezig, startOvergang] = useTransition();
 
@@ -28,7 +34,7 @@ export default function Taalkiezer({
       router.replace(
         // @ts-expect-error: pathname en params horen bij dezelfde route, maar
         // dat verband kan TypeScript hier niet zelf leggen.
-        { pathname, params },
+        { pathname, params, query: Object.fromEntries(zoek.entries()) },
         { locale: nieuw },
       );
     });
