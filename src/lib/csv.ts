@@ -79,9 +79,32 @@ export const MODEL_KOLOMMEN = [
 
 export type ModelKolom = (typeof MODEL_KOLOMMEN)[number];
 
+/**
+ * Tekens waarmee een spreadsheet een cel als formule leest.
+ *
+ * Excel en LibreOffice voeren `=HYPERLINK(...)` uit zodra het bestand opengaat.
+ * De omschrijving, het kenteken, de werknemer en de opmerking van een wagen
+ * worden vrij ingetypt, dus een collega met de rol `lid` kan zo'n cel in de
+ * vloot zetten en wachten tot de beheerder exporteert. De CHECK-constraint in de
+ * databank begrenst alleen de lengte, niet het eerste teken.
+ */
+const FORMULETEKENS = /^[=+\-@\t\r]/;
+
+/**
+ * Neutraliseert een cel die als formule gelezen zou worden.
+ *
+ * Een apostrof vooraan is de afspraak die Excel en LibreOffice allebei kennen:
+ * de cel wordt tekst en de apostrof zelf blijft onzichtbaar. `leesCsv` haalt hem
+ * er bij het inlezen weer af, zodat exporteren en opnieuw importeren dezelfde
+ * waarde oplevert.
+ */
+export function ontsnapFormule(tekst: string): string {
+  return FORMULETEKENS.test(tekst) ? `'${tekst}` : tekst;
+}
+
 function ontsnap(waarde: unknown): string {
   if (waarde === null || waarde === undefined) return "";
-  const tekst = String(waarde);
+  const tekst = ontsnapFormule(String(waarde));
   // Alleen aanhalingstekens zetten wanneer het moet: dat houdt het bestand
   // leesbaar wanneer iemand het in een editor opent.
   return /[",;\n\r]/.test(tekst) ? `"${tekst.replace(/"/g, '""')}"` : tekst;
@@ -136,6 +159,11 @@ export function csvSjabloon(): string {
 }
 
 /** Splitst één CSV-regel, met respect voor velden tussen aanhalingstekens. */
+/** Het spiegelbeeld van `ontsnapFormule`: de beschermende apostrof weghalen. */
+export function herstelFormule(tekst: string): string {
+  return tekst.startsWith("'") && FORMULETEKENS.test(tekst.slice(1)) ? tekst.slice(1) : tekst;
+}
+
 export function splitsRegel(regel: string, scheider: string): string[] {
   const velden: string[] = [];
   let huidig = "";
@@ -210,7 +238,10 @@ export function leesCsv<K extends string = CsvKolom>(
     const velden = splitsRegel(regel, scheider);
     const waarden: Partial<Record<K, string>> = {};
     kop.forEach((kolom, index) => {
-      if (bekend.has(kolom)) waarden[kolom as K] = (velden[index] ?? "").trim();
+      // De apostrof die de export voor een formuleteken zet, hoort er bij het
+      // inlezen weer af: anders komt een omschrijving die met een streepje
+      // begint terug met een apostrof ervoor.
+      if (bekend.has(kolom)) waarden[kolom as K] = herstelFormule((velden[index] ?? "").trim());
     });
     return { regelnummer: i + 2, waarden };
   });

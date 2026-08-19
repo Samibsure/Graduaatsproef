@@ -12,6 +12,7 @@ import {
 } from "@/components/AuthKaart";
 import { Link, useRouter } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { veiligPad } from "@/lib/taalpad";
 
 type Methode = "wachtwoord" | "link";
 
@@ -22,10 +23,10 @@ function AanmeldFormulier() {
   const params = useSearchParams();
   // Uit de queryparameter, dus van buitenaf te zetten. Zonder deze controle kan
   // een link met ?verder=//kwaadaardig.be de gebruiker na het aanmelden naar een
-  // andere site sturen; de servercallback controleerde dit al wel.
-  const gevraagd = params.get("verder");
-  const verder =
-    gevraagd && gevraagd.startsWith("/") && !gevraagd.startsWith("//") ? gevraagd : "/wagens";
+  // andere site sturen. De controle staat in veiligPad(), zodat ze hier en in
+  // de servercallback dezelfde is; twee eigen versies liepen uit de pas, en de
+  // versie hier liet een backslash door.
+  const verder = veiligPad(params.get("verder"));
 
   const [methode, setMethode] = useState<Methode>("wachtwoord");
   const [email, setEmail] = useState("");

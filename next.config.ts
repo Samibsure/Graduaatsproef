@@ -30,6 +30,27 @@ if (isGeheimeSleutel(supabaseSleutel)) {
   );
 }
 
+/*
+ * De terugval bestaat zodat een build nooit struikelt over een ontbrekende
+ * variabele, en dat blijft zo: de site plat leggen weegt zwaarder dan een
+ * publieke sleutel in de broncode. Maar ze wijst naar het productieproject.
+ * Draait een preview-deployment of een lokale build erop, dan schrijft die
+ * rechtstreeks in de échte databank, tussen de gegevens van echte bedrijven,
+ * zonder dat iets dat verraadt.
+ *
+ * Vandaar deze regel in het buildlogboek. Weigeren zou betekenen dat een
+ * vergeten variabele op Vercel de site plat legt, en dat is precies waar de
+ * terugval voor bedoeld is.
+ */
+if (!eersteWaarde(URL_NAMEN, process.env) || !eersteWaarde(SLEUTEL_NAMEN, process.env)) {
+  console.warn(
+    "\n  Let op: geen Supabase-configuratie in de omgeving gevonden.\n" +
+      `  Deze build praat met het standaardproject (${supabaseUrl}).\n` +
+      "  Zet NEXT_PUBLIC_SUPABASE_URL en NEXT_PUBLIC_SUPABASE_ANON_KEY om een\n" +
+      "  eigen project te gebruiken; zie .env.example.\n",
+  );
+}
+
 /**
  * De enige externe bestemming die de applicatie nodig heeft, is het eigen
  * Supabase-project. Door die expliciet te benoemen kan een ingespoten script

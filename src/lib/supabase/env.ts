@@ -17,3 +17,21 @@ export function supabaseConfig() {
 
   return { url, key };
 }
+
+/**
+ * Draait deze omgeving op de terugval in plaats van op eigen configuratie?
+ *
+ * De terugval bestaat zodat een build nooit struikelt over een ontbrekende
+ * variabele; de site plat leggen weegt zwaarder dan een publieke sleutel in de
+ * broncode. Maar ze wijst naar het productieproject, en dat betekent dat een
+ * `npm run dev` zonder .env.local en elke preview-deployment zonder variabelen
+ * rechtstreeks in de échte databank schrijven -- tussen de gegevens van echte
+ * bedrijven, zonder dat iets op het scherm dat verraadt.
+ *
+ * Deze functie maakt dat zichtbaar in plaats van het te verbieden. Weigeren zou
+ * betekenen dat een vergeten variabele op Vercel de site plat legt, en dat was
+ * precies de reden waarom de terugval er kwam.
+ */
+export function draaitOpTerugval(): boolean {
+  return !process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+}
