@@ -10,7 +10,8 @@ import Nav from "@/components/Nav";
 import { SessieProvider } from "@/components/SessieProvider";
 import { SteunKnop } from "@/components/Steun";
 import { Link } from "@/i18n/navigation";
-import { TAALTAG, routing } from "@/i18n/routing";
+import { TAALTAG, routing, type Locale } from "@/i18n/routing";
+import { paginaAlternates } from "@/lib/metadata";
 import { VOETTEKST_KOLOMMEN } from "@/lib/navigatie";
 import { laadSessie } from "@/lib/sessie";
 
@@ -47,16 +48,16 @@ export async function generateMetadata({
     metadataBase: new URL(SITE_URL),
     title: { default: t("titel"), template: t("sjabloon", { pagina: "%s" }) },
     description: t("beschrijving"),
-    alternates: {
-      // hreflang, zodat Google de Franstalige versie aan Waalse bezoekers toont
-      // in plaats van drie versies als duplicaten te behandelen.
-      languages: Object.fromEntries(
-        routing.locales.map((l) => [
-          TAALTAG[l],
-          l === routing.defaultLocale ? "/" : `/${l}`,
-        ]),
-      ),
-    },
+    /*
+     * De startpagina. Elke andere pagina zet haar eigen alternates via
+     * paginaAlternates(); zonder dat erfde ze deze, en verklaarde ze dus dat
+     * haar Franse en Engelse tegenhanger de startpagina was.
+     *
+     * De canonical hoort er ook bij: campagnelinks hangen er graag
+     * queryparameters aan, en zonder canonical is elke variant voor een
+     * zoekmachine een aparte pagina met dezelfde inhoud.
+     */
+    alternates: paginaAlternates(locale as Locale, ""),
     openGraph: {
       type: "website",
       locale: TAALTAG[locale as keyof typeof TAALTAG]?.replace("-", "_"),
