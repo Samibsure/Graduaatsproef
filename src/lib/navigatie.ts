@@ -107,6 +107,10 @@ export const VOETTEKST_KOLOMMEN: readonly { sleutel: string; links: readonly Nav
     links: [
       { href: "/privacy", sleutel: "privacy" },
       { href: "/voorwaarden", sleutel: "voorwaarden" },
+      // De naamsvermelding die CC BY en CC BY-SA verplichten. Ze stond alleen in
+      // public/cars/BRONNEN.md, en een bestand in de repository is geen
+      // vermelding voor wie de site bezoekt.
+      { href: "/fotobronnen", sleutel: "fotobronnen" },
     ],
   },
 ];

@@ -84,6 +84,27 @@ describe("de CO2-drempel", () => {
     expect(co2Drempel(oud)).toBe(50);
     expect(beoordeelValseHybride(oud).isValseHybride).toBe(true);
   });
+
+  /*
+   * De toets is `co2 > drempel`, dus de drempel zelf hoort er nog bij. De tests
+   * hierboven staan op 40 en 60 g/km en raken de kantelwaarde dus nooit: een
+   * verschuiving van één gram of een omslag naar `>=` bleef onzichtbaar,
+   * terwijl dat het verschil is tussen de echte uitstoot en die maal 2,5.
+   */
+  it.each([
+    [50, false],
+    [51, true],
+  ])("kantelt bij %i g/km op de gewone drempel naar %s", (co2, verwacht) => {
+    expect(beoordeelValseHybride({ ...phev, co2 }).isValseHybride).toBe(verwacht);
+  });
+
+  it.each([
+    [75, false],
+    [76, true],
+  ])("kantelt bij %i g/km op de Euro 6e-bis-drempel naar %s", (co2, verwacht) => {
+    const nieuw = { ...phev, besteldatum: "2025-04-01", euronorm: "euro6e-bis" as const, co2 };
+    expect(beoordeelValseHybride(nieuw).isValseHybride).toBe(verwacht);
+  });
 });
 
 describe("de gecorrigeerde uitstoot in de berekening", () => {

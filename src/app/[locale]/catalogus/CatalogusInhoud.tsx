@@ -44,6 +44,7 @@ export default function CatalogusInhoud() {
   const t = useTranslations("catalogus");
   const tJaar = useTranslations("besteljaar");
   const tKosten = useTranslations("kosten");
+  const tFoto = useTranslations("fotobronnen");
   const { euro, pct, getal } = formatters(useLocale());
   const sessie = useSessie();
   const router = useRouter();
@@ -542,6 +543,18 @@ export default function CatalogusInhoud() {
               </Button>
             </div>
           )}
+
+          {/*
+            CC BY en CC BY-SA vragen de naamsvermelding dáár waar het werk
+            gebruikt wordt. Deze regel staat onder het raster; de volledige lijst
+            met auteur, licentie en bronlink staat op /fotobronnen.
+          */}
+          <p className="mt-10 text-center text-[13px] text-ink-500">
+            {tFoto("voetnoot")}{" "}
+            <Link href="/fotobronnen" className="underline underline-offset-2">
+              {tFoto("titel")}
+            </Link>
+          </p>
         </>
       )}
 

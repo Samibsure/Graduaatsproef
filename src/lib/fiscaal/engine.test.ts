@@ -67,6 +67,17 @@ describe("aftrekbaarheid (Tabel 1 en Bijlage 3)", () => {
     }
   });
 
+  it.each([
+    ["2026-12-31", 100],
+    ["2027-01-01", 95],
+  ])("BEV besteld op %s houdt levenslang %i%%", (besteldatum, verwacht) => {
+    // De duurste dag in de hele applicatie voor een elektrische wagen: één dag
+    // later kost vijf procentpunten aftrek, voor de hele gebruiksduur.
+    const wagen = { ...bev, besteldatum };
+    expect(aftrekPct(ctx, wagen, 2027)).toBe(verwacht);
+    expect(aftrekPct(ctx, wagen, 2031)).toBe(verwacht);
+  });
+
   it("BEV besteld in 2027 valt in het afbouwpad op 95%", () => {
     const bev2027 = { ...bev, besteldatum: "2027-02-01" };
     expect(aftrekPct(ctx, bev2027, 2027)).toBe(95);

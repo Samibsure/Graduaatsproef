@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useCallback, useEffect, useState } from "react";
 import { Melding, Veld, invoerKlasse } from "@/components/AuthKaart";
 import Dialoog from "@/components/Dialoog";
@@ -10,6 +10,7 @@ import { useSessie } from "@/components/SessieProvider";
 import { Badge, Card, Container, PageHead, SectionTitle } from "@/components/ui";
 import { bewaarBedrijfsprofiel, wijzigRol, type BedrijfsInvoer } from "@/lib/bedrijf";
 import { ROLLEN, magBeheren, type Bedrijfsrol } from "@/lib/rollen";
+import { voorvoegsel } from "@/lib/taalpad";
 import {
   laadTeam,
   laadUitnodigingen,
@@ -32,6 +33,7 @@ const ROL_TINT: Record<Bedrijfsrol, string> = {
 
 export default function InstellingenPagina() {
   const t = useTranslations("instellingen");
+  const locale = useLocale();
   const sessie = useSessie();
   const isBeheerder = magBeheren(sessie);
 
@@ -106,7 +108,10 @@ export default function InstellingenPagina() {
     setBezig(true);
     try {
       await verwijderMijnBedrijf();
-      window.location.href = "/";
+      // Met het taalvoorvoegsel: "/" is altijd Nederlands bij localePrefix
+        // "as-needed", en een Waalse beheerder landde na het verwijderen van zijn
+        // bedrijf dus op een Nederlandstalige startpagina.
+        window.location.href = `${voorvoegsel(locale)}/`;
     } catch (e) {
       setFout(e instanceof Error ? e.message : String(e));
       setBezig(false);

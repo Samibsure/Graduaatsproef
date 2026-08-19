@@ -16,8 +16,12 @@ const PUBLIEK = [
   { pad: "/handleiding", prioriteit: 0.6 },
   { pad: "/over", prioriteit: 0.5 },
   { pad: "/steunen", prioriteit: 0.4 },
+  // Publiek en niet verboden in robots.ts, dus ze horen hier ook te staan.
+  { pad: "/registreren", prioriteit: 0.6 },
+  { pad: "/aanmelden", prioriteit: 0.4 },
   { pad: "/privacy", prioriteit: 0.3 },
   { pad: "/voorwaarden", prioriteit: 0.3 },
+  { pad: "/fotobronnen", prioriteit: 0.2 },
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {

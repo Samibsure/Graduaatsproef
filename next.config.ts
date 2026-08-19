@@ -112,8 +112,23 @@ const nextConfig: NextConfig = {
           { key: "X-Frame-Options", value: "DENY" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           {
+            /*
+             * Eén jaar, en zonder `preload`.
+             *
+             * Het sleutelwoord `preload` zet op zichzelf niets in gang -- daarvoor
+             * moet het domein op hstspreload.org ingediend worden -- maar het is
+             * wel de verklaring dat je dat wil, en die stap is in de praktijk niet
+             * terug te draaien: eruit geraken duurt maanden en tot dan weigert
+             * elke browser elk subdomein over HTTP. Voor een domein dat vandaag
+             * voor het eerst live gaat, is dat een belofte die je pas hoort te
+             * doen als alles staat. Zet het er gerust bij zodra het draait.
+             *
+             * Twee jaar naar één jaar om dezelfde reden: even effectief tegen een
+             * downgrade-aanval, en een fout in de HTTPS-configuratie is de helft
+             * van de tijd bindend in plaats van het dubbele.
+             */
             key: "Strict-Transport-Security",
-            value: "max-age=63072000; includeSubDomains; preload",
+            value: "max-age=31536000; includeSubDomains",
           },
           {
             key: "Permissions-Policy",

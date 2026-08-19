@@ -392,14 +392,26 @@ export default function VergelijkingPagina() {
             <div className="overflow-hidden rounded-[14px] border border-line">
               <div className="bs-cmp-scroll">
                 <table className="bs-cmp-table w-full text-[15px]">
+                  {/*
+                    Deze tabel schuift horizontaal en telt acht rijen naast vier
+                    kolommen. Zonder scope en rijkoppen kan een schermlezer geen
+                    enkele cel aan een kop koppelen: de gebruiker hoort losse
+                    bedragen zonder te weten waarvan, en van welke wagen. Alle
+                    andere tabellen in de applicatie doen dit al goed.
+                  */}
+                  <caption className="sr-only">{t("kerncijfersTitel")}</caption>
                   <thead>
                     <tr>
-                      <th className="bs-sticky-col min-w-[200px] border-b border-line px-5 py-[18px] text-left align-bottom text-[12px] font-bold uppercase tracking-[0.1em] text-ink-500">
+                      <th
+                        scope="col"
+                        className="bs-sticky-col min-w-[200px] border-b border-line px-5 py-[18px] text-left align-bottom text-[12px] font-bold uppercase tracking-[0.1em] text-ink-500"
+                      >
                         {t("criterium")}
                       </th>
                       {cmp.map((c) => (
                         <th
                           key={c.id}
+                          scope="col"
                           data-win={winner?.id === c.id}
                           className="min-w-[150px] border-b border-line px-5 py-4 text-left"
                         >
@@ -414,9 +426,12 @@ export default function VergelijkingPagina() {
                       const bi = bestIndex(r.get, r.best);
                       return (
                         <tr key={r.label} className="border-b border-line last:border-0">
-                          <td className="bs-sticky-col px-5 py-[15px] font-bold text-ink-700">
+                          <th
+                            scope="row"
+                            className="bs-sticky-col px-5 py-[15px] text-left font-bold text-ink-700"
+                          >
                             {r.label}
-                          </td>
+                          </th>
                           {cmp.map((c, i) => (
                             <td key={c.id} data-win={winner?.id === c.id} className="px-5 py-[15px]">
                               <span className="inline-flex items-center gap-2">
@@ -473,15 +488,20 @@ export default function VergelijkingPagina() {
             <div className="overflow-hidden rounded-[14px] border border-line">
               <div className="bs-cmp-scroll">
                 <table className="bs-cmp-table w-full text-[15px]">
+                  <caption className="sr-only">{t("scoringsmatrix")}</caption>
                   <thead>
                     <tr>
-                      <th className="bs-sticky-col min-w-[220px] border-b border-line px-5 py-4 text-left text-[12px] font-bold uppercase tracking-[0.1em] text-ink-500">
+                      <th
+                        scope="col"
+                        className="bs-sticky-col min-w-[220px] border-b border-line px-5 py-4 text-left text-[12px] font-bold uppercase tracking-[0.1em] text-ink-500"
+                      >
                         {t("criterium")}{" "}
                         <span className="font-normal normal-case tracking-normal">{t("gewicht")}</span>
                       </th>
                       {cmp.map((c) => (
                         <th
                           key={c.id}
+                          scope="col"
                           data-win={winner?.id === c.id}
                           className="min-w-[160px] border-b border-line px-5 py-4 text-left text-[15px] font-bold text-ink"
                         >
@@ -496,10 +516,10 @@ export default function VergelijkingPagina() {
                       const max = Math.max(...vals);
                       return (
                         <tr key={cr.code} className="border-b border-line">
-                          <td className="bs-sticky-col px-5 py-4 text-ink-700">
+                          <th scope="row" className="bs-sticky-col px-5 py-4 text-left text-ink-700">
                             <span className="font-bold">{critNaam(cr.code)}</span>{" "}
                             <span className="text-[13px] text-ink-500">· {Math.round(cr.weging * 100)}%</span>
-                          </td>
+                          </th>
                           {cmp.map((c) => {
                             const s = c.scores[cr.code] ?? 0;
                             return (

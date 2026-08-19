@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   AuthKaart,
   Melding,
@@ -9,7 +9,7 @@ import {
   invoerKlasse,
   knopKlasse,
 } from "@/components/AuthKaart";
-import { useRouter } from "@/i18n/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 export default function WachtwoordHerstellenPagina() {
@@ -19,6 +19,20 @@ export default function WachtwoordHerstellenPagina() {
   const [herhaal, setHerhaal] = useState("");
   const [bezig, setBezig] = useState(false);
   const [fout, setFout] = useState<string | null>(null);
+  /*
+   * Zonder herstelsessie faalt updateUser met "Auth session missing!", en die
+   * Engelse technische tekst kwam letterlijk op het scherm, zonder uitweg. Dat
+   * gebeurt vaker dan het lijkt: een herstellink is eenmalig, en wie deze pagina
+   * bewaard heeft of hem een dag later opnieuw opent, heeft er geen meer.
+   */
+  const [heeftSessie, setHeeftSessie] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    createClient()
+      .auth.getUser()
+      .then(({ data }) => setHeeftSessie(!!data.user))
+      .catch(() => setHeeftSessie(false));
+  }, []);
 
   async function opslaan(e: React.FormEvent) {
     e.preventDefault();
@@ -41,6 +55,25 @@ export default function WachtwoordHerstellenPagina() {
     } finally {
       setBezig(false);
     }
+  }
+
+  if (heeftSessie === false) {
+    return (
+      <AuthKaart
+        titel={t("nieuwWachtwoordTitel")}
+        intro={t("nieuwWachtwoordIntro")}
+        voettekst={
+          <Link
+            href="/wachtwoord-vergeten"
+            className="font-bold text-ink underline underline-offset-2"
+          >
+            {t("nieuweLinkVragen")}
+          </Link>
+        }
+      >
+        <Melding soort="let-op">{t("geenHerstelsessie")}</Melding>
+      </AuthKaart>
+    );
   }
 
   return (

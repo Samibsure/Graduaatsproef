@@ -602,7 +602,13 @@ export default function WagensPagina() {
             {wagens.length === 0 && (
               <tr>
                 <td colSpan={10} className="px-4 py-10 text-center text-ink-500">
-                  {geladen ? t("leeg") : t("laden")}
+                  {/*
+                    Drie toestanden, geen twee. Bij een mislukte laadpoging bleef
+                    `wagens` leeg en stond hier "nog geen wagens" terwijl de
+                    gebruiker er twintig heeft: de tabel sprak de foutbalk erboven
+                    actief tegen.
+                  */}
+                  {fout ? t("nietGeladen") : geladen ? t("leeg") : t("laden")}
                 </td>
               </tr>
             )}

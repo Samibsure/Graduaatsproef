@@ -104,6 +104,17 @@ jobs:
             exit 0
           fi
 
+          # De doelbranch komt uit een workflow_dispatch-invoer en gaat naar een
+          # geforceerde push. Het commentaar hierboven belooft "nooit rechtstreeks
+          # op main", maar niets dwong dat af: één typefout in het invoerveld en
+          # de geschiedenis van main was overschreven.
+          case "$DOEL" in
+            main|master|HEAD|"")
+              echo "::error::De doelbranch mag nooit '$DOEL' zijn."
+              exit 1
+              ;;
+          esac
+
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 

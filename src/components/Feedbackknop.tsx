@@ -4,7 +4,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useId, useRef, useState } from "react";
 import Icon from "@/components/Icon";
 import { Button, Melding, Veld, invoerKlassen } from "@/components/ui";
-import { usePathname } from "@/i18n/navigation";
+import { Link, usePathname } from "@/i18n/navigation";
 import {
   FEEDBACK_EMAIL,
   feedbackMailto,
@@ -182,14 +182,22 @@ export default function Feedbackknop() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="jij@bedrijf.be"
+                  placeholder={t("emailPlaceholder")}
                   className={invoerKlassen}
                 />
               </Veld>
 
               {fout && <Melding soort="fout">{fout}</Melding>}
 
-              <p className="m-0 text-[12px] leading-relaxed text-ink-500">{t("privacy")}</p>
+              <p className="m-0 text-[12px] leading-relaxed text-ink-500">
+                {t.rich("privacy", {
+                  beleid: (chunks) => (
+                    <Link href="/privacy" className="underline underline-offset-2">
+                      {chunks}
+                    </Link>
+                  ),
+                })}
+              </p>
 
               <Button
                 className="w-full"
@@ -207,9 +215,15 @@ export default function Feedbackknop() {
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
         aria-controls={paneelId}
+        aria-label={t("knop")}
         className="ml-auto inline-flex h-12 items-center gap-2 rounded-full border border-line bg-white px-4 text-[14px] font-bold text-ink shadow-diep transition-colors hover:border-ink-500 hover:bg-paper"
       >
         <Icon name={open ? "x" : "message-square"} size={18} />
+        {/*
+          Onder 640px verbergt `hidden` het label ook voor een schermlezer, en
+          dan staat er op elke pagina van de site een knop zonder naam. De
+          aria-label vult dat gat zonder de vormgeving te raken.
+        */}
         <span className="hidden sm:inline">{t("knop")}</span>
       </button>
     </div>

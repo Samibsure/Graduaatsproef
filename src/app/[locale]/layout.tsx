@@ -96,8 +96,22 @@ export default async function RootLayout({
       <body className="antialiased flex min-h-screen flex-col">
         <NextIntlClientProvider>
           <SessieProvider sessie={sessie}>
+            {/*
+              De eerste tab op elke pagina. Zonder skiplink moet wie met het
+              toetsenbord navigeert eerst door de volledige navigatie, en dat is
+              op elke pagina opnieuw (WCAG 2.4.1). Hij is onzichtbaar tot hij
+              focus krijgt.
+            */}
+            <a
+              href="#inhoud"
+              className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-[10px] focus:bg-ink focus:px-4 focus:py-2.5 focus:text-[14px] focus:font-bold focus:text-white"
+            >
+              {t("naarInhoud")}
+            </a>
             <Nav />
-            <main className="flex-1">{children}</main>
+            <main id="inhoud" className="flex-1">
+              {children}
+            </main>
             {/* Op elke pagina bereikbaar. Voor een rekentool is "dit cijfer
                 klopt niet" het waardevolste signaal dat er bestaat, en dat mag
                 niet afhangen van een e-mailadres in een alinea op /over. */}
