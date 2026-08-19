@@ -28,6 +28,10 @@ const MET_RUST = [
   "/robots.txt",
   "/sitemap.xml",
   "/cars/bmw-i4.jpg",
+  // Zit wél onder [locale], maar mag niet omgeleid worden: niet elke scraper
+  // volgt een 307 voor een og:image.
+  "/nl/opengraph-image",
+  "/fr/opengraph-image",
   "/icon.svg",
   "/favicon.ico",
   "/_next/static/chunk.js",

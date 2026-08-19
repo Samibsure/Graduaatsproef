@@ -7,6 +7,7 @@ import Uitfaseringblok from "@/components/Uitfaseringblok";
 import { Badge, Melding, Tabel } from "@/components/ui";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
+import { paginaAlternates } from "@/lib/metadata";
 import { ZEKERHEID_TINT } from "@/lib/fiscaal/bronnen";
 import { DEFAULT_CONTEXT } from "@/lib/fiscaal/defaults";
 import {
@@ -112,7 +113,11 @@ const DIESEL: Vehicle = {
 export async function generateMetadata({ params }: { params: Promise<{ locale: Locale }> }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "fiscaalKader" });
-  return { title: t("titel"), description: t("metaBeschrijving") };
+  return {
+    title: t("titel"),
+    description: t("metaBeschrijving"),
+    alternates: paginaAlternates(locale, "/fiscaal-kader"),
+  };
 }
 
 export default async function FiscaalKaderPagina({

@@ -25,8 +25,17 @@ export const config = {
      *
      * De routehandlers maken hun eigen Supabase-client (zie
      * src/lib/supabase/server.ts) en hebben de sessieverversing hier dus niet
-     * nodig. `src/middleware.test.ts` bewaakt deze lijst.
+     * nodig.
+     *
+     * De og-afbeelding staat er om een andere reden bij. Die route zit wél onder
+     * [locale], maar Next zet in de metadata de URL met voorvoegsel
+     * (/nl/opengraph-image), en next-intl stuurt dat bij "as-needed" met een 307
+     * door naar /opengraph-image. Niet elke scraper volgt zo'n omleiding voor een
+     * og:image, en dan blijft de kaart alsnog leeg. Zonder middleware serveert
+     * Next de route rechtstreeks.
+     *
+     * `src/middleware.test.ts` bewaakt deze lijst.
      */
-    "/((?!auth/|afmelden|robots.txt|sitemap.xml|_next/static|_next/image|favicon.ico|cars/|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
+    "/((?!auth/|afmelden|robots.txt|sitemap.xml|.*opengraph-image|_next/static|_next/image|favicon.ico|cars/|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
   ],
 };

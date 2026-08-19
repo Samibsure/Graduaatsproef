@@ -8,11 +8,16 @@ import {
   opmaak,
 } from "@/components/Juridisch";
 import type { Locale } from "@/i18n/routing";
+import { paginaAlternates } from "@/lib/metadata";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: Locale }> }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "voorwaarden" });
-  return { title: t("titel"), description: t("metaBeschrijving") };
+  return {
+    title: t("titel"),
+    description: t("metaBeschrijving"),
+    alternates: paginaAlternates(locale, "/voorwaarden"),
+  };
 }
 
 export default async function VoorwaardenPagina({

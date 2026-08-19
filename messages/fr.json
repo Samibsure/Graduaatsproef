@@ -101,7 +101,8 @@
     "wachtwoordenVerschillen": "Les deux mots de passe ne correspondent pas.",
     "wachtwoordOpslaan": "Enregistrer le mot de passe",
     "gratisStartenKnop": "Commencer gratuitement",
-    "uitnodigingHerkend": "Une entreprise vous a invité. Inscrivez-vous avec l'adresse à laquelle vous avez reçu l'invitation et vous rejoindrez directement cette entreprise."
+    "uitnodigingHerkend": "Une entreprise vous a invité. Inscrivez-vous avec l'adresse à laquelle vous avez reçu l'invitation et vous rejoindrez directement cette entreprise.",
+    "linkVerlopen": "Ce lien ne fonctionne plus. Il a expiré ou a déjà été utilisé, parfois parce qu'un filtre antispam l'a ouvert au préalable. <nieuwe>Demandez un nouveau lien</nieuwe> et réessayez."
   },
   "instellingen": {
     "intro": "Gérez les données de votre entreprise, vos collègues et vos données.",
@@ -731,7 +732,8 @@
     "voorbehoud_bmwIx3Generatie": "La liste belge montre l'ancienne G08 ; les chiffres de la Neue Klasse ne sont pas confirmés.",
     "voorbehoud_bmwX5Ontbreekt": "La xDrive50e ne figure pas dans la liste de prix belge consultée, seule la xDrive45e plus ancienne y apparaît.",
     "voorbehoud_co2NietGevonden": "Aucun chiffre CO₂ homologué retrouvé pour la version belge. Pour une hybride rechargeable, c'est précisément ce chiffre qui détermine l'ATN et la cotisation.",
-    "restwaardeSchatting": "La valeur résiduelle est une estimation par type de motorisation, pas par modèle : un chiffre belge reconnu par modèle n'existe pas."
+    "restwaardeSchatting": "La valeur résiduelle est une estimation par type de motorisation, pas par modèle : un chiffre belge reconnu par modèle n'existe pas.",
+    "geenRechten": "Pas de droits d'écriture"
   },
   "parameters": {
     "titel": "Paramètres fiscaux",
@@ -1049,7 +1051,8 @@
     "critCo2Uitleg": "Score basé sur les émissions de CO₂ du véhicule.",
     "critRest": "Valeur résiduelle",
     "critRestUitleg": "Valeur résiduelle attendue après quatre ans ; score manuel par véhicule.",
-    "critNut": "Utilité pratique"
+    "critNut": "Utilité pratique",
+    "geenRechten": "Votre rôle ne permet pas d'enregistrer des décisions. Demandez des droits d'écriture à votre administrateur."
   },
   "welkom": {
     "titel": "Bienvenue sur Autofiscaliteit",
@@ -1292,7 +1295,8 @@
     "deelTekst": "Tous vos choix figurent dans le lien. Qui l'ouvre voit exactement ce résultat.",
     "deelKopieer": "Copier le lien",
     "deelGekopieerd": "Copié",
-    "deelLabel": "Copier le lien vers ce calcul"
+    "deelLabel": "Copier le lien vers ce calcul",
+    "metaBeschrijving": "Calculez entièrement une voiture de société : déductibilité, avantage de toute nature, dépenses non admises, cotisation ONSS et coût d'usage total. Gratuit et sans inscription."
   },
   "besteljaar": {
     "titel": "Ce que change l'année de commande",

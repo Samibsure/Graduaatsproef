@@ -25,6 +25,7 @@ import { berekenUitfasering, type Uitfasering } from "@/lib/fiscaal/uitfasering"
 import { CRITERIA_UITGEBREID, scoreVergelijking } from "@/lib/fiscaal/scoring";
 import type { CatalogCar, FiscaleContext, Vehicle } from "@/lib/fiscaal/types";
 import { formatters } from "@/lib/format";
+import { magSchrijven } from "@/lib/rollen";
 
 const MAX_KANDIDATEN = 3;
 const JAREN = [2025, 2026, 2027, 2028, 2029, 2030];
@@ -37,6 +38,7 @@ export default function VergelijkingPagina() {
   const locale = useLocale();
   const { euro, getal, pct } = formatters(locale);
   const sessie = useSessie();
+  const magBewaren = magSchrijven(sessie);
   const [ctx, setCtx] = useState<FiscaleContext | null>(null);
   const [wagens, setWagens] = useState<Vehicle[]>([]);
   const [catalogus, setCatalogus] = useState<CatalogCar[]>([]);
@@ -602,31 +604,52 @@ export default function VergelijkingPagina() {
             <p className="m-0 mb-4 text-[14px] text-ink-500">
               {t("bewarenIntro")}
             </p>
-            <div className="grid gap-3 sm:grid-cols-2">
-              <input
-                value={titel}
-                onChange={(e) => setTitel(e.target.value)}
-                placeholder={t("titelPlaceholder")}
-                className="bs-inp h-[44px] rounded-[10px] px-3.5 text-[15px]"
-              />
-              <input
-                value={notitie}
-                onChange={(e) => setNotitie(e.target.value)}
-                placeholder={t("notitiePlaceholder")}
-                className="bs-inp h-[44px] rounded-[10px] px-3.5 text-[15px]"
-              />
-            </div>
-            <div className="mt-4 flex items-center gap-3">
-              <button
-                onClick={bewaarBeslissing}
-                disabled={bezig}
-                className="inline-flex h-[46px] items-center gap-2 rounded-[11px] bg-gold px-6 text-[15px] font-bold text-white transition-colors hover:bg-gold-hover disabled:opacity-50"
-              >
-                <Icon name="check" size={17} />
-                {bezig ? t("bezig") : t("bewaarBeslissing")}
-              </button>
-              {bewaard && <span className="text-sm font-medium text-emerald-700">{t("bewaard")}</span>}
-            </div>
+            {/*
+              De policy `evaluations_insert` eist mag_schrijven(). Zonder deze
+              controle kon een lezer het formulier invullen, op bewaren klikken en
+              een rauwe Engelse RLS-fout krijgen -- bovenaan een zeer lange pagina,
+              dus buiten beeld. De andere pagina's verbergen hun schrijfacties wel.
+            */}
+            {magBewaren ? (
+              <>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <Veldje label={t("titelPlaceholder")}>
+                    <input
+                      value={titel}
+                      onChange={(e) => setTitel(e.target.value)}
+                      placeholder={t("titelPlaceholder")}
+                      className="bs-inp h-[44px] w-full rounded-[10px] px-3.5 text-[15px]"
+                    />
+                  </Veldje>
+                  <Veldje label={t("notitiePlaceholder")}>
+                    <input
+                      value={notitie}
+                      onChange={(e) => setNotitie(e.target.value)}
+                      placeholder={t("notitiePlaceholder")}
+                      className="bs-inp h-[44px] w-full rounded-[10px] px-3.5 text-[15px]"
+                    />
+                  </Veldje>
+                </div>
+                <div className="mt-4 flex flex-wrap items-center gap-3">
+                  <button
+                    onClick={bewaarBeslissing}
+                    disabled={bezig}
+                    className="inline-flex h-[46px] items-center gap-2 rounded-[11px] bg-gold px-6 text-[15px] font-bold text-white transition-colors hover:bg-gold-hover disabled:opacity-50"
+                  >
+                    <Icon name="check" size={17} />
+                    {bezig ? t("bezig") : t("bewaarBeslissing")}
+                  </button>
+                  {bewaard && (
+                    <span className="text-sm font-medium text-emerald-700">{t("bewaard")}</span>
+                  )}
+                  {/* Ook naast de knop, niet alleen bovenaan de pagina: deze
+                      sectie staat onderaan een lange pagina. */}
+                  {fout && <span className="text-sm font-medium text-danger">{fout}</span>}
+                </div>
+              </>
+            ) : (
+              <p className="m-0 text-[14px] text-ink-500">{t("geenRechten")}</p>
+            )}
             {/* Pas nadat de tool iets opgeleverd heeft, en dan één regel. */}
             {bewaard && <SteunNoot className="mt-4 border-t border-line pt-4" />}
           </div>
@@ -733,4 +756,18 @@ function BarChart({
   );
 }
 
-
+/**
+ * Een invoerveld met een zichtbaar-voor-schermlezers label.
+ *
+ * De twee velden hier hadden alleen een placeholder. Dat is geen toegankelijke
+ * naam volgens WCAG, en hij verdwijnt zodra er getypt wordt: wie terugkomt ziet
+ * twee identieke vakken zonder opschrift.
+ */
+function Veldje({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <label className="block">
+      <span className="sr-only">{label}</span>
+      {children}
+    </label>
+  );
+}

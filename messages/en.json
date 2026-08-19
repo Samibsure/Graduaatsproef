@@ -101,7 +101,8 @@
     "wachtwoordenVerschillen": "The two passwords do not match.",
     "wachtwoordOpslaan": "Save password",
     "gratisStartenKnop": "Start for free",
-    "uitnodigingHerkend": "A company has invited you. Register with the address where you received the invitation and you will join that company straight away."
+    "uitnodigingHerkend": "A company has invited you. Register with the address where you received the invitation and you will join that company straight away.",
+    "linkVerlopen": "This link no longer works. It has expired or was already used, sometimes because a spam filter opened it beforehand. <nieuwe>Request a new link</nieuwe> and try again."
   },
   "instellingen": {
     "intro": "Manage your company details, your colleagues and your data.",
@@ -731,7 +732,8 @@
     "voorbehoud_bmwIx3Generatie": "The Belgian price list shows the old G08; the Neue Klasse figures are unconfirmed.",
     "voorbehoud_bmwX5Ontbreekt": "The xDrive50e does not appear in the Belgian price list consulted, only the older xDrive45e.",
     "voorbehoud_co2NietGevonden": "No homologated CO₂ figure found for the Belgian version. For a plug-in hybrid that figure is exactly what determines the benefit in kind and the contribution.",
-    "restwaardeSchatting": "The residual value is an estimate per drivetrain, not per model: a recognised Belgian per-model figure does not exist."
+    "restwaardeSchatting": "The residual value is an estimate per drivetrain, not per model: a recognised Belgian per-model figure does not exist.",
+    "geenRechten": "No write access"
   },
   "parameters": {
     "titel": "Tax parameters",
@@ -1049,7 +1051,8 @@
     "critCo2Uitleg": "Score based on the vehicle's CO₂ emissions.",
     "critRest": "Residual value",
     "critRestUitleg": "Expected residual value after four years; manual score per vehicle.",
-    "critNut": "Practical usefulness"
+    "critNut": "Practical usefulness",
+    "geenRechten": "Your role cannot save decisions. Ask your administrator for write access."
   },
   "welkom": {
     "titel": "Welcome to Autofiscaliteit",
@@ -1292,7 +1295,8 @@
     "deelTekst": "All your choices sit in the link. Whoever opens it sees exactly this result.",
     "deelKopieer": "Copy link",
     "deelGekopieerd": "Copied",
-    "deelLabel": "Copy the link to this calculation"
+    "deelLabel": "Copy the link to this calculation",
+    "metaBeschrijving": "Work out one company car in full: deductibility, benefit in kind, disallowed expenses, social security contribution and total cost of use. Free and without registration."
   },
   "besteljaar": {
     "titel": "What the order year changes",

@@ -10,7 +10,7 @@ import Nav from "@/components/Nav";
 import { SessieProvider } from "@/components/SessieProvider";
 import { SteunKnop } from "@/components/Steun";
 import { Link } from "@/i18n/navigation";
-import { INTL_LOCALE, routing } from "@/i18n/routing";
+import { TAALTAG, routing } from "@/i18n/routing";
 import { VOETTEKST_KOLOMMEN } from "@/lib/navigatie";
 import { laadSessie } from "@/lib/sessie";
 
@@ -52,14 +52,14 @@ export async function generateMetadata({
       // in plaats van drie versies als duplicaten te behandelen.
       languages: Object.fromEntries(
         routing.locales.map((l) => [
-          INTL_LOCALE[l],
+          TAALTAG[l],
           l === routing.defaultLocale ? "/" : `/${l}`,
         ]),
       ),
     },
     openGraph: {
       type: "website",
-      locale: INTL_LOCALE[locale as keyof typeof INTL_LOCALE]?.replace("-", "_"),
+      locale: TAALTAG[locale as keyof typeof TAALTAG]?.replace("-", "_"),
       siteName: "Autofiscaliteit",
       title: t("titel"),
       description: t("ogBeschrijving"),
@@ -92,7 +92,7 @@ export default async function RootLayout({
   }));
 
   return (
-    <html lang={INTL_LOCALE[locale]} className={inter.variable}>
+    <html lang={TAALTAG[locale]} className={inter.variable}>
       <body className="antialiased flex min-h-screen flex-col">
         <NextIntlClientProvider>
           <SessieProvider sessie={sessie}>

@@ -27,6 +27,17 @@ function AanmeldFormulier() {
   // de servercallback dezelfde is; twee eigen versies liepen uit de pas, en de
   // versie hier liet een backslash door.
   const verder = veiligPad(params.get("verder"));
+  /*
+   * De auth-callback stuurt hierheen met ?fout=link-verlopen wanneer
+   * exchangeCodeForSession of verifyOtp faalt. Niemand las die parameter, dus
+   * de gebruiker belandde op een leeg formulier zonder één woord uitleg.
+   *
+   * Dat gebeurt vaker dan het klinkt: een mailscanner zoals Outlook Safe Links
+   * opent de link vooraf en verbrandt daarmee het eenmalige token. Wie daarna
+   * zelf klikt, probeert in te loggen, krijgt "ongeldige inloggegevens" omdat
+   * zijn account nog niet bevestigd is, en weet van niets.
+   */
+  const linkVerlopen = params.get("fout") === "link-verlopen";
 
   const [methode, setMethode] = useState<Methode>("wachtwoord");
   const [email, setEmail] = useState("");
@@ -118,6 +129,21 @@ function AanmeldFormulier() {
       </div>
 
       <form onSubmit={aanmelden} className="space-y-4">
+        {linkVerlopen && (
+          <Melding soort="let-op">
+            {t.rich("linkVerlopen", {
+              nieuwe: (chunks) => (
+                <Link
+                  href="/wachtwoord-vergeten"
+                  className="font-bold text-ink underline underline-offset-2"
+                >
+                  {chunks}
+                </Link>
+              ),
+            })}
+          </Melding>
+        )}
+
         <Veld label={t("email")}>
           <input
             type="email"

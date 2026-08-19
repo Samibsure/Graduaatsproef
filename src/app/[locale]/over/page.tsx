@@ -6,13 +6,18 @@ import { SteunKaart } from "@/components/Steun";
 import { Badge, Card, knopKlassen } from "@/components/ui";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
+import { paginaAlternates } from "@/lib/metadata";
 import { CONTACT } from "@/lib/contact";
 import { START_HIER_HREF } from "@/lib/navigatie";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: Locale }> }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "over" });
-  return { title: t("titel"), description: t("metaBeschrijving") };
+  return {
+    title: t("titel"),
+    description: t("metaBeschrijving"),
+    alternates: paginaAlternates(locale, "/over"),
+  };
 }
 
 export default async function OverPagina({ params }: { params: Promise<{ locale: Locale }> }) {

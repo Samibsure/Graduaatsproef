@@ -101,7 +101,8 @@
     "wachtwoordenVerschillen": "De twee wachtwoorden komen niet overeen.",
     "wachtwoordOpslaan": "Wachtwoord opslaan",
     "gratisStartenKnop": "Gratis starten",
-    "uitnodigingHerkend": "Je bent uitgenodigd door een bedrijf. Registreer je met het adres waarop je de uitnodiging kreeg, dan kom je meteen in dat bedrijf terecht."
+    "uitnodigingHerkend": "Je bent uitgenodigd door een bedrijf. Registreer je met het adres waarop je de uitnodiging kreeg, dan kom je meteen in dat bedrijf terecht.",
+    "linkVerlopen": "Deze link werkt niet meer. Hij is verlopen of al gebruikt, soms doordat een spamfilter hem vooraf opende. <nieuwe>Vraag een nieuwe link aan</nieuwe> en probeer opnieuw."
   },
   "instellingen": {
     "intro": "Beheer je bedrijfsgegevens, je collega's en je gegevens.",
@@ -731,7 +732,8 @@
     "voorbehoud_bmwIx3Generatie": "De Belgische prijslijst toont de oude G08; de cijfers van de Neue Klasse zijn niet bevestigd.",
     "voorbehoud_bmwX5Ontbreekt": "De xDrive50e staat niet in de geraadpleegde Belgische prijslijst, alleen de oudere xDrive45e.",
     "voorbehoud_co2NietGevonden": "Geen gehomologeerd CO₂-cijfer teruggevonden voor de Belgische uitvoering. Bij een plug-in hybride bepaalt juist dat cijfer het VAA en de bijdrage.",
-    "restwaardeSchatting": "De restwaarde is een schatting per aandrijftype, niet per model: een erkend Belgisch cijfer per model bestaat niet."
+    "restwaardeSchatting": "De restwaarde is een schatting per aandrijftype, niet per model: een erkend Belgisch cijfer per model bestaat niet.",
+    "geenRechten": "Geen schrijfrechten"
   },
   "parameters": {
     "titel": "Fiscale parameters",
@@ -1049,7 +1051,8 @@
     "critCo2Uitleg": "Score op basis van de CO₂-uitstoot van de wagen.",
     "critRest": "Restwaarde",
     "critRestUitleg": "Verwachte restwaarde na vier jaar; handmatige score per wagen.",
-    "critNut": "Praktisch nut"
+    "critNut": "Praktisch nut",
+    "geenRechten": "Je rol mag geen beslissingen bewaren. Vraag je beheerder om schrijfrechten."
   },
   "welkom": {
     "titel": "Welkom bij Autofiscaliteit",
@@ -1292,7 +1295,8 @@
     "deelTekst": "Al je keuzes staan in de link. Wie hem opent, ziet exact dit resultaat.",
     "deelKopieer": "Link kopiëren",
     "deelGekopieerd": "Gekopieerd",
-    "deelLabel": "Link naar deze berekening kopiëren"
+    "deelLabel": "Link naar deze berekening kopiëren",
+    "metaBeschrijving": "Reken één bedrijfswagen volledig door: aftrekbaarheid, voordeel van alle aard, verworpen uitgaven, RSZ-bijdrage en totale gebruikskost. Gratis en zonder registratie."
   },
   "besteljaar": {
     "titel": "Wat het besteljaar verandert",

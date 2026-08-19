@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { screen, waitFor } from "@testing-library/react";
-import ParametersPagina from "./page";
+import ParametersPagina from "./ParametersInhoud";
 import { rendermetIntl } from "@/test/render";
 import { DEFAULT_CONTEXT } from "@/lib/fiscaal/defaults";
 import { PARAM_VELDEN } from "@/lib/parameterVelden";

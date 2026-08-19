@@ -1,6 +1,24 @@
 import { Suspense } from "react";
+import { getTranslations } from "next-intl/server";
 import SimulatorFlow from "@/components/SimulatorFlow";
 import { Container, Laadskelet } from "@/components/ui";
+import type { Locale } from "@/i18n/routing";
+import { paginaAlternates } from "@/lib/metadata";
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: Locale }> }) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "simulator" });
+  return {
+    title: t("titel"),
+    description: t("metaBeschrijving"),
+    /*
+     * De simulator spiegelt elke keuze naar de queryreeks, zodat een resultaat
+     * te delen is. Zonder canonical is elke combinatie van keuzes voor een
+     * zoekmachine een aparte pagina met dezelfde inhoud.
+     */
+    alternates: paginaAlternates(locale, "/simulator"),
+  };
+}
 
 /**
  * De simulator zonder account.

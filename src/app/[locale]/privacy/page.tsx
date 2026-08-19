@@ -9,13 +9,18 @@ import {
   opmaak,
 } from "@/components/Juridisch";
 import type { Locale } from "@/i18n/routing";
+import { paginaAlternates } from "@/lib/metadata";
 import { CONTACT } from "@/lib/contact";
 
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: Locale }> }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "privacy" });
-  return { title: t("titel"), description: t("metaBeschrijving") };
+  return {
+    title: t("titel"),
+    description: t("metaBeschrijving"),
+    alternates: paginaAlternates(locale, "/privacy"),
+  };
 }
 
 export default async function PrivacyPagina({ params }: { params: Promise<{ locale: Locale }> }) {

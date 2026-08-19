@@ -6,6 +6,7 @@ import Icon from "@/components/Icon";
 import { Badge, Card, knopKlassen } from "@/components/ui";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
+import { paginaAlternates } from "@/lib/metadata";
 import { CONTACT } from "@/lib/contact";
 import {
   HEEFT_STEUNKANAAL,
@@ -19,7 +20,11 @@ import {
 export async function generateMetadata({ params }: { params: Promise<{ locale: Locale }> }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "steun" });
-  return { title: t("titel"), description: t("metaBeschrijving") };
+  return {
+    title: t("titel"),
+    description: t("metaBeschrijving"),
+    alternates: paginaAlternates(locale, "/steunen"),
+  };
 }
 
 export default async function SteunenPagina({ params }: { params: Promise<{ locale: Locale }> }) {
