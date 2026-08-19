@@ -100,7 +100,8 @@
     "herhaalWachtwoord": "Herhaal wachtwoord",
     "wachtwoordenVerschillen": "De twee wachtwoorden komen niet overeen.",
     "wachtwoordOpslaan": "Wachtwoord opslaan",
-    "gratisStartenKnop": "Gratis starten"
+    "gratisStartenKnop": "Gratis starten",
+    "uitnodigingHerkend": "Je bent uitgenodigd door een bedrijf. Registreer je met het adres waarop je de uitnodiging kreeg, dan kom je meteen in dat bedrijf terecht."
   },
   "instellingen": {
     "intro": "Beheer je bedrijfsgegevens, je collega's en je gegevens.",
@@ -119,7 +120,7 @@
     "verwijderen": "Verwijderen",
     "collegaVerwijderd": "Collega verwijderd uit het bedrijf.",
     "uitnodigen": "Collega uitnodigen",
-    "uitnodigenHint": "Er vertrekt geen e-mail: verwittig je collega zelf. Registreert die zich met dit adres, dan komt hij automatisch in je bedrijf terecht.",
+    "uitnodigenHint": "Er vertrekt geen e-mail. Voeg het adres toe, kopieer daarna de link die eronder verschijnt en stuur die zelf door: alleen met die link komt je collega in je bedrijf terecht.",
     "uitnodigenPlaceholder": "collega@bedrijf.be",
     "uitnodigenKnop": "Uitnodigen",
     "uitnodigingGenoteerd": "Uitnodiging genoteerd.",
@@ -162,7 +163,11 @@
     "maand12": "December",
     "annuleer": "Annuleren",
     "collegaVerwijderTitel": "Collega verwijderen",
-    "collegaVerwijderTekst": "{naam} verliest de toegang tot de wagens en de beslissingen van dit bedrijf. Het account zelf blijft bestaan."
+    "collegaVerwijderTekst": "{naam} verliest de toegang tot de wagens en de beslissingen van dit bedrijf. Het account zelf blijft bestaan.",
+    "linkKopieer": "Kopieer link",
+    "linkGekopieerd": "Gekopieerd",
+    "linkKopieerLabel": "Kopieer de uitnodigingslink naar het klembord",
+    "linkUitleg": "Deel deze link alleen met de persoon hierboven. Wie hem heeft en zich met dat adres registreert, komt in je bedrijf."
   },
   "fouten": {
     "nietGevondenTitel": "Deze pagina bestaat niet",

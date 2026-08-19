@@ -100,7 +100,8 @@
     "herhaalWachtwoord": "Confirmez le mot de passe",
     "wachtwoordenVerschillen": "Les deux mots de passe ne correspondent pas.",
     "wachtwoordOpslaan": "Enregistrer le mot de passe",
-    "gratisStartenKnop": "Commencer gratuitement"
+    "gratisStartenKnop": "Commencer gratuitement",
+    "uitnodigingHerkend": "Une entreprise vous a invité. Inscrivez-vous avec l'adresse à laquelle vous avez reçu l'invitation et vous rejoindrez directement cette entreprise."
   },
   "instellingen": {
     "intro": "Gérez les données de votre entreprise, vos collègues et vos données.",
@@ -119,7 +120,7 @@
     "verwijderen": "Supprimer",
     "collegaVerwijderd": "Collègue retiré de l'entreprise.",
     "uitnodigen": "Inviter un collègue",
-    "uitnodigenHint": "Aucun e-mail n'est envoyé : prévenez vous-même votre collègue. S'il s'inscrit avec cette adresse, il rejoint automatiquement votre entreprise.",
+    "uitnodigenHint": "Aucun e-mail n'est envoyé. Ajoutez l'adresse, copiez ensuite le lien qui apparaît en dessous et transmettez-le vous-même : ce lien est le seul moyen pour votre collègue de rejoindre votre entreprise.",
     "uitnodigenPlaceholder": "collegue@entreprise.be",
     "uitnodigenKnop": "Inviter",
     "uitnodigingGenoteerd": "Invitation enregistrée.",
@@ -162,7 +163,11 @@
     "maand12": "Décembre",
     "annuleer": "Annuler",
     "collegaVerwijderTitel": "Retirer le collègue",
-    "collegaVerwijderTekst": "{naam} perd l'accès aux véhicules et aux décisions de cette entreprise. Le compte lui-même reste actif."
+    "collegaVerwijderTekst": "{naam} perd l'accès aux véhicules et aux décisions de cette entreprise. Le compte lui-même reste actif.",
+    "linkKopieer": "Copier le lien",
+    "linkGekopieerd": "Copié",
+    "linkKopieerLabel": "Copier le lien d'invitation dans le presse-papiers",
+    "linkUitleg": "Ne partagez ce lien qu'avec la personne ci-dessus. Quiconque le possède et s'inscrit avec cette adresse rejoint votre entreprise."
   },
   "fouten": {
     "nietGevondenTitel": "Cette page n'existe pas",

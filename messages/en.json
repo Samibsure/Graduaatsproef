@@ -100,7 +100,8 @@
     "herhaalWachtwoord": "Repeat password",
     "wachtwoordenVerschillen": "The two passwords do not match.",
     "wachtwoordOpslaan": "Save password",
-    "gratisStartenKnop": "Start for free"
+    "gratisStartenKnop": "Start for free",
+    "uitnodigingHerkend": "A company has invited you. Register with the address where you received the invitation and you will join that company straight away."
   },
   "instellingen": {
     "intro": "Manage your company details, your colleagues and your data.",
@@ -119,7 +120,7 @@
     "verwijderen": "Remove",
     "collegaVerwijderd": "Colleague removed from the company.",
     "uitnodigen": "Invite a colleague",
-    "uitnodigenHint": "No email is sent: let your colleague know yourself. If they register with this address, they automatically join your company.",
+    "uitnodigenHint": "No email is sent. Add the address, then copy the link that appears below and send it yourself: that link is the only way for your colleague to join your company.",
     "uitnodigenPlaceholder": "colleague@company.be",
     "uitnodigenKnop": "Invite",
     "uitnodigingGenoteerd": "Invitation recorded.",
@@ -162,7 +163,11 @@
     "maand12": "December",
     "annuleer": "Cancel",
     "collegaVerwijderTitel": "Remove colleague",
-    "collegaVerwijderTekst": "{naam} loses access to this company's vehicles and decisions. The account itself stays active."
+    "collegaVerwijderTekst": "{naam} loses access to this company's vehicles and decisions. The account itself stays active.",
+    "linkKopieer": "Copy link",
+    "linkGekopieerd": "Copied",
+    "linkKopieerLabel": "Copy the invitation link to the clipboard",
+    "linkUitleg": "Only share this link with the person above. Anyone who has it and registers with that address joins your company."
   },
   "fouten": {
     "nietGevondenTitel": "This page does not exist",

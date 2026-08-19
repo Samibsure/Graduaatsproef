@@ -1,7 +1,8 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
-import { useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useState } from "react";
 import {
   AuthKaart,
   Melding,
@@ -12,10 +13,31 @@ import {
 import { Link, useRouter } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/client";
 
+/**
+ * De pagina is een schil om het formulier.
+ *
+ * `useSearchParams()` maakt een component dynamisch, en de layout heeft
+ * generateStaticParams: zonder Suspense-grens weigert `next build` deze route
+ * te prerenderen. Dezelfde constructie staat op /simulator.
+ */
 export default function RegistreerPagina() {
+  return (
+    <Suspense fallback={null}>
+      <RegistreerFormulier />
+    </Suspense>
+  );
+}
+
+function RegistreerFormulier() {
   const t = useTranslations("auth");
   const locale = useLocale();
   const router = useRouter();
+  /*
+   * Het token uit de uitnodigingslink. Zonder token maakt de registratietrigger
+   * altijd een eigen bedrijf aan; met een geldig token landt het profiel in het
+   * bedrijf dat uitnodigde, met de rol uit de uitnodiging. Zie migratie 0014.
+   */
+  const token = useSearchParams().get("uitnodiging")?.trim() ?? "";
   const [naam, setNaam] = useState("");
   const [bedrijfsnaam, setBedrijfsnaam] = useState("");
   const [ondernemingsnummer, setOndernemingsnummer] = useState("");
@@ -38,10 +60,16 @@ export default function RegistreerPagina() {
         options: {
           // Het bedrijf wordt server-side aangemaakt door de trigger
           // handle_new_user, op basis van deze gegevens.
+          //
+          // Het uitnodigingstoken hoort daarbij: zonder token maakt de trigger
+          // altijd een eigen bedrijf aan. Koppelen op alleen het e-mailadres
+          // liet iedereen uitnodigingen planten voor adressen die hij niet
+          // bezat, en daarmee vreemde bedrijven binnenhalen (migratie 0014).
           data: {
             volledige_naam: naam.trim(),
             bedrijfsnaam: bedrijfsnaam.trim(),
             ondernemingsnummer: ondernemingsnummer.trim(),
+            uitnodiging_token: token,
           },
           emailRedirectTo:
             `${window.location.origin}/auth/callback?verder=/wagens&taal=${locale}`,
@@ -85,6 +113,8 @@ export default function RegistreerPagina() {
       }
     >
       <form onSubmit={registreren} className="space-y-4">
+        {token && <Melding soort="ok">{t("uitnodigingHerkend")}</Melding>}
+
         <Veld label={t("jeNaam")}>
           <input
             type="text"
@@ -96,26 +126,35 @@ export default function RegistreerPagina() {
           />
         </Veld>
 
-        <Veld label={t("bedrijfsnaam")}>
-          <input
-            type="text"
-            required
-            minLength={2}
-            autoComplete="organization"
-            value={bedrijfsnaam}
-            onChange={(e) => setBedrijfsnaam(e.target.value)}
-            className={invoerKlasse}
-          />
-        </Veld>
+        {/*
+          Wie met een uitnodiging komt, sluit aan bij een bestaand bedrijf. Die
+          twee velden zouden dan om gegevens vragen waar de trigger niets mee
+          doet, en suggereren dat hij een eigen bedrijf aanmaakt.
+        */}
+        {!token && (
+          <>
+            <Veld label={t("bedrijfsnaam")}>
+              <input
+                type="text"
+                required
+                minLength={2}
+                autoComplete="organization"
+                value={bedrijfsnaam}
+                onChange={(e) => setBedrijfsnaam(e.target.value)}
+                className={invoerKlasse}
+              />
+            </Veld>
 
-        <Veld label={t("ondernemingsnummer")} hint={t("ondernemingsnummerHint")}>
-          <input
-            type="text"
-            value={ondernemingsnummer}
-            onChange={(e) => setOndernemingsnummer(e.target.value)}
-            className={invoerKlasse}
-          />
-        </Veld>
+            <Veld label={t("ondernemingsnummer")} hint={t("ondernemingsnummerHint")}>
+              <input
+                type="text"
+                value={ondernemingsnummer}
+                onChange={(e) => setOndernemingsnummer(e.target.value)}
+                className={invoerKlasse}
+              />
+            </Veld>
+          </>
+        )}
 
         <Veld label={t("email")}>
           <input

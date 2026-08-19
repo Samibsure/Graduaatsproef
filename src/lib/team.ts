@@ -11,6 +11,12 @@ export interface Uitnodiging {
   id: string;
   email: string;
   rol: Bedrijfsrol;
+  /**
+   * De sleutel waarmee de uitgenodigde zich aan dit bedrijf koppelt. Alleen wie
+   * de uitnodiging beheert leest hem; de RLS-policies beperken de tabel al tot
+   * het eigen bedrijf.
+   */
+  token: string;
   vervalt_op: string;
   aanvaard_op: string | null;
   created_at: string;
@@ -28,7 +34,7 @@ export async function laadTeam(): Promise<Teamlid[]> {
 export async function laadUitnodigingen(): Promise<Uitnodiging[]> {
   const { data, error } = await supabase
     .from("uitnodigingen")
-    .select("id, email, rol, vervalt_op, aanvaard_op, created_at")
+    .select("id, email, rol, token, vervalt_op, aanvaard_op, created_at")
     .is("aanvaard_op", null)
     .order("created_at", { ascending: false });
   if (error) throw new Error(`Uitnodigingen laden mislukt: ${error.message}`);
@@ -36,9 +42,23 @@ export async function laadUitnodigingen(): Promise<Uitnodiging[]> {
 }
 
 /**
+ * De link die de uitgenodigde nodig heeft.
+ *
+ * Er vertrekt geen mail: de uitnodiging is een rij in de databank en de
+ * beheerder stuurt de link zelf door. Het token in die link is wat de koppeling
+ * mogelijk maakt. Koppelen op alleen het e-mailadres liet iedereen uitnodigingen
+ * planten voor adressen die hij niet bezat, en zo een vreemd bedrijf binnenhalen
+ * zodra iemand van dat bedrijf zich registreerde (migratie 0014).
+ */
+export function uitnodigingslink(token: string, basis: string): string {
+  return `${basis.replace(/\/$/, "")}/registreren?uitnodiging=${encodeURIComponent(token)}`;
+}
+
+/**
  * Nodigt een collega uit. Het bedrijf komt uit de sessie (kolomdefault in de
- * database); registreert die persoon zich later met dit e-mailadres, dan
- * koppelt de trigger handle_new_user hem automatisch aan dit bedrijf.
+ * database) en het token uit een kolomdefault; registreert die persoon zich
+ * later met dit e-mailadres én dit token, dan koppelt de trigger
+ * handle_new_user hem aan dit bedrijf.
  */
 export async function nodigUit(email: string, rol: Bedrijfsrol = "lid"): Promise<void> {
   const { error } = await supabase

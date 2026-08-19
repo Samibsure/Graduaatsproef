@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Melding, Veld, invoerKlasse } from "@/components/AuthKaart";
 import Dialoog from "@/components/Dialoog";
 import Icon from "@/components/Icon";
+import Kopieerknop from "@/components/Kopieerknop";
 import { useSessie } from "@/components/SessieProvider";
 import { Badge, Card, Container, PageHead, SectionTitle } from "@/components/ui";
 import { bewaarBedrijfsprofiel, wijzigRol, type BedrijfsInvoer } from "@/lib/bedrijf";
@@ -14,6 +15,7 @@ import {
   laadUitnodigingen,
   nodigUit,
   trekUitnodigingIn,
+  uitnodigingslink,
   verwijderMijnBedrijf,
   verwijderTeamlid,
   type Teamlid,
@@ -32,6 +34,15 @@ export default function InstellingenPagina() {
   const t = useTranslations("instellingen");
   const sessie = useSessie();
   const isBeheerder = magBeheren(sessie);
+
+  /*
+   * De uitnodigingslink moet het domein dragen waar de collega hem opent, en
+   * niet dat van de omgeving waarin de pagina toevallig gebouwd is. Op de
+   * server is `window` er niet; deze component is een client component en de
+   * lijst rendert pas na het laden, dus die waarde is er op het moment dat ze
+   * nodig is.
+   */
+  const basisUrl = typeof window === "undefined" ? "" : window.location.origin;
 
   const [profiel, setProfiel] = useState<BedrijfsInvoer>({
     naam: "",
@@ -373,23 +384,43 @@ export default function InstellingenPagina() {
               {uitnodigingen.length > 0 && (
                 <ul className="m-0 mt-4 list-none space-y-2 p-0">
                   {uitnodigingen.map((u) => (
-                    <li
-                      key={u.id}
-                      className="flex items-center justify-between gap-3 rounded-[10px] bg-paper px-4 py-2.5"
-                    >
-                      <span className="flex min-w-0 items-center gap-2">
-                        <span className="truncate text-[14px] text-ink-700">{u.email}</span>
-                        <Badge tint={ROL_TINT[u.rol]}>{rolLabel(u.rol)}</Badge>
-                      </span>
-                      <button
-                        disabled={bezig}
-                        onClick={() =>
-                          voerUit(() => trekUitnodigingIn(u.id), t("uitnodigingIngetrokken"))
-                        }
-                        className="shrink-0 text-[13px] font-bold text-ink-500 hover:text-ink"
-                      >
-                        {t("intrekken")}
-                      </button>
+                    <li key={u.id} className="rounded-[10px] bg-paper px-4 py-2.5">
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="flex min-w-0 items-center gap-2">
+                          <span className="truncate text-[14px] text-ink-700">{u.email}</span>
+                          <Badge tint={ROL_TINT[u.rol]}>{rolLabel(u.rol)}</Badge>
+                        </span>
+                        <button
+                          disabled={bezig}
+                          onClick={() =>
+                            voerUit(() => trekUitnodigingIn(u.id), t("uitnodigingIngetrokken"))
+                          }
+                          className="shrink-0 text-[13px] font-bold text-ink-500 hover:text-ink"
+                        >
+                          {t("intrekken")}
+                        </button>
+                      </div>
+
+                      {/*
+                        Er vertrekt geen mail: de uitnodiging is een rij in de
+                        databank en de beheerder stuurt deze link zelf door. Het
+                        token erin is wat de koppeling mogelijk maakt; zonder
+                        token maakt de registratie een eigen bedrijf aan.
+                      */}
+                      <div className="mt-2 flex flex-wrap items-center gap-2">
+                        <code className="min-w-0 flex-1 truncate rounded-[8px] border border-line bg-white px-2.5 py-1.5 text-[12.5px] text-ink-700">
+                          {uitnodigingslink(u.token, basisUrl)}
+                        </code>
+                        <Kopieerknop
+                          waarde={uitnodigingslink(u.token, basisUrl)}
+                          label={t("linkKopieerLabel")}
+                          kopieerLabel={t("linkKopieer")}
+                          gekopieerdLabel={t("linkGekopieerd")}
+                        />
+                      </div>
+                      <p className="m-0 mt-1.5 text-[12.5px] leading-relaxed text-ink-500">
+                        {t("linkUitleg")}
+                      </p>
                     </li>
                   ))}
                 </ul>
